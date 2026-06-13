@@ -568,3 +568,78 @@
   outline: none;
   border-color: var(--color-accent);
 }
+
+/* ── AI Image Generator ──────────────────────────────────────────────────── */
+.fit-aig { gap: 14px; }
+
+.fit-aig-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.fit-aig-progress {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  padding: 6px 0;
+}
+
+.fit-aig-sync-msg {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+.fit-aig-sync-msg--ok  { background: #d1fadf; color: #166534; }
+.fit-aig-sync-msg--err { background: #fee2e2; color: #991b1b; }
+
+/* Slot grid override for AI generator */
+.fit-aig-grid { margin-top: 4px; }
+
+/* Each slot cell */
+.fit-aig-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fit-aig-cell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+/* Tag badges: "Ảnh thật" / "AI" */
+.fit-aig-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.fit-aig-tag--real { background: #d1fae5; color: #065f46; }
+.fit-aig-tag--ai   { background: #dbeafe; color: #1e40af; }
+
+/* Generating / error slot placeholders */
+.fit-aig-ph--gen {
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.fit-aig-ph--err {
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.fit-aig-cell-error {
+  font-size: 0.68rem;
+  color: var(--color-danger);
+  line-height: 1.4;
+  word-break: break-word;
+}

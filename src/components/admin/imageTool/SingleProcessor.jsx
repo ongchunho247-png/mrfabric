@@ -11,6 +11,7 @@ import {
   STATUS_LABEL,
 } from '../../../helpers/fabricImageHelpers'
 import AIAssistPanel from './AIAssistPanel'
+import AIImageGenerator from './AIImageGenerator'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -355,10 +356,19 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
         </div>
       )}
 
-      {/* Slot preview — hiển thị sau khi xử lý */}
+      {/* Slot preview — hiển thị sau khi xử lý (trước AI generator) */}
       {processedSlots && <SlotPreview slots={processedSlots} />}
 
-      {/* AI assistant — hiển thị khi đã có file */}
+      {/* AI Image Generator — hiển thị khi đã có surface_texture */}
+      {processedSlots?.surface_texture && (
+        <AIImageGenerator
+          selectedEntry={selectedEntry}
+          surfaceTextureUrl={processedSlots.surface_texture}
+          onSyncToLibrary={onSaveImages}
+        />
+      )}
+
+      {/* AI text assistant — panel phụ / debug */}
       {file && (
         <AIAssistPanel
           nccCode={selectedEntry?.maNCC || nccExtracted}
