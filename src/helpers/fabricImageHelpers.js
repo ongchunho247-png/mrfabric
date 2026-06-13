@@ -1,5 +1,117 @@
 // ── Fabric Image Tool helpers — Canvas-based, no external deps ──────────────
 
+// ── Color utilities ───────────────────────────────────────────────────────────
+
+export const COLOR_HEX_MAP = {
+  'beige':       '#D4C5A9',
+  'black':       '#1A1A1A',
+  'blue':        '#3B5998',
+  'navy':        '#1B3A6B',
+  'navy blue':   '#1B3A6B',
+  'brown':       '#7B4F2E',
+  'burgundy':    '#800020',
+  'camel':       '#C19A6B',
+  'charcoal':    '#36454F',
+  'coral':       '#E8735A',
+  'cream':       '#FFF8E7',
+  'dark blue':   '#1A2F5E',
+  'dark brown':  '#5C3317',
+  'dark green':  '#1A4A2E',
+  'dark grey':   '#4A4A4A',
+  'dark gray':   '#4A4A4A',
+  'emerald':     '#50C878',
+  'gold':        '#C9A84C',
+  'green':       '#3A7D44',
+  'grey':        '#888888',
+  'gray':        '#888888',
+  'ivory':       '#FFFFF0',
+  'khaki':       '#C3B091',
+  'light blue':  '#ADD8E6',
+  'light grey':  '#D3D3D3',
+  'light gray':  '#D3D3D3',
+  'linen':       '#FAF0E6',
+  'maroon':      '#800000',
+  'mint':        '#98D8C8',
+  'moss':        '#8A9A5B',
+  'mustard':     '#FFDB58',
+  'natural':     '#F5F0E8',
+  'nude':        '#E8C9A0',
+  'ochre':       '#CC7722',
+  'off white':   '#FAF9F6',
+  'olive':       '#6B7C3A',
+  'orange':      '#D4622A',
+  'peach':       '#FFCBA4',
+  'pink':        '#E8A0B0',
+  'plum':        '#8E4585',
+  'purple':      '#6A0DAD',
+  'red':         '#C0392B',
+  'rose':        '#E8909A',
+  'rust':        '#B7410E',
+  'sage':        '#B2AC88',
+  'sand':        '#C2B280',
+  'silver':      '#C0C0C0',
+  'slate':       '#708090',
+  'stone':       '#928374',
+  'taupe':       '#9B8B7A',
+  'teal':        '#008080',
+  'terracotta':  '#E2725B',
+  'truffle':     '#6B4C3B',
+  'turquoise':   '#40E0D0',
+  'walnut':      '#5C4033',
+  'white':       '#FAFAFA',
+  'wine':        '#722F37',
+  'yellow':      '#F5D04A',
+}
+
+/** Tra cứu hex từ tên màu (không phân biệt hoa thường, fallback null) */
+export function getColorHex(colorName) {
+  if (!colorName) return null
+  const key = colorName.trim().toLowerCase()
+  return COLOR_HEX_MAP[key] || null
+}
+
+/**
+ * Tìm tất cả màu variants của cùng 1 mẫu vải.
+ * Logic: entries cùng nhaCungCap + tenCuon → các màu khác nhau của cùng bộ sưu tập.
+ * Nếu không tìm được siblings, trả về chỉ entry gốc.
+ */
+export function findColorVariants(maNCC, priceTable) {
+  if (!maNCC || !priceTable?.length) return []
+  const code = maNCC.trim().toLowerCase()
+  const base = priceTable.find(
+    (e) => !e.deletedAt && (e.maNCC || '').trim().toLowerCase() === code,
+  )
+  if (!base) return []
+
+  // Tìm tất cả entries cùng nhà cung cấp + cuốn mẫu
+  if (base.nhaCungCap && base.tenCuon) {
+    const siblings = priceTable.filter(
+      (e) =>
+        !e.deletedAt &&
+        e.nhaCungCap === base.nhaCungCap &&
+        e.tenCuon === base.tenCuon &&
+        e.nhomMau,
+    )
+    if (siblings.length > 0) {
+      // Dedup by nhomMau, giữ thứ tự: entry gốc lên đầu
+      const seen = new Set()
+      const result = []
+      for (const e of [base, ...siblings]) {
+        const key = (e.nhomMau || '').trim().toLowerCase()
+        if (!seen.has(key)) {
+          seen.add(key)
+          result.push(e)
+        }
+      }
+      return result
+    }
+  }
+
+  // Fallback: chỉ entry gốc
+  return [base]
+}
+
+
 /** Slot index → image field mapping (template: fabric_6_grid_A, 3×2 grid) */
 export const SLOT_KEYS = [
   { slot: 'slot_1', field: 'surface_texture',  label: 'Slot 1 — Bề mặt vải' },

@@ -1,0 +1,399 @@
+import { useState, useCallback } from 'react'
+import { SLOT_KEYS } from '../../../helpers/fabricImageHelpers'
+
+const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
+
+const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2–6
+
+const SLOT_PROGRESS = {
+  slot_1: 'Tạo bề mặt vải theo màu…',
+  slot_2: 'Tạo ảnh tay cầm vải…',
+  slot_3: 'Tạo ảnh sofa…',
+  slot_4: 'Tạo ảnh rèm…',
+  slot_5: 'Tạo ảnh thước đo…',
+  slot_6: 'Tạo ảnh chi tiết…',
+}
+
+function initColorData(colorVariants) {
+  return Object.fromEntries(
+    colorVariants.map((cv) => [
+      cv.maNCC,
+      Object.fromEntries(
+        SLOT_KEYS.map((s) => [s.slot, { status: S.IDLE, imageUrl: null, error: null }]),
+      ),
+    ]),
+  )
+}
+
+function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.onerror = () => resolve(dataUrl)
+    img.src = dataUrl
+  })
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onSyncColor }) {
+  const [colorData, setColorData] = useState(() => initColorData(colorVariants))
+  const [globalRunning, setGlobalRunning] = useState(false)
+  const [activeColor, setActiveColor] = useState(null) // maNCC đang generate
+  const [colorProgress, setColorProgress] = useState({}) // { [maNCC]: string }
+  const [syncStatuses, setSyncStatuses] = useState({}) // { [maNCC]: null | 'syncing' | 'synced' | 'error' }
+  const [syncMsgs, setSyncMsgs] = useState({}) // { [maNCC]: string }
+
+  function updateSlot(maNCC, slotKey, updates) {
+    setColorData((prev) => ({
+      ...prev,
+      [maNCC]: {
+        ...prev[maNCC],
+        [slotKey]: { ...prev[maNCC][slotKey], ...updates },
+      },
+    }))
+  }
+
+  function setColorProg(maNCC, msg) {
+    setColorProgress((prev) => ({ ...prev, [maNCC]: msg }))
+  }
+
+  // ── Tạo surface_texture màu mới (gọi /api/ai/recolor-surface) ────────────
+  const generateSurface = useCallback(
+    async (colorEntry) => {
+      const targetColor = {
+        name: colorEntry.nhomMau || colorEntry.maNCC,
+        hex: null, // sẽ được server tự xử lý nếu cần
+      }
+      updateSlot(colorEntry.maNCC, 'slot_1', { status: S.GENERATING, error: null })
+      setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
+      try {
+        const res = await fetch('/api/ai/recolor-surface', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            surfaceTextureUrl: baseSurfaceUrl,
+            targetColor,
+            nccCode: colorEntry.maNCC,
+            supplier: colorEntry.nhaCungCap || '',
+            collection: colorEntry.tenCuon || '',
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo surface')
+        updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: data.imageUrl })
+        return data.imageUrl
+      } catch (err) {
+        updateSlot(colorEntry.maNCC, 'slot_1', { status: S.ERROR, error: err.message })
+        return null
+      }
+    },
+    [baseSurfaceUrl],
+  )
+
+  // ── Tạo 1 slot ứng dụng (slot_2–slot_6) ─────────────────────────────────
+  const generateAppSlot = useCallback(
+    async (colorEntry, slotKey, surfaceRef) => {
+      const targetColor = { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null }
+      updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
+      setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
+      try {
+        const res = await fetch('/api/ai/generate-slot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slot: slotKey,
+            surfaceTextureUrl: surfaceRef,
+            nccCode: colorEntry.maNCC,
+            colorName: colorEntry.nhomMau || '',
+            targetColor,
+            supplier: colorEntry.nhaCungCap || '',
+            collection: colorEntry.tenCuon || '',
+            materialMetadata: {
+              thanhPhan: colorEntry.thanhPhan || '',
+              khoVai: colorEntry.khoVai || '',
+              beMat: Array.isArray(colorEntry.beMat)
+                ? colorEntry.beMat.join(', ')
+                : colorEntry.beMat || '',
+            },
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo ảnh AI')
+        updateSlot(colorEntry.maNCC, slotKey, { status: S.DONE, imageUrl: data.imageUrl })
+      } catch (err) {
+        updateSlot(colorEntry.maNCC, slotKey, { status: S.ERROR, error: err.message })
+      }
+    },
+    [],
+  )
+
+  // ── Tạo đầy đủ 6 slot cho 1 màu ─────────────────────────────────────────
+  async function generateColor(colorEntry) {
+    setActiveColor(colorEntry.maNCC)
+    // Bước 1: tạo surface màu mới
+    const coloredSurface = await generateSurface(colorEntry)
+    // Dùng surface màu mới làm tham chiếu; nếu thất bại dùng ảnh gốc
+    const surfaceRef = coloredSurface || baseSurfaceUrl
+    // Bước 2: tạo 5 slot ứng dụng tuần tự
+    for (const sk of APP_SLOT_KEYS) {
+      await generateAppSlot(colorEntry, sk.slot, surfaceRef)
+    }
+    setColorProg(colorEntry.maNCC, '')
+    setActiveColor(null)
+  }
+
+  // ── Tạo toàn bộ (tất cả màu, tuần tự) ───────────────────────────────────
+  async function handleGenerateAll() {
+    if (!baseSurfaceUrl || globalRunning) return
+    setGlobalRunning(true)
+    // Reset tất cả về idle
+    setColorData(initColorData(colorVariants))
+    setSyncStatuses({})
+    setSyncMsgs({})
+    for (const cv of colorVariants) {
+      await generateColor(cv)
+    }
+    setGlobalRunning(false)
+  }
+
+  // ── Tạo lại toàn bộ cho 1 màu ────────────────────────────────────────────
+  async function handleGenerateColor(colorEntry) {
+    if (globalRunning) return
+    setGlobalRunning(true)
+    // Reset slots của màu này về idle
+    setColorData((prev) => ({
+      ...prev,
+      [colorEntry.maNCC]: Object.fromEntries(
+        SLOT_KEYS.map((s) => [s.slot, { status: S.IDLE, imageUrl: null, error: null }]),
+      ),
+    }))
+    setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: null }))
+    setSyncMsgs((prev) => ({ ...prev, [colorEntry.maNCC]: '' }))
+    await generateColor(colorEntry)
+    setGlobalRunning(false)
+  }
+
+  // ── Tạo lại 1 slot trong 1 màu ───────────────────────────────────────────
+  async function handleRegenerateSlot(colorEntry, slotKey) {
+    if (globalRunning) return
+    setGlobalRunning(true)
+    setActiveColor(colorEntry.maNCC)
+    if (slotKey === 'slot_1') {
+      const coloredSurface = await generateSurface(colorEntry)
+      // Nếu tạo lại slot_1, cũng cần cập nhật reference cho các slot đã done
+      // (không tự động regenerate nhưng surface mới sẽ dùng lần generate tiếp theo)
+      if (coloredSurface) {
+        // Xoá các slot 2-6 đã dùng surface cũ để tránh nhầm lẫn
+        // (optional: giữ nguyên để user quyết định)
+      }
+    } else {
+      const currentSurface = colorData[colorEntry.maNCC]?.slot_1?.imageUrl || baseSurfaceUrl
+      await generateAppSlot(colorEntry, slotKey, currentSurface)
+    }
+    setColorProg(colorEntry.maNCC, '')
+    setActiveColor(null)
+    setGlobalRunning(false)
+  }
+
+  // ── Đồng bộ 1 màu vào thư viện ───────────────────────────────────────────
+  async function handleSyncColor(colorEntry) {
+    const slots = colorData[colorEntry.maNCC]
+    const doneSlots = SLOT_KEYS.filter((s) => slots[s.slot].status === S.DONE)
+    if (doneSlots.length === 0) {
+      setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'error' }))
+      setSyncMsgs((prev) => ({ ...prev, [colorEntry.maNCC]: 'Chưa có slot nào được tạo xong.' }))
+      return
+    }
+    setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'syncing' }))
+    setSyncMsgs((prev) => ({ ...prev, [colorEntry.maNCC]: 'Đang nén và lưu ảnh…' }))
+    try {
+      const imageMap = {}
+      for (const s of doneSlots) {
+        imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
+      }
+      onSyncColor?.(colorEntry.maNCC, imageMap)
+      setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'synced' }))
+      setSyncMsgs((prev) => ({
+        ...prev,
+        [colorEntry.maNCC]: `✓ Đã lưu ${Object.keys(imageMap).length} ảnh cho mã ${colorEntry.maNCC} (${colorEntry.nhomMau})`,
+      }))
+    } catch (err) {
+      setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'error' }))
+      setSyncMsgs((prev) => ({ ...prev, [colorEntry.maNCC]: err.message || 'Lỗi khi lưu.' }))
+    }
+  }
+
+  // ── Đồng bộ tất cả màu đã xong ───────────────────────────────────────────
+  async function handleSyncAll() {
+    for (const cv of colorVariants) {
+      const slots = colorData[cv.maNCC]
+      const anyDone = SLOT_KEYS.some((s) => slots[s.slot].status === S.DONE)
+      if (anyDone && syncStatuses[cv.maNCC] !== 'synced') {
+        await handleSyncColor(cv)
+      }
+    }
+  }
+
+  const totalDone = colorVariants.filter((cv) =>
+    SLOT_KEYS.some((s) => colorData[cv.maNCC]?.[s.slot]?.status === S.DONE),
+  ).length
+
+  const totalSynced = colorVariants.filter((cv) => syncStatuses[cv.maNCC] === 'synced').length
+
+  return (
+    <div className="fit-mcg">
+      {/* Header */}
+      <div className="fit-mcg-header">
+        <div className="fit-mcg-title">
+          Tạo bộ ảnh theo màu
+          <span className="fit-mcg-count">{colorVariants.length} màu</span>
+        </div>
+        <div className="fit-mcg-summary">
+          {totalDone > 0 && (
+            <span className="fit-mcg-stat">{totalDone}/{colorVariants.length} màu đã tạo xong</span>
+          )}
+          {totalSynced > 0 && (
+            <span className="fit-mcg-stat fit-mcg-stat--ok">{totalSynced} đã đồng bộ</span>
+          )}
+        </div>
+      </div>
+
+      {!baseSurfaceUrl && (
+        <div className="fit-phase-notice">
+          Cần xử lý ảnh thật trước (bấm ▶ Xử lý ảnh ở trên) để có ảnh tham chiếu.
+        </div>
+      )}
+
+      {/* Global actions */}
+      <div className="fit-mcg-actions">
+        <button
+          className="btn btn-primary btn-xs"
+          disabled={!baseSurfaceUrl || globalRunning}
+          onClick={handleGenerateAll}
+        >
+          {globalRunning ? '⏳ Đang tạo…' : `✦ Tạo tất cả ${colorVariants.length} màu`}
+        </button>
+
+        {totalDone > 0 && !globalRunning && (
+          <button
+            className="btn btn-secondary btn-xs"
+            onClick={handleSyncAll}
+            disabled={globalRunning || totalSynced === totalDone}
+          >
+            🔄 Đồng bộ tất cả
+          </button>
+        )}
+      </div>
+
+      {/* Per-color cards */}
+      <div className="fit-mcg-list">
+        {colorVariants.map((cv) => {
+          const slots = colorData[cv.maNCC]
+          const doneCount = SLOT_KEYS.filter((s) => slots[s.slot].status === S.DONE).length
+          const isRunning = activeColor === cv.maNCC
+          const syncStatus = syncStatuses[cv.maNCC]
+          const syncMsg = syncMsgs[cv.maNCC]
+          const prog = colorProgress[cv.maNCC]
+          const canSync = doneCount > 0
+
+          return (
+            <div key={cv.maNCC} className={`fit-color-card${isRunning ? ' fit-color-card--active' : ''}`}>
+              {/* Color card header */}
+              <div className="fit-color-header">
+                <div className="fit-color-info">
+                  <span className="fit-color-name">{cv.nhomMau || cv.maNCC}</span>
+                  <span className="fit-color-code">{cv.maNCC}</span>
+                  {doneCount > 0 && (
+                    <span className="fit-color-done">{doneCount}/6 ảnh</span>
+                  )}
+                </div>
+                <div className="fit-color-actions">
+                  <button
+                    className="btn btn-secondary btn-xs"
+                    disabled={!baseSurfaceUrl || globalRunning}
+                    onClick={() => handleGenerateColor(cv)}
+                  >
+                    {isRunning ? '⏳…' : '✦ Tạo màu này'}
+                  </button>
+                  {canSync && (
+                    <button
+                      className="btn btn-primary btn-xs"
+                      disabled={globalRunning || syncStatus === 'syncing' || syncStatus === 'synced'}
+                      onClick={() => handleSyncColor(cv)}
+                    >
+                      {syncStatus === 'syncing' ? '⏳…'
+                        : syncStatus === 'synced' ? '✓ Đã lưu'
+                        : '🔄 Đồng bộ'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress */}
+              {prog && <div className="fit-color-progress">⏳ {prog}</div>}
+
+              {/* Sync message */}
+              {syncMsg && (
+                <div className={`fit-color-sync-msg${syncStatus === 'error' ? ' fit-color-sync-msg--err' : ' fit-color-sync-msg--ok'}`}>
+                  {syncMsg}
+                </div>
+              )}
+
+              {/* 6-slot grid */}
+              <div className="fit-slot-grid fit-color-grid">
+                {SLOT_KEYS.map((sk) => {
+                  const slot = slots[sk.slot]
+                  return (
+                    <div key={sk.slot} className="fit-slot-item fit-color-cell">
+                      <div className="fit-color-cell-hd">
+                        <span className="fit-slot-label">{sk.label}</span>
+                        {slot.imageUrl && <span className="fit-aig-tag fit-aig-tag--ai">AI</span>}
+                      </div>
+
+                      {slot.imageUrl ? (
+                        <img src={slot.imageUrl} alt={sk.label} className="fit-slot-img" />
+                      ) : slot.status === S.GENERATING ? (
+                        <div className="fit-slot-ph fit-aig-ph--gen">⏳ Đang tạo…</div>
+                      ) : slot.status === S.ERROR ? (
+                        <div className="fit-slot-ph fit-aig-ph--err">✕ Lỗi</div>
+                      ) : (
+                        <div className="fit-slot-ph">Chưa tạo</div>
+                      )}
+
+                      {slot.error && (
+                        <div className="fit-aig-cell-error" title={slot.error}>
+                          {slot.error.length > 60 ? slot.error.slice(0, 60) + '…' : slot.error}
+                        </div>
+                      )}
+
+                      {slot.status !== S.GENERATING && (
+                        <button
+                          className="fit-reset-btn"
+                          onClick={() => handleRegenerateSlot(cv, sk.slot)}
+                          disabled={globalRunning}
+                          style={{ marginTop: 4 }}
+                        >
+                          ↺ Tạo lại
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

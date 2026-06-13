@@ -40,14 +40,25 @@ Be specific, factual, and concise. Max 3 sentences. English only.`,
 
 // ── Step 2: Prompt cho từng slot (dùng fabricAnalysis từ vision) ──────────────
 
-function buildPrompt(slot, { fabricAnalysis, colorName, supplier, collection, materialMetadata }) {
+function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, collection, materialMetadata }) {
+  // targetColor overrides colorName when doing multi-color generation
+  const activeColor = targetColor?.name || colorName || null
+  const colorHex = targetColor?.hex || null
+  const colorDesc = activeColor
+    ? `${activeColor}${colorHex ? ` (${colorHex})` : ''}`
+    : null
+
   const desc = fabricAnalysis
-    || `fabric with exact pattern, color (${colorName || 'as shown in reference'}), and texture from the reference image`
+    || `fabric with exact pattern${colorDesc ? `, ${colorDesc} color` : ''}, and texture from the reference image`
+
+  const colorLine = colorDesc
+    ? `COLOR: The fabric is in ${colorDesc} — maintain this exact color throughout the entire image.`
+    : ''
 
   const brandLine = [
     supplier ? `Supplier: ${supplier}.` : '',
     collection ? ` Collection: ${collection}.` : '',
-    colorName ? ` Colorway: ${colorName}.` : '',
+    activeColor ? ` Colorway: ${activeColor}.` : '',
     materialMetadata?.thanhPhan ? ` Composition: ${materialMetadata.thanhPhan}.` : '',
   ].join('')
 
@@ -57,6 +68,7 @@ function buildPrompt(slot, { fabricAnalysis, colorName, supplier, collection, ma
     slot_1: `Professional premium fabric surface texture photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE: The fabric displayed filling the entire frame, showcasing its surface pattern and weave quality as the sole subject. A gentle, natural drape or soft roll at one edge gives life and dimension — not completely flat, not heavily folded.
 
@@ -81,6 +93,7 @@ ${noText}`,
     slot_2: `Professional high-end textile showroom photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE: An elegant woman's hand gently holds this fabric, lightly pinching the top edge between thumb and index finger. The fabric cascades downward in soft, natural folds revealing its drape and weight. The grip is relaxed and refined — not clutching.
 
@@ -106,6 +119,7 @@ ${noText}`,
     slot_3: `Professional luxury interior design product photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE: A contemporary 2–3 seat sofa, fully and precisely upholstered in this fabric. The sofa has:
 - Clean, straight-lined silhouette with tight seat cushions and low-profile arms
@@ -130,6 +144,7 @@ ${noText}`,
     slot_4: `Professional luxury window treatment product photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE: Elegant floor-to-ceiling curtain panels crafted from this fabric:
 - 2 panels hanging from a slim minimal curtain rod (brushed gold or matte black)
@@ -157,6 +172,7 @@ ${noText}`,
     slot_5: `Technical textile measurement reference photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE:
 - The fabric laid perfectly flat on a pure white surface
@@ -184,6 +200,7 @@ ${noText}`,
     slot_6: `Luxury macro textile detail photography.
 
 FABRIC: ${desc}
+${colorLine}
 
 SCENE: The fabric folded at a crisp 90-degree angle, displaying:
 - The FRONT face of the fabric with its full pattern and surface texture
@@ -230,6 +247,7 @@ export default async function handler(req, res) {
       surfaceTextureUrl,
       nccCode,
       colorName,
+      targetColor,
       supplier,
       collection,
       materialMetadata,
@@ -261,6 +279,7 @@ export default async function handler(req, res) {
     const prompt = buildPrompt(slot, {
       fabricAnalysis,
       colorName,
+      targetColor,
       supplier,
       collection,
       materialMetadata,

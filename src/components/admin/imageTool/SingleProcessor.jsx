@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import {
   extractNccCode,
   detectImageType,
   matchNccInPriceTable,
+  findColorVariants,
   processSingleImage,
   processMasterImage,
   processSlotImage,
@@ -10,8 +11,8 @@ import {
   BATCH_STATUS,
   STATUS_LABEL,
 } from '../../../helpers/fabricImageHelpers'
+import MultiColorGenerator from './MultiColorGenerator'
 import AIAssistPanel from './AIAssistPanel'
-import AIImageGenerator from './AIImageGenerator'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -43,44 +44,18 @@ function TypeChip({ type }) {
   return <span className={`fit-type-chip ${cls}`}>{label}</span>
 }
 
-// ── ProductInfoCard — hiển thị thông tin vật liệu khi đã tìm được NCC ────────
-
 function ProductInfoCard({ entry }) {
   if (!entry) return null
   return (
     <div className="fit-card">
       <div className="fit-card-title">Thông tin vật liệu</div>
-      <InfoRow label="Mã NCC"       value={entry.maNCC} />
-      <InfoRow label="Nhà cung cấp" value={entry.nhaCungCap} />
-      <InfoRow label="Cuốn mẫu"     value={entry.tenCuon} />
-      <InfoRow label="Dòng sản phẩm"value={entry.dongSanPham} />
-      <InfoRow label="Thành phần"   value={entry.thanhPhan} />
-      <InfoRow label="Nhóm màu"     value={entry.nhomMau} />
-      <InfoRow label="Bề mặt"       value={Array.isArray(entry.beMat) ? entry.beMat.join(', ') : entry.beMat} />
-      <InfoRow label="Phân khúc"    value={entry.phanKhuc} />
-    </div>
-  )
-}
-
-// ── SlotPreview — hiển thị 6 slot sau khi tách ───────────────────────────────
-
-function SlotPreview({ slots }) {
-  if (!slots) return null
-  return (
-    <div className="fit-card">
-      <div className="fit-card-title">Xem trước 6 slot</div>
-      <div className="fit-slot-grid">
-        {SLOT_KEYS.map((s) => (
-          <div key={s.slot} className="fit-slot-item">
-            <span className="fit-slot-label">{s.label}</span>
-            {slots[s.field] ? (
-              <img src={slots[s.field]} alt={s.label} className="fit-slot-img" />
-            ) : (
-              <div className="fit-slot-ph">Trống</div>
-            )}
-          </div>
-        ))}
-      </div>
+      <InfoRow label="Mã NCC"        value={entry.maNCC} />
+      <InfoRow label="Nhà cung cấp"  value={entry.nhaCungCap} />
+      <InfoRow label="Cuốn mẫu"      value={entry.tenCuon} />
+      <InfoRow label="Dòng sản phẩm" value={entry.dongSanPham} />
+      <InfoRow label="Thành phần"    value={entry.thanhPhan} />
+      <InfoRow label="Nhóm màu"      value={entry.nhomMau} />
+      <InfoRow label="Bề mặt"        value={Array.isArray(entry.beMat) ? entry.beMat.join(', ') : entry.beMat} />
     </div>
   )
 }
@@ -97,17 +72,20 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   const [selectedEntry, setSelectedEntry] = useState(null)
   const [isDrag, setIsDrag] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [processedSlots, setProcessedSlots] = useState(null)
-  const [saveStatus, setSaveStatus] = useState(null) // null | 'saving' | 'saved' | 'error'
+  const [baseSurfaceUrl, setBaseSurfaceUrl] = useState(null) // ảnh gốc sau xử lý
 
-  // Khi nhận file mới
+  // Tìm tất cả màu variants của mã NCC đã chọn
+  const colorVariants = useMemo(() => {
+    if (!selectedEntry || !priceTable) return []
+    return findColorVariants(selectedEntry.maNCC, priceTable)
+  }, [selectedEntry, priceTable])
+
   function handleFile(f) {
     if (!f) return
     const objectUrl = URL.createObjectURL(f)
     setFile(f)
     setPreviewUrl(objectUrl)
-    setProcessedSlots(null)
-    setSaveStatus(null)
+    setBaseSurfaceUrl(null)
 
     const ncc = extractNccCode(f.name)
     const type = detectImageType(f.name)
@@ -125,7 +103,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     }
   }
 
-  // Khi admin tự nhập NCC thủ công
   function handleManualSearch() {
     const ncc = nccInput.trim()
     if (!ncc) return
@@ -134,7 +111,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setSelectedEntry(result.type === BATCH_STATUS.FOUND ? result.matches[0] : null)
   }
 
-  // Drag-drop
   const onDragOver = useCallback((e) => { e.preventDefault(); setIsDrag(true) }, [])
   const onDragLeave = useCallback(() => setIsDrag(false), [])
   const onDrop = useCallback((e) => {
@@ -144,61 +120,46 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceTable])
 
-  // Xử lý ảnh (Phase 2 + 3)
+  // Xử lý ảnh gốc → baseSurfaceUrl (surface_texture chuẩn)
   async function handleProcess() {
     if (!file) return
     setProcessing(true)
-    setSaveStatus(null)
+    setBaseSurfaceUrl(null)
     try {
-      let slots
+      let surface
       if (imageType === 'master') {
-        slots = await processMasterImage(file)
+        // Master → lấy slot_1 làm base surface
+        const slots = await processMasterImage(file)
+        surface = slots.surface_texture
       } else if (imageType.startsWith('slot_')) {
-        slots = await processSlotImage(file, imageType)
+        const slots = await processSlotImage(file, imageType)
+        surface = slots.surface_texture || Object.values(slots)[0]
       } else {
-        // single → surface_texture
-        const result = await processSingleImage(file)
-        slots = { surface_texture: result }
+        surface = await processSingleImage(file)
       }
-      setProcessedSlots(slots)
+      setBaseSurfaceUrl(surface)
     } catch (err) {
       console.error('[FIT] Process error:', err)
-      setSaveStatus('error')
     } finally {
       setProcessing(false)
     }
   }
 
-  // Lưu vào adminMaterials
-  async function handleSave() {
-    if (!selectedEntry || !processedSlots) return
-    setSaveStatus('saving')
-    try {
-      await onSaveImages?.(selectedEntry.maNCC, processedSlots)
-      setSaveStatus('saved')
-    } catch (err) {
-      console.error('[FIT] Save error:', err)
-      setSaveStatus('error')
-    }
-  }
-
-  // Reset toàn bộ
   function handleReset() {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(null); setPreviewUrl(null)
     setNccExtracted(''); setNccInput('')
     setImageType('single')
     setMatchResult(null); setSelectedEntry(null)
-    setProcessedSlots(null); setSaveStatus(null)
+    setBaseSurfaceUrl(null)
   }
 
   const canProcess = !!file && !processing
-  const canSave = !!processedSlots && !!selectedEntry && saveStatus !== 'saved'
 
   return (
     <div className="fit-single">
 
-      {/* Upload zone — chỉ hiển thị khi chưa có file */}
+      {/* Upload zone */}
       {!file && (
         <div
           className={`fit-upload-zone${isDrag ? ' fit-upload-zone--drag' : ''}`}
@@ -209,7 +170,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
           <div className="fit-upload-icon">🖼</div>
           <div className="fit-upload-label">Kéo thả ảnh vải vào đây, hoặc click để chọn file</div>
           <div className="fit-upload-hint">
-            Tên file: <code>mãNCC.jpg</code> · <code>mãNCC_master.jpg</code> · <code>mãNCC_slot1.jpg</code> …
+            Tên file: <code>mãNCC.jpg</code> · <code>mãNCC_master.jpg</code> · <code>mãNCC_slot1.jpg</code>
           </div>
           <input
             type="file"
@@ -223,29 +184,25 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
       {file && (
         <div className="fit-single-cols">
 
-          {/* Cột trái: preview ảnh gốc */}
+          {/* Cột trái: preview */}
           <div className="fit-preview-col">
             <img src={previewUrl} alt={file.name} className="fit-preview-img" />
-
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <TypeChip type={imageType} />
               <button className="fit-reset-btn" onClick={handleReset}>↺ Chọn lại</button>
             </div>
-
-            {/* Tên file */}
             <div className="fit-card">
               <div className="fit-card-title">Tên file</div>
               <div className="fit-filename">{file.name}</div>
             </div>
           </div>
 
-          {/* Cột phải: NCC + product info + actions */}
+          {/* Cột phải: NCC + xử lý */}
           <div className="fit-info-col">
 
             {/* NCC detection */}
             <div className="fit-card">
               <div className="fit-card-title">Nhận diện mã NCC</div>
-
               <div className="fit-ncc-row">
                 {nccExtracted ? (
                   <span className="fit-ncc-code">{nccExtracted}</span>
@@ -257,7 +214,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                 {matchResult && <StatusBadge status={matchResult.type} />}
               </div>
 
-              {/* Nếu nhiều kết quả → cho chọn */}
               {(matchResult?.type === BATCH_STATUS.MULTIPLE || matchResult?.type === BATCH_STATUS.PARTIAL) && (
                 <div className="fit-match-list">
                   {matchResult.matches.map((e) => (
@@ -275,7 +231,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                 </div>
               )}
 
-              {/* Nhập thủ công nếu không tìm được */}
               <div className="fit-ncc-manual">
                 <label>Nhập thủ công:</label>
                 <input
@@ -289,29 +244,39 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               </div>
             </div>
 
-            {/* Product info */}
             <ProductInfoCard entry={selectedEntry} />
 
-            {/* Không tìm thấy */}
-            {matchResult?.type === BATCH_STATUS.NOT_FOUND && (
-              <div className="fit-phase-notice">
-                Mã NCC <strong>{nccInput || nccExtracted}</strong> chưa có trong Bảng đơn giá.
-                Hãy thêm vào Bảng đơn giá trước rồi xử lý lại.
+            {/* Màu variants tìm được */}
+            {colorVariants.length > 1 && (
+              <div className="fit-card">
+                <div className="fit-card-title">
+                  Danh sách màu
+                  <span className="fit-mcg-count">{colorVariants.length} màu</span>
+                </div>
+                <div className="fit-color-chips">
+                  {colorVariants.map((cv) => (
+                    <span key={cv.maNCC} className="fit-color-chip">
+                      {cv.nhomMau || cv.maNCC}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Action buttons */}
-            <div className="fit-card">
-              <div className="fit-card-title">Xử lý ảnh</div>
-
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 4 }}>
-                {imageType === 'master'
-                  ? 'Sẽ tách ảnh thành 6 slot theo template fabric_6_grid_A (3×2 grid)'
-                  : imageType.startsWith('slot_')
-                  ? `Sẽ crop + enhance và lưu vào ${SLOT_KEYS.find(s => s.slot === imageType)?.label || imageType}`
-                  : 'Sẽ crop vuông + enhance nhẹ và lưu vào Slot 1 (surface_texture)'}
+            {matchResult?.type === BATCH_STATUS.NOT_FOUND && (
+              <div className="fit-phase-notice">
+                Mã NCC <strong>{nccInput || nccExtracted}</strong> chưa có trong Bảng đơn giá.
               </div>
+            )}
 
+            {/* Xử lý ảnh */}
+            <div className="fit-card">
+              <div className="fit-card-title">Xử lý ảnh gốc</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>
+                {imageType === 'master'
+                  ? 'Tách ảnh master 3×2, lấy slot 1 làm ảnh tham chiếu'
+                  : 'Crop vuông + cân sáng + làm nét → ảnh tham chiếu cho AI'}
+              </div>
               <div className="fit-actions">
                 <button
                   className="btn btn-primary btn-xs"
@@ -320,35 +285,13 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                 >
                   {processing ? 'Đang xử lý…' : '▶ Xử lý ảnh'}
                 </button>
-
-                {processedSlots && (
-                  <button
-                    className="btn btn-primary btn-xs"
-                    disabled={!canSave}
-                    onClick={handleSave}
-                  >
-                    {saveStatus === 'saving' ? 'Đang lưu…' : '💾 Lưu vào thư viện'}
-                  </button>
-                )}
               </div>
-
-              {/* Gợi ý khi chưa chọn NCC */}
-              {!selectedEntry && !!file && (
-                <div className="fit-phase-notice">
-                  Cần xác nhận mã NCC trước khi lưu.
-                </div>
-              )}
-
-              {/* Kết quả lưu */}
-              {saveStatus === 'saved' && (
-                <div className="fit-save-bar">
-                  <span className="fit-save-ok">✓ Đã lưu ảnh vào thư viện cho mã {selectedEntry?.maNCC}</span>
-                  <button className="fit-reset-btn" onClick={handleReset}>Xử lý ảnh mới</button>
-                </div>
-              )}
-              {saveStatus === 'error' && (
-                <div className="fit-save-bar">
-                  <span className="fit-save-err">✕ Có lỗi khi lưu. Thử lại.</span>
+              {baseSurfaceUrl && (
+                <div className="fit-surface-preview">
+                  <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: '8px 0 4px' }}>
+                    Ảnh tham chiếu (surface_texture):
+                  </div>
+                  <img src={baseSurfaceUrl} alt="surface" className="fit-surface-thumb" />
                 </div>
               )}
             </div>
@@ -356,25 +299,24 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
         </div>
       )}
 
-      {/* AI Image Generator — hiển thị khi đã có surface_texture */}
-      {processedSlots?.surface_texture && (
-        <AIImageGenerator
-          selectedEntry={selectedEntry}
-          surfaceTextureUrl={processedSlots.surface_texture}
-          onSyncToLibrary={onSaveImages}
+      {/* MultiColorGenerator — hiện khi đã có surface + NCC hợp lệ */}
+      {baseSurfaceUrl && colorVariants.length > 0 && (
+        <MultiColorGenerator
+          colorVariants={colorVariants}
+          baseSurfaceUrl={baseSurfaceUrl}
+          onSyncColor={onSaveImages}
         />
       )}
 
-      {/* AI text assistant — panel phụ / debug */}
+      {/* AI text assistant */}
       {file && (
         <AIAssistPanel
           nccCode={selectedEntry?.maNCC || nccExtracted}
           color={selectedEntry?.nhomMau || ''}
-          surfaceTextureUrl={processedSlots?.surface_texture || ''}
+          surfaceTextureUrl={baseSurfaceUrl || ''}
           scaleMetadata={null}
         />
       )}
-
     </div>
   )
 }
