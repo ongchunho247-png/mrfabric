@@ -356,9 +356,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
         </div>
       )}
 
-      {/* Slot preview — hiển thị sau khi xử lý (trước AI generator) */}
-      {processedSlots && <SlotPreview slots={processedSlots} />}
-
       {/* AI Image Generator — hiển thị khi đã có surface_texture */}
       {processedSlots?.surface_texture && (
         <AIImageGenerator

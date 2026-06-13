@@ -54,6 +54,30 @@ function buildPrompt(slot, { fabricAnalysis, colorName, supplier, collection, ma
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   const prompts = {
+    slot_1: `Professional premium fabric surface texture photography.
+
+FABRIC: ${desc}
+
+SCENE: The fabric displayed filling the entire frame, showcasing its surface pattern and weave quality as the sole subject. A gentle, natural drape or soft roll at one edge gives life and dimension — not completely flat, not heavily folded.
+
+COMPOSITION & CAMERA:
+- Fabric fills 100% of the frame — no background visible
+- Slight overhead angle (75–80°, not pure top-down) to give subtle perspective and depth
+- Entire surface in sharp focus — maximum sharpness from edge to edge
+- Pattern repeat fully visible, centered and balanced
+
+LIGHTING:
+- Soft directional sidelight at 30–45° from upper left to reveal three-dimensional weave texture
+- No harsh shadows, no hotspots or glare on the surface
+- Even luminosity across the frame with gentle shadow in the subtle drape fold
+- Light temperature: warm neutral (matching natural daylight on fabric)
+
+STYLE: Premium fabric swatch photography. Think Liberty Fabrics, Schumacher, Dedar, or Zimmer+Rohde fabric catalog closeups. The viewer should almost feel the texture through the screen.
+
+CRITICAL: Reproduce the exact pattern, colors, repeat layout, and weave structure of the reference fabric with maximum fidelity. This is the hero texture shot — quality and accuracy are paramount. Do not alter, simplify, or stylize the original design.
+${brandLine}
+${noText}`,
+
     slot_2: `Professional high-end textile showroom photography.
 
 FABRIC: ${desc}
@@ -211,7 +235,7 @@ export default async function handler(req, res) {
       materialMetadata,
     } = req.body || {}
 
-    const VALID_SLOTS = ['slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
+    const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
     if (!slot || !VALID_SLOTS.includes(slot)) {
       return res.status(400).json({ ok: false, error: `Slot không hợp lệ. Cần: ${VALID_SLOTS.join(', ')}.` })
     }

@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react'
 import { SLOT_KEYS } from '../../../helpers/fabricImageHelpers'
 
-const AI_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slot_2 đến slot_6
+// Tất cả 6 slot đều được AI tạo (kể cả slot_1 — bề mặt vải chất lượng cao)
+const AI_SLOT_KEYS = SLOT_KEYS
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
 const PROGRESS_LABELS = {
+  slot_1: 'Đang tạo ảnh bề mặt vải…',
   slot_2: 'Đang tạo ảnh tay cầm vải…',
   slot_3: 'Đang tạo ảnh sofa…',
   slot_4: 'Đang tạo ảnh rèm…',
@@ -68,12 +70,11 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     [surfaceTextureUrl, selectedEntry],
   )
 
-  // Tạo tất cả 5 slot AI (tuần tự để tránh rate limit)
+  // Tạo tất cả 6 slot AI (tuần tự để tránh rate limit)
   async function handleGenerateAll() {
     if (!surfaceTextureUrl || globalRunning) return
     setGlobalRunning(true)
     setSyncStatus(null)
-    // Reset tất cả slot AI về idle
     setSlots(initSlots)
     for (const s of AI_SLOT_KEYS) {
       await generateSlot(s.slot)
@@ -91,7 +92,7 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     setGlobalRunning(false)
   }
 
-  // Nén ảnh về JPEG nhỏ để fit localStorage (~600px, ~50-120KB mỗi ảnh)
+  // Nén ảnh về JPEG nhỏ để fit localStorage
   function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
     return new Promise((resolve) => {
       const img = new Image()
@@ -105,7 +106,7 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
         canvas.getContext('2d').drawImage(img, 0, 0, w, h)
         resolve(canvas.toDataURL('image/jpeg', quality))
       }
-      img.onerror = () => resolve(dataUrl) // fallback giữ nguyên
+      img.onerror = () => resolve(dataUrl)
       img.src = dataUrl
     })
   }
@@ -128,13 +129,15 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     setSyncMsg('Đang nén và lưu ảnh…')
 
     try {
-      // Nén tất cả ảnh về 600px JPEG trước khi ghi localStorage (tránh QuotaExceededError)
       const imageMap = {}
 
-      if (surfaceTextureUrl) {
+      // Nếu slot_1 chưa có AI, dùng ảnh thật gốc làm fallback cho surface_texture
+      const slot1Done = slots['slot_1']?.status === S.DONE
+      if (!slot1Done && surfaceTextureUrl) {
         imageMap.surface_texture = await compressDataUrl(surfaceTextureUrl, 600, 0.85)
       }
 
+      // Các slot AI done → nén và ghi vào imageMap (slot_1 AI sẽ override surface_texture nếu có)
       for (const s of readySlots) {
         imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
       }
@@ -155,15 +158,14 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     <div className="fit-card fit-aig">
       <div className="fit-card-title">AI tạo ảnh ứng dụng</div>
 
-      {/* Thông tin đầu vào */}
       {!surfaceTextureUrl && (
         <div className="fit-phase-notice">
-          Cần xử lý ảnh thật trước để có surface_texture (bấm ▶ Xử lý ảnh ở trên).
+          Cần xử lý ảnh thật trước để có ảnh tham chiếu (bấm ▶ Xử lý ảnh ở trên).
         </div>
       )}
       {!selectedEntry && (
         <div className="fit-phase-notice">
-          Cần xác nhận mã NCC trước khi tạo ảnh AI (để AI biết thông tin vật liệu).
+          Cần xác nhận mã NCC trước khi tạo ảnh AI.
         </div>
       )}
 
@@ -174,17 +176,14 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
           disabled={!surfaceTextureUrl || globalRunning}
           onClick={handleGenerateAll}
         >
-          {globalRunning ? '⏳ Đang tạo…' : '✦ Tạo bộ 5 ảnh bằng AI'}
+          {globalRunning ? '⏳ Đang tạo…' : '✦ Tạo bộ 6 ảnh bằng AI'}
         </button>
 
         {doneCount > 0 && !globalRunning && (
           <button
             className="btn btn-secondary btn-xs"
             disabled={globalRunning}
-            onClick={() => {
-              setSlots(initSlots)
-              setSyncStatus(null)
-            }}
+            onClick={() => { setSlots(initSlots); setSyncStatus(null) }}
           >
             ↺ Tạo lại toàn bộ
           </button>
@@ -203,28 +202,16 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
         )}
       </div>
 
-      {/* Progress message */}
       {progressMsg && <div className="fit-aig-progress">⏳ {progressMsg}</div>}
 
-      {/* Sync result */}
       {syncMsg && (
         <div className={`fit-aig-sync-msg${syncStatus === 'error' ? ' fit-aig-sync-msg--err' : ' fit-aig-sync-msg--ok'}`}>
           {syncMsg}
         </div>
       )}
 
-      {/* 6-slot grid */}
+      {/* 6-slot grid — tất cả AI generated */}
       <div className="fit-slot-grid fit-aig-grid">
-        {/* Slot 1: ảnh thật */}
-        <AigSlotCell
-          label="Slot 1 — Bề mặt vải"
-          imageUrl={surfaceTextureUrl}
-          status={surfaceTextureUrl ? S.DONE : S.IDLE}
-          tag="Ảnh thật"
-          tagClass="fit-aig-tag--real"
-        />
-
-        {/* Slots 2–6: AI generated */}
         {AI_SLOT_KEYS.map((sk) => {
           const s = slots[sk.slot]
           return (
@@ -235,7 +222,6 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
               status={s.status}
               error={s.error}
               tag="AI"
-              tagClass="fit-aig-tag--ai"
               onRegenerate={s.status !== S.GENERATING ? () => handleRegenerateSlot(sk.slot) : null}
               disabled={globalRunning}
             />
@@ -248,12 +234,12 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
 
 // ── Sub-component: 1 ô trong lưới ────────────────────────────────────────────
 
-function AigSlotCell({ label, imageUrl, status, error, tag, tagClass, onRegenerate, disabled }) {
+function AigSlotCell({ label, imageUrl, status, error, tag, onRegenerate, disabled }) {
   return (
     <div className="fit-slot-item fit-aig-cell">
       <div className="fit-aig-cell-header">
         <span className="fit-slot-label">{label}</span>
-        {imageUrl && <span className={`fit-aig-tag ${tagClass}`}>{tag}</span>}
+        {imageUrl && <span className="fit-aig-tag fit-aig-tag--ai">{tag}</span>}
       </div>
 
       {imageUrl ? (
