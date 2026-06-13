@@ -91,6 +91,25 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     setGlobalRunning(false)
   }
 
+  // Nén ảnh về JPEG nhỏ để fit localStorage (~600px, ~50-120KB mỗi ảnh)
+  function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+        const w = Math.round(img.width * scale)
+        const h = Math.round(img.height * scale)
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = () => resolve(dataUrl) // fallback giữ nguyên
+      img.src = dataUrl
+    })
+  }
+
   // Đồng bộ vào thư viện chính
   async function handleSync() {
     if (!selectedEntry) {
@@ -106,17 +125,20 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
     }
 
     setSyncStatus('syncing')
-
-    // Xây dựng map field → imageUrl
-    const imageMap = {}
-    // Slot 1: surface_texture từ ảnh thật
-    if (surfaceTextureUrl) imageMap.surface_texture = surfaceTextureUrl
-    // Slots 2-6: từ AI
-    for (const s of readySlots) {
-      imageMap[s.field] = slots[s.slot].imageUrl
-    }
+    setSyncMsg('Đang nén và lưu ảnh…')
 
     try {
+      // Nén tất cả ảnh về 600px JPEG trước khi ghi localStorage (tránh QuotaExceededError)
+      const imageMap = {}
+
+      if (surfaceTextureUrl) {
+        imageMap.surface_texture = await compressDataUrl(surfaceTextureUrl, 600, 0.85)
+      }
+
+      for (const s of readySlots) {
+        imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
+      }
+
       await onSyncToLibrary?.(selectedEntry.maNCC, imageMap)
       setSyncStatus('synced')
       setSyncMsg(`✓ Đã lưu ${Object.keys(imageMap).length} ảnh vào thư viện cho mã ${selectedEntry.maNCC}`)
