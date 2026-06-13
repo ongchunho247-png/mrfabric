@@ -139,7 +139,7 @@ export default function AIImageGenerator({ selectedEntry, surfaceTextureUrl, onS
         imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
       }
 
-      await onSyncToLibrary?.(selectedEntry.maNCC, imageMap)
+      onSyncToLibrary?.(selectedEntry.maNCC, imageMap)
       setSyncStatus('synced')
       setSyncMsg(`✓ Đã lưu ${Object.keys(imageMap).length} ảnh vào thư viện cho mã ${selectedEntry.maNCC}`)
     } catch (err) {

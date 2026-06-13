@@ -161,43 +161,39 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
   // ── Lưu ảnh đã xử lý từ Fabric Image Tool vào adminMaterials ────────────────
   function handleSaveFabricImages(maNCC, slotImages) {
     // slotImages: { surface_texture: dataUrl, main_hand_image: dataUrl, … }
-    // Ảnh phải được nén trước khi gọi hàm này (AIImageGenerator.compressDataUrl)
+    // Ảnh nên được nén trước khi gọi để tránh localStorage quota
     const key = (maNCC || '').trim().toLowerCase()
-    return new Promise((resolve, reject) => {
-      setAdminMaterials((prev) => {
-        const existingIdx = prev.findIndex(
-          (m) => !m.deletedAt && (m.maNCC || '').trim().toLowerCase() === key,
-        )
-        const existing = existingIdx >= 0 ? prev[existingIdx] : null
-        const updatedImages = {
-          ...(existing?.images || {}),
-          ...Object.fromEntries(
-            Object.entries(slotImages).map(([k, url]) => [k, { path: url }]),
-          ),
+    setAdminMaterials((prev) => {
+      const existingIdx = prev.findIndex(
+        (m) => !m.deletedAt && (m.maNCC || '').trim().toLowerCase() === key,
+      )
+      const existing = existingIdx >= 0 ? prev[existingIdx] : null
+      const updatedImages = {
+        ...(existing?.images || {}),
+        ...Object.fromEntries(
+          Object.entries(slotImages).map(([k, url]) => [k, { path: url }]),
+        ),
+      }
+      let next
+      if (existing) {
+        next = [...prev]
+        next[existingIdx] = { ...existing, images: updatedImages }
+      } else {
+        const newMat = {
+          id: `fit-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          maNCC,
+          images: updatedImages,
+          trangThai: 'active',
+          source: { type: 'fabric-image-tool', createdAt: new Date().toISOString() },
         }
-        let next
-        if (existing) {
-          next = [...prev]
-          next[existingIdx] = { ...existing, images: updatedImages }
-        } else {
-          const newMat = {
-            id: `fit-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-            maNCC,
-            images: updatedImages,
-            trangThai: 'active',
-            source: { type: 'fabric-image-tool', createdAt: new Date().toISOString() },
-          }
-          next = [...prev, newMat]
-        }
-        try {
-          localStorage.setItem('mrfabric_admin_materials', JSON.stringify(next))
-          resolve()
-        } catch (e) {
-          console.error('[handleSaveFabricImages] localStorage quota exceeded:', e)
-          reject(new Error('Bộ nhớ đầy — ảnh vẫn hiển thị trong session này nhưng sẽ mất sau khi reload. Thử xóa bớt dữ liệu cũ.'))
-        }
-        return next
-      })
+        next = [...prev, newMat]
+      }
+      try {
+        localStorage.setItem('mrfabric_admin_materials', JSON.stringify(next))
+      } catch (e) {
+        console.error('[handleSaveFabricImages] localStorage quota exceeded:', e)
+      }
+      return next
     })
   }
 
