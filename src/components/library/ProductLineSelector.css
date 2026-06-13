@@ -1,0 +1,71 @@
+.pls-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pls-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pls-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-accent-light);
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.pls-tag:hover {
+  background: var(--color-border-light);
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.pls-tag--active {
+  background: var(--color-text);
+  color: #fff;
+  border-color: var(--color-text);
+}
+
+.pls-tag--active:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.pls-hash {
+  font-weight: 700;
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
+.pls-tag--active .pls-hash {
+  opacity: 0.7;
+}
+
+.pls-name {
+  line-height: 1;
+}
+
+.pls-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+.pls-tag--active .pls-count {
+  background: rgba(255, 255, 255, 0.2);
+}

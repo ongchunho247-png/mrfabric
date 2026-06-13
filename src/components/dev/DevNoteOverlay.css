@@ -1,0 +1,526 @@
+/* ─── Capture layer ──────────────────────────────────────────────── */
+.dn-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  /* Explicit black crosshair — visible on any background color */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cline x1='12' y1='2' x2='12' y2='22' stroke='%23000' stroke-width='2'/%3E%3Cline x1='2' y1='12' x2='22' y2='12' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23000'/%3E%3C/svg%3E") 12 12, crosshair;
+}
+
+/* ─── Horizontal note bar at top ────────────────────────────────── */
+.dn-bar {
+  position: fixed;
+  top: 76px; /* below app header — matches library-sidebar sticky top */
+  left: 0;
+  right: 0;
+  z-index: 9001;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 252, 210, 0.97);
+  border-bottom: 2px solid #f9a825;
+  overflow-x: auto;
+  pointer-events: all;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+  scrollbar-width: thin;
+  scrollbar-color: #f9a825 transparent;
+}
+.dn-bar::-webkit-scrollbar { height: 4px; }
+.dn-bar::-webkit-scrollbar-thumb { background: #f9a825; border-radius: 2px; }
+
+/* ─── Note card (in bar) ─────────────────────────────────────────── */
+.dn-nc {
+  flex-shrink: 0;
+  width: 185px;
+  background: #fffde7;
+  border: 1.5px solid #f9a825;
+  border-radius: 5px;
+  font-size: 11px;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+  transition: border-color 0.12s, width 0.15s;
+}
+
+.dn-nc--on {
+  border-color: #e65100;
+  width: 230px;
+}
+
+.dn-nc-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  background: #f9a825;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.dn-nc--on .dn-nc-head {
+  background: #e65100;
+  color: #fff;
+}
+
+.dn-nc-num {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dn-nc-area {
+  flex: 1;
+  font-size: 9px;
+  font-weight: 600;
+  color: #7b4800;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 1px 4px;
+  border-radius: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.dn-nc--on .dn-nc-area {
+  color: #ffd0a0;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dn-nc-pos {
+  flex: 1;
+  font-size: 9px;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dn-nc-x {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.1s;
+}
+.dn-nc-x:hover { background: rgba(0, 0, 0, 0.32); }
+
+.dn-nc-body {
+  padding: 4px 7px;
+  min-height: 22px;
+  max-height: 38px;
+  overflow: hidden;
+  color: #333;
+  line-height: 1.4;
+  cursor: text;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 10px;
+}
+.dn-nc-body:hover { background: rgba(0, 0, 0, 0.03); }
+
+.dn-nc-empty {
+  color: #bbb;
+  font-style: italic;
+}
+
+.dn-nc-edit {
+  padding: 5px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dn-nc-ta {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 10px;
+  font-family: inherit;
+  line-height: 1.4;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+  caret-color: #000;
+  min-height: 54px;
+}
+.dn-nc-ta:focus { outline: none; border-color: #e65100; }
+
+.dn-nc-pos-row {
+  font-size: 9px;
+  color: #aaa;
+  font-variant-numeric: tabular-nums;
+}
+
+.dn-nc-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.dn-nc-btn {
+  flex: 1;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.dn-nc-btn--save { background: #e65100; color: #fff; }
+.dn-nc-btn--save:hover { background: #bf360c; }
+.dn-nc-btn--cancel { background: #eee; color: #555; }
+.dn-nc-btn--cancel:hover { background: #ddd; }
+
+/* ─── Note box (legacy — kept for reference, no longer rendered) ── */
+.dn-note {
+  position: fixed;
+  z-index: 9001;
+  width: 220px;
+  background: #fffde7;
+  border: 2px solid #f9a825;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  pointer-events: all;
+  transform: translateY(-4px);
+}
+
+.dn-note--editing {
+  border-color: #e65100;
+  box-shadow: 0 4px 20px rgba(230, 81, 0, 0.25);
+}
+
+.dn-note-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  background: #f9a825;
+  border-radius: 4px 4px 0 0;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.dn-note-bar-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dn-note--editing .dn-note-bar {
+  background: #e65100;
+  color: #fff;
+}
+
+.dn-note-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.dn-note-pos {
+  font-size: 10px;
+  opacity: 0.7;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.dn-note-x {
+  margin-left: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.dn-note-x:hover { background: rgba(0, 0, 0, 0.3); }
+
+/* Area label strip — shown when click location was detected */
+.dn-note-area {
+  padding: 2px 10px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #7b4800;
+  background: #fff3cc;
+  border-bottom: 1px solid #f0d060;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dn-note--editing .dn-note-area {
+  color: #7b2800;
+  background: #ffe0c0;
+  border-bottom-color: #f0a060;
+}
+
+.dn-note-body {
+  padding: 8px 10px;
+  min-height: 32px;
+  color: #333;
+  line-height: 1.5;
+  cursor: text;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.dn-note-body:hover { background: #fffae0; }
+
+.dn-note-empty {
+  color: #aaa;
+  font-style: italic;
+}
+
+.dn-note-edit {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dn-note-ta {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  line-height: 1.5;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+  caret-color: #000;
+}
+.dn-note-ta:focus {
+  outline: none;
+  border-color: #f9a825;
+}
+
+.dn-note-edit-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.dn-note-btn {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dn-note-btn--save {
+  background: #e65100;
+  color: #fff;
+}
+.dn-note-btn--save:hover { background: #bf360c; }
+
+.dn-note-btn--cancel {
+  background: #eee;
+  color: #555;
+}
+.dn-note-btn--cancel:hover { background: #ddd; }
+
+/* ─── Bottom-right panel ─────────────────────────────────────────── */
+.dn-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9002;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-family: system-ui, sans-serif;
+  pointer-events: all;
+}
+
+/* Popup list */
+.dn-panel-popup {
+  width: 300px;
+  max-height: 400px;
+  background: #fff;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dn-panel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.dn-panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+.dn-panel-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.dn-pa-btn {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.dn-pa-btn:hover { background: #111; }
+
+.dn-pa-btn--del {
+  background: #c62828;
+}
+.dn-pa-btn--del:hover { background: #8e0000; }
+
+.dn-panel-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 6px 0;
+}
+
+.dn-panel-empty {
+  font-size: 12px;
+  color: #999;
+  padding: 12px 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.dn-panel-row {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.dn-panel-row:last-child { border-bottom: none; }
+
+.dn-pr-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.dn-pr-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e65100;
+}
+
+.dn-pr-pos {
+  font-size: 10px;
+  color: #aaa;
+  font-variant-numeric: tabular-nums;
+}
+
+.dn-pr-area {
+  font-size: 10px;
+  font-weight: 600;
+  color: #a05000;
+  background: #fff3cc;
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-bottom: 3px;
+}
+
+.dn-pr-content {
+  font-size: 12px;
+  color: #444;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────────────── */
+.dn-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dn-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s, transform 0.1s;
+  user-select: none;
+}
+.dn-toggle:hover { background: #111; }
+.dn-toggle:active { transform: scale(0.97); }
+
+.dn-toggle--on {
+  background: #e65100;
+  animation: dn-pulse 1.5s infinite;
+}
+.dn-toggle--on:hover { background: #bf360c; }
+
+@keyframes dn-pulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(230, 81, 0, 0.4); }
+  50% { box-shadow: 0 2px 16px rgba(230, 81, 0, 0.7); }
+}
+
+.dn-count {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fff;
+  color: #333;
+  border: 1.5px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: background 0.1s;
+}
+.dn-count:hover { background: #f5f5f5; }
+.dn-count--on {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}

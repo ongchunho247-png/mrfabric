@@ -1,0 +1,57 @@
+.liu-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.liu-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.liu-dropzone:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.liu-icon {
+  font-size: 2rem;
+}
+
+.liu-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.liu-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.liu-preview-img {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  object-fit: contain;
+}
+
+.liu-reselect-btn {
+  font-size: 0.85rem;
+}

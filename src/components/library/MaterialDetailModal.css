@@ -1,0 +1,240 @@
+.mdm-box {
+  width: 100%;
+  max-width: 960px;
+}
+
+.mdm-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-accent-light);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.15s;
+}
+
+.mdm-close-btn:hover {
+  background: var(--color-border);
+}
+
+.mdm-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .mdm-layout {
+    flex-direction: row;
+  }
+}
+
+.mdm-left {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mdm-spec-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .mdm-left {
+    width: 420px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--color-border-light);
+  }
+}
+
+.mdm-right {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.mdm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mdm-code {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.mdm-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mdm-line {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+.mdm-save-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mdm-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  background: var(--color-accent-light);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.mdm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mdm-info-row {
+  display: flex;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.mdm-info-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.mdm-info-value {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.mdm-info-code {
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent-dark, #1a5fa8);
+  letter-spacing: 0.04em;
+  background: var(--color-border-light, #f0f0f0);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.mdm-note {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.mdm-note-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+/* Variant dots strip — below image viewer */
+.mdm-variant-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--color-border-light, #eee);
+  margin-top: 10px;
+}
+
+.mdm-variant-dot-btn {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.mdm-variant-dot-btn:hover {
+  transform: scale(1.3);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-light);
+}
+
+/* Variant selector (legacy) */
+.mdm-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.mdm-variant-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  margin-bottom: 2px;
+}
+
+.mdm-variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: left;
+}
+.mdm-variant-btn:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.mdm-variant-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.mdm-variant-code {
+  font-size: 0.68rem;
+  font-family: monospace;
+  color: var(--color-text-muted);
+}
+

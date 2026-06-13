@@ -1,0 +1,94 @@
+.library-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.library-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.library-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ── Material count bar ── */
+.library-count {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  padding: 0 2px;
+}
+
+/* ── View selector (role-based filter visibility) ── */
+.lv-selector {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.lv-selector-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 0 0 7px;
+}
+
+.lv-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.lv-pill {
+  padding: 3px 11px;
+  border-radius: 12px;
+  font-size: 0.77rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-accent-light);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+  line-height: 1.4;
+}
+.lv-pill:hover {
+  border-color: #7090d0;
+  color: #2a4a8a;
+}
+.lv-pill--on {
+  background: #dde8ff;
+  border-color: #5070c0;
+  color: #1a3880;
+  font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+  .library-page {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .library-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 76px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+
+  .library-content {
+    flex: 1;
+  }
+}

@@ -1,0 +1,70 @@
+.fp-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.fp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.fp-header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.fp-clear-btn {
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  padding: 4px 8px;
+}
+
+.fp-toggle-btn {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  display: none;
+}
+
+/* Mobile: collapsed by default */
+@media (max-width: 1023px) {
+  .fp-toggle-btn {
+    display: inline-flex;
+  }
+
+  .fp-body {
+    display: none;
+  }
+
+  .fp-body--open {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fp-toggle-btn {
+    display: none;
+  }
+
+  .fp-body {
+    display: block;
+  }
+}
+
+.fp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fp-empty {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 8px 0;
+}
+

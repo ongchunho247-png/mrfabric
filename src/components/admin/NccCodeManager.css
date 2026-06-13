@@ -1,0 +1,335 @@
+.ncm-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 0;
+}
+
+.ncm-intro {
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ncm-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ncm-format {
+  display: inline-block;
+  background: var(--color-text);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  align-self: flex-start;
+}
+
+/* ── Add NCC form ── */
+.ncm-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.ncm-name-input { flex: 2; min-width: 150px; }
+
+.ncm-code-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ncm-code-input {
+  width: 100px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ncm-code-err {
+  font-size: 0.7rem;
+  color: var(--color-danger);
+}
+
+.ncm-select { flex: 3; min-width: 200px; }
+.ncm-custom-input { width: 80px; text-transform: uppercase; }
+
+/* ── List controls (expand/collapse all) ── */
+.ncm-list-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ncm-ctrl-btn {
+  font-size: 0.78rem;
+  padding: 5px 12px;
+}
+
+.ncm-list-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Accordion list ── */
+.ncm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── NCC Card — flat row ── */
+.ncm-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.ncm-card-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.ncm-card-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.ncm-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.ncm-badge--code {
+  background: var(--color-text);
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  transition: background 0.12s;
+}
+.ncm-badge--code:hover { background: #3a3a5a; }
+
+.ncm-badge--empty {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+.ncm-badge--empty:hover { background: var(--color-accent); color: #fff; }
+
+.ncm-code-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ncm-code-inline-input {
+  width: 110px;
+  padding: 3px 8px !important;
+  height: auto !important;
+  font-size: 0.83rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.ncm-del-btn {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  flex-shrink: 0;
+}
+
+/* ── Card body ── */
+.ncm-card-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+}
+
+/* ── Cuốn mẫu table ── */
+.ncm-cuon-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.ncm-cuon-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+  background: #f8f9fb;
+  white-space: nowrap;
+}
+
+.ncm-cuon-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+.ncm-cuon-table tbody tr:last-child td { border-bottom: none; }
+.ncm-cuon-table tbody tr:hover td { background: var(--color-accent-light); }
+
+.ncm-cuon-td-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ncm-cuon-code {
+  font-family: monospace;
+  font-size: 0.78rem;
+  background: var(--color-accent-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--color-text-secondary);
+}
+
+.ncm-cuon-td-cat,
+.ncm-cuon-td-trang {
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.ncm-cuon-actions {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.ncm-cuon-edit,
+.ncm-cuon-ok,
+.ncm-cuon-del {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.ncm-cuon-edit:hover { background: #e8eef8; color: #2a4a8a; }
+.ncm-cuon-ok:hover { background: #dcfce7; color: #166534; }
+.ncm-cuon-del:hover { background: #fee2e2; color: #b91c1c; }
+
+.ncm-cuon-tr--edit td { background: #f0f5ff !important; }
+
+.ncm-cuon-edit-input {
+  font-size: 0.82rem;
+  padding: 3px 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.ncm-cuon-edit-short { max-width: 80px; }
+
+.ncm-cuon-empty {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+  padding: 4px 2px;
+}
+
+/* ── Add cuốn form ── */
+.ncm-cuon-form {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  padding: 10px 12px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border);
+}
+
+.ncm-cuon-f-input {
+  flex: 2;
+  min-width: 120px;
+  font-size: 0.82rem;
+  padding: 5px 8px;
+}
+
+.ncm-cuon-f-name { flex: 3; min-width: 160px; }
+
+.ncm-cuon-f-short { flex: 1; min-width: 80px; max-width: 120px; }
+
+.ncm-cuon-form-btns {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ncm-add-cuon-btn {
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  align-self: flex-start;
+}
+
+/* ── Số mã column ── */
+.ncm-th-count { width: 56px; text-align: center; }
+.ncm-cuon-td-count { text-align: center; }
+
+.ncm-count-badge {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  background: var(--color-accent-light);
+  color: var(--color-text-muted);
+}
+
+.ncm-count-badge--has {
+  background: #d4edda;
+  color: #1a7232;
+}
+
+/* ── Empty state ── */
+.ncm-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  line-height: 1.5;
+}

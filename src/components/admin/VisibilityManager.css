@@ -1,0 +1,453 @@
+.vis-mgr {
+  padding: 20px 0;
+}
+
+.vis-header {
+  margin-bottom: 16px;
+}
+
+.vis-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 4px;
+}
+
+.vis-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.vis-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* ── NCC list (cấp 1) ───────────────────────── */
+
+.vis-ncc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vis-ncc {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.vis-ncc--hidden {
+  border-color: var(--color-danger, #c0392b);
+}
+
+.vis-ncc-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--color-bg);
+  cursor: default;
+}
+
+.vis-ncc--hidden .vis-ncc-head {
+  background: #fff8f8;
+}
+
+.vis-ncc-name {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.vis-ncc-meta {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Collections (cấp 2) ───────────────────────── */
+
+.vis-cols {
+  border-top: 1px solid var(--color-border);
+  padding: 6px 0 6px 20px;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vis-col {
+  border: 1px solid var(--color-border-light, #e0e8f0);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.vis-col--hidden {
+  border-color: rgba(192, 57, 43, 0.35);
+}
+
+.vis-col-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg);
+}
+
+.vis-col--hidden .vis-col-head {
+  background: #fff5f5;
+}
+
+.vis-col-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.vis-col-meta {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Groups (cấp 3) ─────────────────────────── */
+
+.vis-groups {
+  border-top: 1px solid var(--color-border);
+  padding: 6px 0 6px 18px;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vis-group {
+  border: 1px solid var(--color-border-light, #e8e8e8);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.vis-group--hidden {
+  border-color: rgba(192, 57, 43, 0.35);
+}
+
+.vis-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--color-bg);
+}
+
+.vis-group--hidden .vis-group-head {
+  background: #fff5f5;
+}
+
+.vis-group-name {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.vis-group-count {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Expand button ──────────────────────────── */
+
+.vis-expand-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+  border-radius: 3px;
+  transition: background 0.1s;
+}
+.vis-expand-btn:hover { background: var(--color-border-light, #eee); }
+
+.vis-expand-btn--sm {
+  width: 18px;
+  height: 18px;
+  font-size: 0.58rem;
+}
+
+/* ── Toggle buttons ─────────────────────────── */
+
+.vis-toggle-btn {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--color-text);
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.vis-toggle-btn:hover { border-color: #27ae60; color: #27ae60; background: #f0fdf4; }
+
+.vis-toggle-btn--sm {
+  font-size: 0.7rem;
+  padding: 3px 9px;
+}
+
+.vis-toggle-btn--hidden {
+  border-color: var(--color-danger, #c0392b);
+  color: var(--color-danger, #c0392b);
+  background: #fbeae8;
+}
+.vis-toggle-btn--hidden:hover { background: #fad5d2; }
+
+/* ── Children / Materials (cấp 3) ──────────── */
+
+.vis-children {
+  border-top: 1px solid var(--color-border-light, #eee);
+  padding: 4px 0;
+  background: var(--color-surface);
+}
+
+.vis-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 38px;
+  font-size: 0.77rem;
+  border-bottom: 1px solid var(--color-border-light, #f2f2f2);
+}
+.vis-child:last-child { border-bottom: none; }
+
+.vis-child-code {
+  font-family: monospace;
+  font-size: 0.74rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.vis-child-ncc {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  background: var(--color-border-light, #f0f0f0);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.vis-child-spacer { flex: 1; }
+
+/* ── Delete all button (hiện trên head của mỗi cấp) ── */
+
+.vis-del-all-btn {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, border-color 0.1s, color 0.1s, background 0.1s;
+}
+.vis-ncc-head:hover .vis-del-all-btn,
+.vis-col-head:hover .vis-del-all-btn,
+.vis-group-head:hover .vis-del-all-btn { opacity: 1; }
+.vis-del-all-btn:hover {
+  border-color: var(--color-danger, #c0392b);
+  color: var(--color-danger, #c0392b);
+  background: #fff5f5;
+  opacity: 1;
+}
+
+/* ── Item-level hide/show toggle ── */
+
+.vis-item-toggle {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, border-color 0.1s, background 0.1s;
+}
+.vis-child:hover .vis-item-toggle { opacity: 1; }
+.vis-item-toggle--hidden {
+  border-color: var(--color-danger, #c0392b);
+  color: var(--color-danger, #c0392b);
+  background: #fbeae8;
+  opacity: 1;
+}
+.vis-item-toggle:hover { border-color: #aaa; background: #f5f5f5; opacity: 1; }
+
+/* ── Delete btn (cấp 4 — item) ── */
+
+.vis-del-btn {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  opacity: 0;
+}
+.vis-child:hover .vis-del-btn { opacity: 1; }
+.vis-del-btn:hover { border-color: var(--color-danger, #c0392b); color: var(--color-danger, #c0392b); background: #fff5f5; }
+
+/* ── Thùng rác ──────────────────────────────── */
+
+.vis-trash {
+  margin-top: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.vis-trash-head {
+  display: flex;
+  align-items: center;
+  background: var(--color-bg);
+  border-bottom: 1px solid transparent;
+}
+
+.vis-trash-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: left;
+  transition: background 0.1s;
+}
+.vis-trash-toggle:hover { background: var(--color-border-light, #f5f5f5); }
+
+.vis-trash-toggle-icon { font-size: 0.65rem; }
+
+.vis-perm-del-all-btn {
+  flex-shrink: 0;
+  margin-right: 10px;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border: 1px solid var(--color-danger, #c0392b);
+  color: var(--color-danger, #c0392b);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.vis-perm-del-all-btn:hover { background: #fbeae8; }
+
+.vis-trash-list {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 0;
+  background: var(--color-surface);
+}
+
+.vis-trash-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  padding: 0 14px 8px;
+  margin: 0;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+}
+
+.vis-trash-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--color-border-light, #f2f2f2);
+  font-size: 0.8rem;
+}
+.vis-trash-row:last-child { border-bottom: none; }
+
+.vis-trash-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.vis-trash-code {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.vis-trash-nha {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.vis-trash-days {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.vis-trash-days--warn {
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.vis-trash-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vis-restore-btn {
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border: 1px solid #27ae60;
+  color: #27ae60;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.vis-restore-btn:hover { background: #f0fdf4; }
+
+.vis-perm-del-btn {
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border: 1px solid var(--color-danger, #c0392b);
+  color: var(--color-danger, #c0392b);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.vis-perm-del-btn:hover { background: #fbeae8; }

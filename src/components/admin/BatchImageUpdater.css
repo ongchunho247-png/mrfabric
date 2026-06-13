@@ -1,0 +1,128 @@
+.biu-wrap {
+  margin-bottom: 24px;
+}
+
+.biu-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-surface);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.biu-dropzone:hover,
+.biu-dropzone--drag {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.biu-drop-icon {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.biu-drop-title {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.biu-drop-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.biu-drop-hint code {
+  background: var(--color-accent-light);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+}
+
+.biu-processing {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ── Results ── */
+.biu-results {
+  margin-top: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.biu-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--color-accent-light);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.biu-summary-ok { color: #27ae60; }
+.biu-summary-fail { color: var(--color-danger, #c0392b); }
+
+.biu-clear-btn {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+}
+
+.biu-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.biu-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8rem;
+}
+
+.biu-row:last-child { border-bottom: none; }
+
+.biu-row--ok { background: #f0fdf4; }
+.biu-row--nomatch { background: #fff8f8; }
+
+.biu-row-icon { flex-shrink: 0; font-size: 0.75rem; }
+
+.biu-row-file {
+  flex: 1;
+  min-width: 0;
+  font-family: monospace;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+}
+
+.biu-row-match {
+  color: #27ae60;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.biu-row-match code {
+  background: rgba(39,174,96,0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.biu-row-nomatch {
+  color: var(--color-danger, #c0392b);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}

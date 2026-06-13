@@ -1,0 +1,131 @@
+.mc {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: box-shadow 0.15s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+
+.mc:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ── Slot 1 image (surface_texture / closeup) ── */
+.mc-img-wrap {
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: var(--color-accent-light);
+  position: relative;
+}
+
+.mc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+
+.mc:hover .mc-img {
+  transform: scale(1.03);
+}
+
+.mc-img-ph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* ── Variant color dots strip — right below image ── */
+.mc-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--color-border-light, #eee);
+  min-height: 28px;
+}
+
+.mc-variant-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.mc-variant-dot:hover,
+.mc-variant-dot--active {
+  transform: scale(1.3);
+  border-color: var(--color-accent);
+}
+
+.mc-variant-more {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* ── Body ── */
+.mc-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.mc-code {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.mc-phankhuc {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Save button ── */
+.mc-save-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-muted);
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+.mc-save-btn:hover {
+  background: #fff;
+  color: #c0392b;
+  transform: scale(1.1);
+}
+
+.mc-save-btn--saved {
+  color: #c0392b;
+  background: #fff;
+}

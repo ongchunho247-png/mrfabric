@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\\\Claude Code\\\\01. MrFabric\")",
+      "Bash(npx vite *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

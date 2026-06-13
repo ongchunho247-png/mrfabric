@@ -1,0 +1,245 @@
+// ── Fabric Image Tool helpers — Canvas-based, no external deps ──────────────
+
+/** Slot index → image field mapping (template: fabric_6_grid_A, 3×2 grid) */
+export const SLOT_KEYS = [
+  { slot: 'slot_1', field: 'surface_texture',  label: 'Slot 1 — Bề mặt vải' },
+  { slot: 'slot_2', field: 'main_hand_image',  label: 'Slot 2 — Cầm tay' },
+  { slot: 'slot_3', field: 'sofa_image',        label: 'Slot 3 — Sofa / Gối' },
+  { slot: 'slot_4', field: 'curtain_image',     label: 'Slot 4 — Trên rèm' },
+  { slot: 'slot_5', field: 'ruler_image',       label: 'Slot 5 — Thước đo' },
+  { slot: 'slot_6', field: 'detail_image',      label: 'Slot 6 — Chi tiết' },
+]
+
+export const BATCH_STATUS = {
+  PENDING:    'pending',
+  FOUND:      'found',
+  NOT_FOUND:  'not_found',
+  MULTIPLE:   'multiple',
+  PARTIAL:    'partial',
+  INVALID:    'invalid',
+  PROCESSING: 'processing',
+  DONE:       'done',
+  ERROR:      'error',
+}
+
+export const STATUS_LABEL = {
+  pending:    'Chờ xử lý',
+  found:      'Đã tìm thấy mã NCC',
+  not_found:  'Không tìm thấy mã NCC',
+  multiple:   'Nhiều kết quả trùng',
+  partial:    'Tương tự một số mã',
+  invalid:    'Không đọc được mã NCC từ tên file',
+  processing: 'Đang xử lý…',
+  done:       'Đã xử lý xong',
+  error:      'Lỗi xử lý',
+}
+
+// ── NCC extraction ────────────────────────────────────────────────────────────
+
+/**
+ * Đọc mã NCC từ tên file.
+ * Quy tắc: bỏ extension → bỏ hậu tố _master / _slot1-6 → trim
+ * Ví dụ: "ABC123_master.jpg" → "ABC123", "XY-01_slot3.png" → "XY-01"
+ */
+export function extractNccCode(filename) {
+  if (!filename) return null
+  const noExt = filename.replace(/\.(jpg|jpeg|png|webp|gif|bmp)$/i, '')
+  const noSuffix = noExt.replace(/[_-](master|slot[1-6])$/i, '')
+  const code = noSuffix.trim()
+  return code || null
+}
+
+/**
+ * Xác định loại ảnh dựa trên tên file.
+ * Trả về: 'master' | 'slot_1'…'slot_6' | 'single'
+ */
+export function detectImageType(filename) {
+  if (!filename) return 'single'
+  const noExt = filename.replace(/\.(jpg|jpeg|png|webp|gif|bmp)$/i, '')
+  if (/[_-]master$/i.test(noExt)) return 'master'
+  const m = noExt.match(/[_-](slot[1-6])$/i)
+  if (m) return m[1].toLowerCase()
+  return 'single'
+}
+
+// ── Price table matching ──────────────────────────────────────────────────────
+
+/**
+ * Tìm mã NCC trong bảng đơn giá.
+ * Ưu tiên exact match, fallback về partial.
+ */
+export function matchNccInPriceTable(nccCode, priceTable) {
+  if (!nccCode || !priceTable?.length) return { type: BATCH_STATUS.NOT_FOUND, matches: [] }
+  const code = nccCode.trim().toLowerCase()
+
+  const exact = priceTable.filter(
+    (e) => !e.deletedAt && (e.maNCC || '').trim().toLowerCase() === code,
+  )
+  if (exact.length === 1) return { type: BATCH_STATUS.FOUND, matches: exact }
+  if (exact.length > 1)   return { type: BATCH_STATUS.MULTIPLE, matches: exact }
+
+  // Partial: mã NCC bắt đầu bằng code hoặc code chứa trong mã NCC
+  const partial = priceTable.filter((e) => {
+    if (e.deletedAt) return false
+    const m = (e.maNCC || '').trim().toLowerCase()
+    return m && (m.startsWith(code) || code.startsWith(m))
+  })
+  if (partial.length > 0) return { type: BATCH_STATUS.PARTIAL, matches: partial }
+
+  return { type: BATCH_STATUS.NOT_FOUND, matches: [] }
+}
+
+// ── Canvas image processing ───────────────────────────────────────────────────
+
+/** Load File → dataURL (compressed, max maxDim px on longest side) */
+export function loadImageAsDataUrl(file, maxDim = 1200) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', 0.88))
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không tải được ảnh')) }
+    img.src = url
+  })
+}
+
+/** Crop trung tâm về hình vuông 1:1 */
+export function cropToSquare(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const size = Math.min(img.width, img.height)
+      const x = Math.floor((img.width - size) / 2)
+      const y = Math.floor((img.height - size) / 2)
+      const canvas = document.createElement('canvas')
+      canvas.width = size
+      canvas.height = size
+      canvas.getContext('2d').drawImage(img, x, y, size, size, 0, 0, size, size)
+      resolve(canvas.toDataURL('image/jpeg', 0.92))
+    }
+    img.onerror = reject
+    img.src = dataUrl
+  })
+}
+
+/**
+ * Làm nét vải: contrast nhẹ + sharpen kernel 3×3.
+ * Không tạo texture giả, không đổi họa tiết — chỉ làm rõ nét đã có.
+ */
+export function enhanceTexture(dataUrl, { brightness = 1.0, contrast = 1.08 } = {}) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      ctx.filter = `brightness(${brightness}) contrast(${contrast})`
+      ctx.drawImage(img, 0, 0)
+      ctx.filter = 'none'
+
+      // Sharpen convolution 0 -1 0 / -1 5 -1 / 0 -1 0
+      const src = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const out = applySharpen(src)
+      ctx.putImageData(out, 0, 0)
+      resolve(canvas.toDataURL('image/jpeg', 0.92))
+    }
+    img.onerror = reject
+    img.src = dataUrl
+  })
+}
+
+function applySharpen(imageData) {
+  const { data, width, height } = imageData
+  const output = new Uint8ClampedArray(data)
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      for (let c = 0; c < 3; c++) {
+        const i = (y * width + x) * 4 + c
+        const sum =
+          -data[((y - 1) * width + x) * 4 + c] +
+          -data[(y * width + (x - 1)) * 4 + c] +
+          5 * data[i] +
+          -data[(y * width + (x + 1)) * 4 + c] +
+          -data[((y + 1) * width + x) * 4 + c]
+        output[i] = Math.max(0, Math.min(255, sum))
+      }
+    }
+  }
+  return new ImageData(output, width, height)
+}
+
+/**
+ * Tách ảnh master (3×2 grid) thành 6 slot.
+ * Template fabric_6_grid_A: hàng 1 = slot 1-2-3, hàng 2 = slot 4-5-6.
+ * Trả về mảng 6 dataURL theo thứ tự slot_1…slot_6.
+ */
+export function splitMasterGrid(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const W = img.width
+      const H = img.height
+      const sw = Math.floor(W / 3)
+      const sh = Math.floor(H / 2)
+      // Positions: [row, col]
+      const positions = [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]]
+      const result = positions.map(([row, col]) => {
+        const canvas = document.createElement('canvas')
+        canvas.width = sw
+        canvas.height = sh
+        canvas.getContext('2d').drawImage(img, col * sw, row * sh, sw, sh, 0, 0, sw, sh)
+        return canvas.toDataURL('image/jpeg', 0.92)
+      })
+      resolve(result)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không tải được ảnh master')) }
+    img.src = url
+  })
+}
+
+/**
+ * Pipeline hoàn chỉnh cho ảnh đơn (single):
+ * load → crop vuông → enhance → trả về dataURL cho surface_texture
+ */
+export async function processSingleImage(file, options = {}) {
+  const raw = await loadImageAsDataUrl(file, 1400)
+  const cropped = await cropToSquare(raw)
+  const enhanced = await enhanceTexture(cropped, options)
+  return enhanced
+}
+
+/**
+ * Pipeline cho ảnh master (3×2 grid):
+ * load file → tách 6 slot → trả về object { surface_texture, main_hand_image, … }
+ */
+export async function processMasterImage(file) {
+  const slots = await splitMasterGrid(file)
+  const result = {}
+  SLOT_KEYS.forEach((s, i) => { result[s.field] = slots[i] })
+  return result
+}
+
+/**
+ * Pipeline cho file slot đơn lẻ (ví dụ slot_3.jpg → sofa_image):
+ * load → crop → enhance → trả về object { [field]: dataURL }
+ */
+export async function processSlotImage(file, slotKey, options = {}) {
+  const raw = await loadImageAsDataUrl(file, 1200)
+  const cropped = await cropToSquare(raw)
+  const enhanced = await enhanceTexture(cropped, options)
+  const sk = SLOT_KEYS.find((s) => s.slot === slotKey)
+  const field = sk ? sk.field : 'surface_texture'
+  return { [field]: enhanced }
+}

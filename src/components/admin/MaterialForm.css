@@ -1,0 +1,790 @@
+.mf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Section blocks ── */
+.mf-section {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.mf-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.mf-section-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.mf-section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.mf-section-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
+.mf-section-body {
+  padding: 16px;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* NCC accent — amber */
+.mf-section--ncc .mf-section-header {
+  background: #fffbf0;
+  border-bottom: 1px solid #f0dea0;
+}
+.mf-section--ncc {
+  border-left: 3px solid #c8991a;
+}
+.mf-section--ncc .mf-section-title { color: #8b6914; }
+
+/* MrFabric accent — dark brand */
+.mf-section--mrfabric .mf-section-header {
+  background: var(--color-accent-light);
+  border-bottom: 1px solid var(--color-border);
+}
+.mf-section--mrfabric {
+  border-left: 3px solid var(--color-text);
+}
+.mf-section--mrfabric .mf-section-title { color: var(--color-text); }
+
+/* Design accent — green */
+.mf-section--design .mf-section-header {
+  background: #f0f7f3;
+  border-bottom: 1px solid #c0daca;
+}
+.mf-section--design {
+  border-left: 3px solid #4a7c5e;
+}
+.mf-section--design .mf-section-title { color: #2e5c42; }
+
+/* ── Grid ── */
+.mf-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .mf-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.mf-grid--full {
+  grid-template-columns: 1fr !important;
+}
+
+/* ── Fields ── */
+.mf-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.form-input--readonly {
+  background: var(--color-accent-light);
+  cursor: default;
+}
+
+.mf-error {
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  margin-top: 2px;
+}
+
+.form-input--error {
+  border-color: var(--color-danger);
+}
+
+.mf-hint {
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.mf-hint--warn {
+  color: var(--color-danger, #c0392b);
+  font-weight: 600;
+  margin-top: -8px;
+}
+
+/* ── OCR badge ── */
+.mf-ocr-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #fff8e0;
+  color: #8b6914;
+  border: 1px solid #f0dea0;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+
+/* ── ChatGPT button ── */
+.mf-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.mf-chatgpt-btn {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+}
+
+/* ── NCC selector extras ── */
+.mf-ncc-empty {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: 8px 12px;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+
+.mf-ncc-code-row {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mf-ncc-code-badge {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.82rem;
+  background: var(--color-text);
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+}
+
+/* ── NCC confirm / done bar ── */
+.mf-ncc-confirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.mf-confirm-btn {
+  font-size: 0.875rem;
+}
+
+.mf-confirm-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.mf-ncc-done-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: #f0f7f3;
+  border: 1px solid #c0daca;
+  border-radius: var(--radius-sm);
+}
+
+.mf-ncc-done-icon {
+  color: #2e7d52;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.mf-ncc-done-text {
+  font-size: 0.85rem;
+  color: #2e7d52;
+  font-weight: 600;
+  flex: 1;
+}
+
+.mf-ncc-edit-btn {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  color: var(--color-text-muted);
+}
+
+/* ── Locked hint between sections ── */
+.mf-locked-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: var(--color-accent-light);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.mf-locked-icon {
+  font-size: 1.2rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* ── Auto-badge ── */
+.mf-auto-badge {
+  background: #e8f0fc;
+  color: #3a5cb8;
+  border-color: #c5d5f5;
+}
+
+/* ── maMrFabric auto field ── */
+.mf-code-auto {
+  background: #f8f9fe;
+  border-color: #c5d5f5;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ── Catalogue row ── */
+.mf-cat-row {
+  display: flex;
+  gap: 8px;
+}
+
+.mf-cat-row .form-input {
+  flex: 1;
+}
+
+.mf-cat-back-btn {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* ── Leadtime row ── */
+.mf-leadtime-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mf-leadtime-input {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.mf-leadtime-unit {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* ── TagField (Note 10) ── */
+.tf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 0 4px;
+}
+
+.tf-tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  background: var(--color-accent-light);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  line-height: 1.4;
+}
+
+.tf-tag:hover {
+  background: #eef2ff;
+  border-color: #7090d0;
+  color: #2a4a8a;
+}
+
+.tf-tag--on {
+  background: #dde8ff;
+  border-color: #5070c0;
+  color: #1a3880;
+  font-weight: 600;
+}
+
+.tf-add-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.tf-new-input {
+  flex: 1;
+  font-size: 0.875rem;
+  padding: 5px 10px;
+  min-width: 0;
+  max-width: 200px;
+}
+
+.tf-add-btn {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* ProductLinePills extra style */
+.tf-tag--line {
+  font-size: 0.82rem;
+}
+
+.tf-tag-code {
+  font-family: monospace;
+  font-size: 0.72em;
+  opacity: 0.7;
+}
+
+/* ── Tag item wrapper (pill + delete button side by side) ── */
+.tf-tags {
+  row-gap: 4px;
+}
+
+.tf-tag-item {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Small delete × button beside each tag */
+.tf-tag-rmv {
+  width: 18px;
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 12px 12px 0;
+  background: var(--color-tag-bg);
+  color: var(--color-text-muted);
+  border-left: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: color 0.12s, background 0.12s;
+  line-height: 1;
+}
+
+.tf-tag-rmv:hover {
+  color: var(--color-danger);
+  background: #fde8e8;
+}
+
+/* When adjacent to a selected (on) tag */
+.tf-tag--on + .tf-tag-rmv {
+  background: #c8d8f8;
+  color: #4060a8;
+  border-left-color: #a0b8e8;
+}
+
+.tf-tag--on + .tf-tag-rmv:hover {
+  color: var(--color-danger);
+  background: #fde8e8;
+}
+
+/* Code input in add forms */
+.tf-code-input {
+  width: 80px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* ── NhomMauPills colors ── */
+.tf-tag--color {
+  font-size: 0.8rem;
+  min-width: auto;
+}
+
+.tf-color-code {
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.tf-color-sep {
+  opacity: 0.5;
+}
+
+.tf-color-name {
+  font-size: 0.75em;
+}
+
+.mf-color-unknown {
+  color: var(--color-warning);
+}
+
+/* ── Price block (Note 4) ── */
+.mf-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mf-giamua-ref {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 5px 10px;
+  background: #fffbf0;
+  border: 1px solid #f0dea0;
+  border-radius: var(--radius-sm);
+}
+
+.mf-giamua-ref strong {
+  color: var(--color-text);
+  font-family: monospace;
+}
+
+.mf-price-formula {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+
+/* ── NhomMau swatch strip ── */
+.nhm-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.nhm-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s, border-color 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nhm-swatch:hover {
+  transform: scale(1.15);
+  border-color: rgba(0,0,0,0.25);
+}
+
+.nhm-swatch--on {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(74,120,184,0.35);
+  transform: scale(1.1);
+}
+
+.nhm-check {
+  font-size: 0.75rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  pointer-events: none;
+}
+
+.nhm-selected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.nhm-selected-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.nhm-selected-code {
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--color-text-primary);
+}
+
+.nhm-selected-name {
+  color: var(--color-text-muted);
+}
+
+.nhm-clear {
+  margin-left: 4px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.nhm-clear:hover {
+  background: #fde8e8;
+  color: var(--color-danger);
+}
+
+/* ── BeMaTField ── */
+.bemat-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.bemat-chip {
+  padding: 4px 11px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.bemat-chip:hover {
+  background: var(--color-accent-light);
+  border-color: #90b0e0;
+}
+
+.bemat-chip--on {
+  background: #dde8ff;
+  border-color: #5070c0;
+  color: #2d4ea0;
+  font-weight: 600;
+}
+
+.bemat-opts--custom {
+  margin-top: -4px;
+}
+
+.bemat-chip-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.bemat-chip-rm {
+  margin-left: 2px;
+  padding: 0 4px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 3px;
+  line-height: 1.6;
+}
+.bemat-chip-rm:hover { background: #fde8e8; color: var(--color-danger); }
+
+/* ── MrFabricCodeNote (Note 8) ── */
+.mf-code-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2px 0;
+  margin-top: 7px;
+  padding: 8px 12px;
+  background: #eef2ff;
+  border: 1px solid #c5d2f5;
+  border-radius: var(--radius-sm);
+}
+
+.mf-code-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mf-code-seg-chip {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #2d4ea0;
+  background: #d8e4ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+}
+
+.mf-code-seg-hint {
+  font-size: 0.68rem;
+  color: #6070b8;
+  white-space: nowrap;
+}
+
+.mf-code-seg-dash {
+  font-size: 0.7rem;
+  color: #a0b0d8;
+  padding: 0 2px;
+}
+
+/* ── Product image field (Note 2) ── */
+.pimg-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  position: relative;
+}
+
+.pimg-zone:focus {
+  outline: none;
+  border-color: #7090d0;
+  border-style: solid;
+}
+
+.pimg-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+}
+
+.pimg-remove {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  color: var(--color-danger);
+}
+
+.pimg-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 0;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.pimg-placeholder-icon {
+  font-size: 1.8rem;
+}
+
+.pimg-placeholder-text {
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.pimg-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.pimg-file-btn {
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── NhomMau color add panel (Note 3) ── */
+.mf-color-add-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 10px;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.mf-color-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.mf-color-suggest-btn {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* Empty state hint for TagField */
+.tf-empty-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  padding: 4px 0;
+  font-style: italic;
+}
+
+/* ── HashtagField chips ── */
+.hf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.hf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px 3px 10px;
+  background: #e8f0fe;
+  border: 1px solid #c0d4f8;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  color: #2d4ea0;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.hf-chip-rm {
+  margin-left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: #6080c0;
+  transition: background 0.1s, color 0.1s;
+}
+.hf-chip-rm:hover {
+  background: #fde8e8;
+  color: var(--color-danger);
+}
