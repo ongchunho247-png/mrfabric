@@ -508,3 +508,63 @@
   padding: 0;
 }
 .fit-reset-btn:hover { color: var(--color-danger); }
+
+/* ── AI / ChatGPT panel ──────────────────────────────────────────────────── */
+.fit-ai-panel { gap: 12px; }
+
+.fit-ai-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fit-ai-btn--active {
+  background: var(--color-accent-light) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-text) !important;
+}
+
+.fit-ai-loading {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  padding: 6px 0;
+}
+
+.fit-ai-error {
+  font-size: 0.82rem;
+  color: var(--color-danger);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fit-ai-result {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fit-ai-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fit-ai-textarea {
+  width: 100%;
+  font-size: 0.82rem;
+  font-family: monospace;
+  line-height: 1.55;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.fit-ai-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}

@@ -10,6 +10,7 @@ import {
   BATCH_STATUS,
   STATUS_LABEL,
 } from '../../../helpers/fabricImageHelpers'
+import AIAssistPanel from './AIAssistPanel'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -356,6 +357,16 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
 
       {/* Slot preview — hiển thị sau khi xử lý */}
       {processedSlots && <SlotPreview slots={processedSlots} />}
+
+      {/* AI assistant — hiển thị khi đã có file */}
+      {file && (
+        <AIAssistPanel
+          nccCode={selectedEntry?.maNCC || nccExtracted}
+          color={selectedEntry?.nhomMau || ''}
+          surfaceTextureUrl={processedSlots?.surface_texture || ''}
+          scaleMetadata={null}
+        />
+      )}
 
     </div>
   )
