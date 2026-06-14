@@ -20,8 +20,84 @@ const QUALITY_LABEL = { low: 'Thấp', medium: 'Trung bình', high: 'Cao' }
 // Default quality per slot
 const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_3: 'low', slot_4: 'low' }
 
+// ── Preset chất lượng theo loại vật liệu ─────────────────────────────────────
+const QUALITY_PRESETS = [
+  {
+    id: 'pattern',
+    label: 'Họa tiết',
+    desc: 'Jacquard, in hoa, thêu, vân phức tạp',
+    qualities: { slot_1: 'medium', slot_2: 'medium', slot_3: 'low', slot_4: 'low' },
+    cost: 0.106,
+  },
+  {
+    id: 'texture',
+    label: 'Vân đơn giản',
+    desc: 'Linen, gân, plain weave, bề mặt nhẹ',
+    qualities: { slot_1: 'low', slot_2: 'medium', slot_3: 'low', slot_4: 'low' },
+    cost: 0.075,
+  },
+  {
+    id: 'solid',
+    label: 'Trơn',
+    desc: 'Màu solid, tối giản, ít chi tiết bề mặt',
+    qualities: { slot_1: 'low', slot_2: 'low', slot_3: 'low', slot_4: 'low' },
+    cost: 0.044,
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    desc: 'Tất cả cao — catalog chất lượng nhất',
+    qualities: { slot_1: 'high', slot_2: 'high', slot_3: 'medium', slot_4: 'low' },
+    cost: 0.377,
+  },
+]
+
+function matchPreset(qualities) {
+  return QUALITY_PRESETS.find((p) =>
+    SLOT_KEYS.every((sk) => p.qualities[sk.slot] === qualities[sk.slot])
+  )?.id || 'custom'
+}
+
+// ── PresetSelector ────────────────────────────────────────────────────────────
+function PresetSelector({ qualities, onApply }) {
+  const activeId = matchPreset(qualities)
+  return (
+    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+      {QUALITY_PRESETS.map((p) => {
+        const active = activeId === p.id
+        return (
+          <button
+            key={p.id}
+            onClick={() => onApply(p.qualities)}
+            title={p.desc}
+            style={{
+              padding: '4px 12px',
+              borderRadius: 20,
+              border: `1.5px solid ${active ? 'var(--color-accent)' : 'var(--color-border)'}`,
+              background: active ? 'var(--color-accent)' : 'var(--color-surface)',
+              color: active ? '#fff' : 'var(--color-text)',
+              fontSize: '0.8rem',
+              fontWeight: active ? 600 : 400,
+              cursor: 'pointer',
+              transition: 'all 0.12s',
+            }}
+          >
+            {p.label}
+            <span style={{ marginLeft: 5, opacity: 0.75, fontWeight: 400 }}>${p.cost.toFixed(3)}</span>
+          </button>
+        )
+      })}
+      {activeId === 'custom' && (
+        <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', alignSelf: 'center' }}>
+          Tùy chỉnh
+        </span>
+      )}
+    </div>
+  )
+}
+
 // ── QualityCard: chọn phân giải per slot + hiển thị chi phí ─────────────────
-function QualityCard({ qualities, onChange, colorCount }) {
+function QualityCard({ qualities, onChange, onApplyPreset, colorCount }) {
   const costPerSet = SLOT_KEYS.reduce((sum, sk) => sum + (QUALITY_PRICE[qualities[sk.slot]] || 0), 0)
   const costPerGroup = colorCount > 1
     ? costPerSet + (colorCount - 1) * (QUALITY_PRICE[qualities['slot_1']] + QUALITY_PRICE[qualities['slot_2']] + QUALITY_PRICE[qualities['slot_3']] + QUALITY_PRICE[qualities['slot_4']])
@@ -30,6 +106,7 @@ function QualityCard({ qualities, onChange, colorCount }) {
   return (
     <div className="fit-card" style={{ marginBottom: 12 }}>
       <div className="fit-card-title">Chế độ phân giải ảnh</div>
+      <PresetSelector qualities={qualities} onApply={onApplyPreset} />
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
@@ -130,6 +207,10 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
 
   function setSlotQuality(slotKey, quality) {
     setSlotQualities((prev) => ({ ...prev, [slotKey]: quality }))
+  }
+
+  function applyPreset(presetQualities) {
+    setSlotQualities(presetQualities)
   }
 
   function updateSlot(maNCC, slotKey, updates) {
@@ -421,6 +502,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
       <QualityCard
         qualities={slotQualities}
         onChange={setSlotQuality}
+        onApplyPreset={applyPreset}
         colorCount={colorVariants.length}
       />
 
