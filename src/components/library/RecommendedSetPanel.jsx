@@ -1,5 +1,11 @@
 import { useState } from 'react'
+import { findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import './RecommendedSetPanel.css'
+
+function resolveColorName(m) {
+  if (m.aiColorHex) return findClosestColorEntry(m.aiColorHex)?.name_en || findColorEntry(m.nhomMau)?.name_en || m.nhomMau || ''
+  return findColorEntry(m.nhomMau)?.name_en || m.nhomMau || ''
+}
 
 function SpecRow({ label, value }) {
   if (!value || (Array.isArray(value) && value.length === 0)) return null
@@ -17,7 +23,7 @@ function buildCopyText(items) {
   const lines = items.map((m, i) => {
     const parts = [
       `Mã sản phẩm: ${m.maMrFabric || ''}`,
-      `Màu sắc: ${m.nhomMau || ''}`,
+      `Màu sắc: ${resolveColorName(m)}`,
       `Công năng: ${Array.isArray(m.congNang) ? m.congNang.join(', ') : (m.congNang || '')}`,
       `Khổ: ${m.khoVai || ''}`,
       `Thành phần: ${m.thanhPhan || ''}`,
@@ -65,7 +71,7 @@ export default function RecommendedSetPanel({ items }) {
                 )}
               </div>
               <div className="rsp-fields">
-                <SpecRow label="Mã màu" value={m.nhomMau} />
+                <SpecRow label="Nhóm màu" value={resolveColorName(m)} />
                 <SpecRow label="Thành phần" value={m.thanhPhan} />
                 <SpecRow label="Khổ" value={m.khoVai} />
                 <SpecRow label="Công năng" value={m.congNang} />

@@ -1,4 +1,13 @@
-import { COLOR_GROUPS } from '../data/colorGroups'
+import { COLOR_GROUPS, findColorEntry, findClosestColorEntry } from '../data/colorGroups'
+
+function resolveColorName(item) {
+  if (item.aiColorHex) {
+    const closest = findClosestColorEntry(item.aiColorHex)
+    if (closest) return closest.name_en
+  }
+  const entry = findColorEntry(item.nhomMau)
+  return entry ? entry.name_en : (item.nhomMau || '—')
+}
 
 function joinArr(val) {
   if (!val) return ''
@@ -11,7 +20,7 @@ export function formatForKTS(items) {
     lines.push(`${i + 1}. ${item.maMrFabric}`)
     lines.push(`   Dòng sản phẩm: ${item.tenDongSanPham}`)
     lines.push(`   Trạng thái: ${item.moodboardStatus || 'Đề xuất chính'}`)
-    lines.push(`   Nhóm màu: ${item.nhomMau}`)
+    lines.push(`   Nhóm màu: ${resolveColorName(item)}`)
     lines.push(`   Tone màu: ${item.toneMau}`)
     lines.push(`   Ứng dụng: ${joinArr(item.ungDung)}`)
     lines.push(`   Công năng: ${joinArr(item.congNang)}`)
@@ -32,7 +41,7 @@ export function formatForSale(items) {
     lines.push(`${i + 1}. ${item.maMrFabric}`)
     lines.push(`   Dòng sản phẩm: ${item.tenDongSanPham}`)
     lines.push(`   Trạng thái: ${item.moodboardStatus || 'Đề xuất chính'}`)
-    lines.push(`   Màu: ${item.nhomMau} / ${item.toneMau}`)
+    lines.push(`   Màu: ${resolveColorName(item)} / ${item.toneMau}`)
     lines.push(`   Công năng: ${joinArr(item.congNang)}`)
     lines.push(`   Phân khúc: ${item.phanKhuc}`)
     if (item.ghiChuTuVanSale) {
@@ -65,10 +74,6 @@ export async function copyToClipboard(text) {
 }
 
 export function formatAsTable(items) {
-  function resolveColor(code) {
-    const entry = COLOR_GROUPS.find((c) => c.code === code)
-    return entry ? entry.name_en : (code || '—')
-  }
 
   function statusLabel(s) {
     if (!s || s === 'Đề xuất chính') return '✓ Đề xuất chính'
@@ -83,7 +88,7 @@ export function formatAsTable(items) {
     String(i + 1),
     item.maMrFabric || '—',
     (item.tenDongSanPham || '—').replace(/^MrFabric\s+/, ''),
-    resolveColor(item.nhomMau),
+    resolveColorName(item),
     item.khoVai || '—',
     item.thanhPhan || '—',
     statusLabel(item.moodboardStatus),

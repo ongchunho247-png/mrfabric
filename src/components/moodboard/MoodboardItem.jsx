@@ -1,4 +1,10 @@
+import { findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import './MoodboardItem.css'
+
+function resolveColorName(item) {
+  if (item.aiColorHex) return findClosestColorEntry(item.aiColorHex)?.name_en || findColorEntry(item.nhomMau)?.name_en || item.nhomMau
+  return findColorEntry(item.nhomMau)?.name_en || item.nhomMau
+}
 
 const STATUS_OPTIONS = ['Đề xuất chính', 'Phương án thay thế', 'Cần kiểm tra mẫu thật']
 
@@ -32,7 +38,7 @@ export default function MoodboardItem({ item, onViewDetail, onRemove, onStatusCh
         </div>
 
         <div className="mbi-tags">
-          {item.nhomMau && <span className="tag">{item.nhomMau}</span>}
+          {item.nhomMau && <span className="tag">{resolveColorName(item)}</span>}
           {item.toneMau && <span className="tag">{item.toneMau}</span>}
           {Array.isArray(item.congNang) && item.congNang.slice(0, 2).map((c) => (
             <span key={c} className="tag">{c}</span>
