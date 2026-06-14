@@ -3,7 +3,7 @@ import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 import { recordGeneration } from '../../../helpers/budgetStorage'
 import { addRulerOverlay } from '../../../helpers/rulerOverlay'
-import { getColorHex, getEffectiveHex, getVariantHex, saveVariantHex, resetVariantHex } from '../../../helpers/colorDictStorage'
+import { getColorHex, getVariantHex, saveVariantHex, resetVariantHex } from '../../../helpers/colorDictStorage'
 
 // ── ColorDot: compact color picker per maNCC ─────────────────────────────────
 function ColorDot({ maNCC, nhomMau, onChanged }) {
@@ -302,6 +302,17 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     checkRefs()
   }, [colorVariants])
 
+  // Khi có variant override: dùng maNCC làm name để tránh mâu thuẫn nhomMau vs hex
+  // e.g. "A15-15 (#096167)" thay vì "RD (#096167)" — AI không bị confused bởi "RD = Red"
+  function buildTargetColor(colorEntry) {
+    const variantHex  = getVariantHex(colorEntry.maNCC)
+    const effectiveHex = variantHex || getColorHex(colorEntry.nhomMau) || null
+    return {
+      name: variantHex ? colorEntry.maNCC : (colorEntry.nhomMau || colorEntry.maNCC),
+      hex:  effectiveHex,
+    }
+  }
+
   function setSlotQuality(slotKey, quality) {
     setSlotQualities((prev) => ({ ...prev, [slotKey]: quality }))
   }
@@ -342,7 +353,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               surfaceTextureUrl: baseSurfaceUrl,
               nccCode: colorEntry.maNCC,
               colorName: colorEntry.nhomMau || '',
-              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null },
+              targetColor: buildTargetColor(colorEntry),
               supplier: colorEntry.nhaCungCap || '',
               collection: colorEntry.tenCuon || '',
               scaleMetadata: scaleMetadata || null,
@@ -370,10 +381,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
 
       // Màu biến thể: recolor surface sang màu mới
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
-      const targetColor = {
-        name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null,
-      }
+      const targetColor = buildTargetColor(colorEntry)
       try {
         const res = await fetch('/api/ai/recolor-surface', {
           method: 'POST',
@@ -403,10 +411,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
   // colorMode: 'ref' = khớp màu reference (slot_1 đã render đúng màu); 'force' = đổi màu theo targetColor
   const generateAppSlot = useCallback(
     async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis, colorMode = 'force') => {
-      const targetColor = {
-        name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null,
-      }
+      const targetColor = buildTargetColor(colorEntry)
       updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
       try {
