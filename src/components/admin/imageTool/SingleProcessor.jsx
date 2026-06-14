@@ -4,10 +4,6 @@ import {
   detectImageType,
   matchNccInPriceTable,
   findColorVariants,
-  processSingleImage,
-  processMasterImage,
-  processSlotImage,
-  applyImageTransform,
   loadImageAsDataUrl,
   SLOT_KEYS,
   BATCH_STATUS,
@@ -327,78 +323,37 @@ function RulerCard({ file, onScaleConfirmed, confirmedScale }) {
   )
 }
 
-// ── Phase 3: Orientation control ──────────────────────────────────────────────
+// ── Phase 3: Grain direction picker ──────────────────────────────────────────
 
-const ORIENT_OPTIONS = [
-  { key: 'none',      label: 'Giữ nguyên' },
-  { key: 'rotate90',  label: '↻ 90°' },
-  { key: 'rotate180', label: '180°' },
-  { key: 'rotate270', label: '↺ 270°' },
-  { key: 'flipH',     label: '↔ Lật ngang' },
-  { key: 'flipV',     label: '↕ Lật dọc' },
-]
-
-function OrientationCard({ baseSurfaceUrl, onConfirm, confirmed }) {
-  const [transform, setTransform] = useState('none')
-  const [preview, setPreview] = useState(baseSurfaceUrl)
-  const [applying, setApplying] = useState(false)
-
-  useEffect(() => {
-    if (!baseSurfaceUrl) return
-    setApplying(true)
-    applyImageTransform(baseSurfaceUrl, transform).then((url) => {
-      setPreview(url)
-      setApplying(false)
-    })
-  }, [baseSurfaceUrl, transform])
-
-  if (confirmed) {
-    return (
-      <div className="fit-card fit-orient-card fit-orient-card--done">
-        <div className="fit-card-title">Chiều vải đã xác nhận ✓</div>
-        <img src={confirmed} alt="Surface" className="fit-surface-thumb" />
-        <button className="fit-reset-btn" onClick={() => onConfirm(null)}>
-          Chỉnh lại
-        </button>
-      </div>
-    )
-  }
-
+function GrainCard({ previewUrl, fabricGrain, onChange }) {
   return (
     <div className="fit-card fit-orient-card">
-      <div className="fit-card-title">Xác nhận chiều vải / họa tiết</div>
-      <div className="fit-orient-hint">
-        Kiểm tra chiều đúng của hoa văn, vân vải. Xoay / lật nếu cần trước khi xác nhận.
-        Hệ thống không tự đoán chiều — admin phải xác nhận.
+      <div className="fit-card-title">Chiều vân vải</div>
+      {previewUrl && (
+        <img src={previewUrl} alt="Ảnh gốc" className="fit-surface-thumb" style={{ marginBottom: 10 }} />
+      )}
+      <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
+        Khổ vải theo phương nào? (ảnh gốc giữ nguyên, không xử lý thêm)
       </div>
-
-      <div className="fit-orient-preview">
-        {applying
-          ? <div className="fit-orient-applying">Đang áp dụng…</div>
-          : preview && <img src={preview} alt="Preview" className="fit-orient-img" />
-        }
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          className={`btn btn-xs${fabricGrain === 'ngang' ? ' btn-primary' : ' btn-secondary'}`}
+          onClick={() => onChange('ngang')}
+        >
+          Ngang
+        </button>
+        <button
+          className={`btn btn-xs${fabricGrain === 'doc' ? ' btn-primary' : ' btn-secondary'}`}
+          onClick={() => onChange('doc')}
+        >
+          Dọc
+        </button>
       </div>
-
-      <div className="fit-orient-btns">
-        {ORIENT_OPTIONS.map((o) => (
-          <button
-            key={o.key}
-            className={`btn btn-xs${transform === o.key ? ' btn-primary' : ' btn-secondary'}`}
-            onClick={() => setTransform(o.key)}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
-
-      <button
-        className="btn btn-primary btn-xs"
-        disabled={applying}
-        onClick={() => onConfirm(preview || baseSurfaceUrl)}
-        style={{ marginTop: 8 }}
-      >
-        ✓ Xác nhận chiều vải đúng
-      </button>
+      {fabricGrain && (
+        <div style={{ marginTop: 8, fontSize: '0.8rem', color: 'var(--color-success, #16a34a)' }}>
+          ✓ Khổ vải theo phương {fabricGrain === 'ngang' ? 'ngang' : 'dọc'}
+        </div>
+      )}
     </div>
   )
 }
@@ -479,39 +434,20 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   // Phase 2: Ruler scale
   const [scaleMetadata, setScaleMetadata] = useState(null)
 
-  // Phase 3: Process + Orientation
-  const [processing, setProcessing] = useState(false)
-  const [baseSurfaceUrl, setBaseSurfaceUrl] = useState(null)   // sau crop/enhance
-  const [finalSurfaceUrl, setFinalSurfaceUrl] = useState(null) // sau xác nhận chiều
+  // Phase 3: raw surface URL (ảnh gốc, không xử lý canvas) + chiều vân
+  const [rawSurfaceUrl, setRawSurfaceUrl] = useState(null)
+  const [fabricGrain, setFabricGrain] = useState(null) // 'ngang' | 'doc'
 
-  // Auto-process khi file thay đổi (không cần button thủ công)
+  // Khi file thay đổi: chỉ load sang data URL (1 lần encode) để gửi API
   useEffect(() => {
     if (!file) return
     let cancelled = false
-    setProcessing(true)
-    setBaseSurfaceUrl(null)
-    setFinalSurfaceUrl(null)
-    ;(async () => {
-      try {
-        let surface
-        if (imageType === 'master') {
-          const slots = await processMasterImage(file)
-          surface = slots.surface_texture
-        } else if (imageType.startsWith('slot_')) {
-          const slots = await processSlotImage(file, imageType)
-          surface = slots.surface_texture || Object.values(slots)[0]
-        } else {
-          surface = await processSingleImage(file)
-        }
-        if (!cancelled) setBaseSurfaceUrl(surface)
-      } catch (err) {
-        console.error('[FIT] Auto-process error:', err)
-      } finally {
-        if (!cancelled) setProcessing(false)
-      }
-    })()
+    setRawSurfaceUrl(null)
+    setFabricGrain(null)
+    loadImageAsDataUrl(file, 1400).then((url) => {
+      if (!cancelled) setRawSurfaceUrl(url)
+    }).catch((err) => console.error('[FIT] Load image error:', err))
     return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file])
 
   // Phase 4: Scope
@@ -553,8 +489,8 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     const objectUrl = URL.createObjectURL(f)
     setFile(f)
     setPreviewUrl(objectUrl)
-    setBaseSurfaceUrl(null)
-    setFinalSurfaceUrl(null)
+    setRawSurfaceUrl(null)
+    setFabricGrain(null)
     setScaleMetadata(null)
 
     const ncc = extractNccCode(f.name)
@@ -603,12 +539,12 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setNccExtracted(''); setNccInput('')
     setImageType('single')
     setMatchResult(null); setSelectedEntry(null)
-    setBaseSurfaceUrl(null); setFinalSurfaceUrl(null)
+    setRawSurfaceUrl(null); setFabricGrain(null)
     setScaleMetadata(null)
     setScope('all'); setSelectedNccs(null)
   }
 
-  const showGenerator = !!finalSurfaceUrl && colorVariants.length > 0
+  const showGenerator = !!rawSurfaceUrl && !!fabricGrain && colorVariants.length > 0
 
   return (
     <div className="fit-single">
@@ -769,17 +705,17 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               />
             )}
 
-            {/* Phase 3: Orientation control */}
-            {baseSurfaceUrl && (
-              <OrientationCard
-                baseSurfaceUrl={baseSurfaceUrl}
-                confirmed={finalSurfaceUrl}
-                onConfirm={(url) => setFinalSurfaceUrl(url)}
+            {/* Phase 3: Grain direction */}
+            {rawSurfaceUrl && (
+              <GrainCard
+                previewUrl={previewUrl}
+                fabricGrain={fabricGrain}
+                onChange={setFabricGrain}
               />
             )}
 
             {/* Phase 4: Scope selection */}
-            {finalSurfaceUrl && colorVariants.length > 1 && (
+            {rawSurfaceUrl && fabricGrain && colorVariants.length > 1 && (
               <ScopeCard
                 colorVariants={colorVariants}
                 baseEntry={selectedEntry}
@@ -797,9 +733,10 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
       {showGenerator && (
         <MultiColorGenerator
           colorVariants={activeVariants}
-          baseSurfaceUrl={finalSurfaceUrl}
+          baseSurfaceUrl={rawSurfaceUrl}
           baseNcc={selectedEntry?.maNCC}
           scaleMetadata={scaleMetadata}
+          fabricGrain={fabricGrain}
           productType={activeType}
           slotTemplate={slotTemplate}
           onSyncColor={onSaveImages}

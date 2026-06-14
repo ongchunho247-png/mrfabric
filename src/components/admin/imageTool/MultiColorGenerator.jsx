@@ -45,7 +45,7 @@ function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, productType, slotTemplate, onSyncColor }) {
+export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, fabricGrain, productType, slotTemplate, onSyncColor }) {
   const [colorData, setColorData] = useState(() => initColorData(colorVariants))
   const [globalRunning, setGlobalRunning] = useState(false)
   const [activeColor, setActiveColor] = useState(null) // maNCC đang generate
@@ -94,6 +94,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
                 thanhPhan: colorEntry.thanhPhan || '',
                 khoVai: colorEntry.khoVai || '',
                 beMat: Array.isArray(colorEntry.beMat) ? colorEntry.beMat.join(', ') : colorEntry.beMat || '',
+                grainDirection: fabricGrain || '',
               },
             }),
           })

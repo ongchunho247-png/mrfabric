@@ -1007,6 +1007,14 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
 
   // beMat = "Linen look", "Matte smooth", v.v. — phải inject vào desc để AI render đúng surface texture
   const beMat = materialMetadata?.beMat || ''
+  // grainDirection: 'ngang' = fabric grain runs horizontally, 'doc' = vertically
+  const grainDir = materialMetadata?.grainDirection || ''
+  const grainLine = grainDir === 'ngang'
+    ? 'Fabric grain runs HORIZONTALLY — weave lines flow left-to-right across the width.'
+    : grainDir === 'doc'
+    ? 'Fabric grain runs VERTICALLY — weave lines flow top-to-bottom along the length.'
+    : ''
+
   const baseDesc = fabricAnalysis
     || `material with exact texture from reference${colorDesc ? ` in ${colorDesc}` : ''}`
   // Đặt beMat trước analysis để AI ưu tiên surface type từ database
@@ -1026,6 +1034,7 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
     activeColor                 ? ` Colorway: ${activeColor}.`                 : '',
     materialMetadata?.thanhPhan ? ` Composition: ${materialMetadata.thanhPhan}.` : '',
     beMat                       ? ` Surface: ${beMat}.`                        : '',
+    grainLine                   ? ` ${grainLine}`                               : '',
   ].join('')
 
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
