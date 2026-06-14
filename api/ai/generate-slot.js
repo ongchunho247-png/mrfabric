@@ -298,26 +298,39 @@ ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  // slot_5: không gian tổng thể ~2m — full room view
-  slot_5: (desc, colorLine, brandLine, noText) => `Professional luxury window treatment photography — full room context at 2 metres.
+  // slot_5: nội thất ~2m — full room, ripple-wave curtains, refined interior
+  slot_5: (desc, colorLine, brandLine, noText) => `Luxury interior architecture photography — floor-to-ceiling curtains in a refined living space.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: Elegant floor-to-ceiling curtain panels photographed from approximately 2 metres away — wide enough to show the full curtain in its room context:
-- 2 panels on a slim minimal rod (brushed gold or matte black)
-- Panels softly parted in the middle with relaxed natural wave folds
-- Full length from ceiling to floor, just grazing the floor
-- Soft diffused daylight filtering through or beside the panels
-- Camera distance: approximately 2 metres — full curtain and surrounding room visible
+CURTAIN SPECIFICATION (critical — follow exactly):
+- PLEAT STYLE: Wave/ripple pleat — uniform, evenly spaced S-curve waves running top to bottom
+  All waves identical in width and depth — perfectly regular, no irregular bunching, no heavy gathered folds
+- HANG: Perfectly vertical, straight hang from ceiling track or rod to floor
+- HEM: Bottom of curtain exactly 1 cm above floor — NOT pooling on floor, NOT visibly short
+- COVERAGE: Curtain panels span the full width of the window wall — floor-to-ceiling glass or large window fully covered
+- TRACK/ROD: Concealed ceiling track (preferred) or ultra-slim rod at ceiling level — minimal hardware
+- LIGHT: Soft daylight filtering through or beside the panels — curtains glow slightly from backlight if fabric is sheer or semi-sheer
 
-ROOM: Light airy minimal interior. Warm white walls. Parquet or light wood floor. Morning light creating luminous effect. Furniture partially visible at sides (not dominant).
+ROOM — refined luxury interior (like a high-end residential project):
+- Large living space, high ceiling (2.8–3.2m)
+- Neutral warm palette: cream, taupe, warm white walls and floor
+- Light wood or warm stone flooring
+- Furniture PARTIALLY visible — low-profile sofa or chaise at one side, a round coffee table, possibly a vase with tall botanical arrangement
+- Soft ambient lighting: warm downlights or natural light — no harsh overhead fluorescence
+- Calm, sophisticated atmosphere — not cluttered
 
-CAMERA: Full vertical or near-vertical composition, slight 3/4 angle showing drape depth and room breadth.
+CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximately 1.2–1.5m height. Full curtain height and room breadth visible. Distance approximately 2 metres from curtain face.
 
-STYLE: High-end window treatment — Designers Guild, Colefax & Fowler. Elegant, airy, architectural.
+STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home showroom quality. Calm, architectural, aspirational.
 
-CRITICAL: Fabric pattern and color must be visible on the curtain surface at this distance. Natural soft drape. No sofa as main subject.
+CRITICAL:
+1. Curtain waves MUST be uniform and evenly spaced — ripple/wave pleat style, not irregular natural folds
+2. Hem exactly 1 cm from floor — precise, intentional
+3. Curtain fabric pattern and color clearly recognizable on the surface at this distance
+4. Interior is refined and minimal — furniture supports, never dominates
+5. No sofa as the main subject — curtain and space are the heroes
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
