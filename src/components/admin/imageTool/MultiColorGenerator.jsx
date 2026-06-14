@@ -3,7 +3,81 @@ import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 import { recordGeneration } from '../../../helpers/budgetStorage'
 import { addRulerOverlay } from '../../../helpers/rulerOverlay'
-import { getColorHex } from '../../../helpers/colorDictStorage'
+import { getColorHex, getEffectiveHex, getVariantHex, saveVariantHex, resetVariantHex } from '../../../helpers/colorDictStorage'
+
+// ── ColorDot: compact color picker per maNCC ─────────────────────────────────
+function ColorDot({ maNCC, nhomMau, onChanged }) {
+  const [open, setOpen] = useState(false)
+  const variantHex  = getVariantHex(maNCC)
+  const groupHex    = getColorHex(nhomMau)
+  const displayHex  = variantHex || groupHex || '#cccccc'
+  const isOverridden = !!variantHex
+  const source = variantHex ? 'Tùy chỉnh mã này' : groupHex ? `Nhóm ${nhomMau}` : 'Chưa có màu'
+
+  function handleChange(e) {
+    saveVariantHex(maNCC, e.target.value)
+    onChanged()
+  }
+
+  function handleReset() {
+    resetVariantHex(maNCC)
+    onChanged()
+    setOpen(false)
+  }
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        title={`${displayHex} — ${source}`}
+        style={{
+          width: 16, height: 16, borderRadius: '50%',
+          background: displayHex,
+          border: isOverridden ? '2px solid var(--color-accent)' : '1.5px solid var(--color-border)',
+          cursor: 'pointer', padding: 0, flexShrink: 0,
+        }}
+      />
+      {open && (
+        <div
+          style={{
+            position: 'absolute', top: 22, left: 0, zIndex: 50,
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 8, padding: '10px 12px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+            minWidth: 180, display: 'flex', flexDirection: 'column', gap: 8,
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            {source} — <span style={{ fontFamily: 'monospace' }}>{displayHex.toUpperCase()}</span>
+          </div>
+          <input
+            type="color"
+            value={displayHex}
+            onChange={handleChange}
+            style={{ width: '100%', height: 32, border: 'none', cursor: 'pointer', borderRadius: 4 }}
+          />
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => setOpen(false)}
+              style={{ flex: 1, fontSize: '0.75rem', padding: '3px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)' }}
+            >
+              Đóng
+            </button>
+            {isOverridden && (
+              <button
+                onClick={handleReset}
+                style={{ flex: 1, fontSize: '0.75rem', padding: '3px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)', color: 'var(--color-text-muted)' }}
+              >
+                Reset nhóm
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -193,6 +267,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
   const [slotQualities, setSlotQualities] = useState(DEFAULT_QUALITIES)
   const [saveReference, setSaveReference] = useState(false)
   const [refSaved, setRefSaved] = useState({}) // maNCC → bool
+  const [colorOverrideRev, setColorOverrideRev] = useState(0) // tăng khi user đổi màu → re-render dot
 
   // Kiểm tra mã nào đã có surface_reference lưu trong IndexedDB
   useEffect(() => {
@@ -248,7 +323,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               surfaceTextureUrl: baseSurfaceUrl,
               nccCode: colorEntry.maNCC,
               colorName: colorEntry.nhomMau || '',
-              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: getColorHex(colorEntry.nhomMau) || null },
+              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null },
               supplier: colorEntry.nhaCungCap || '',
               collection: colorEntry.tenCuon || '',
               scaleMetadata: scaleMetadata || null,
@@ -278,7 +353,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
       const targetColor = {
         name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: getColorHex(colorEntry.nhomMau) || null,
+        hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null,
       }
       try {
         const res = await fetch('/api/ai/recolor-surface', {
@@ -311,7 +386,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis, colorMode = 'force') => {
       const targetColor = {
         name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: getColorHex(colorEntry.nhomMau) || null,
+        hex: getEffectiveHex(colorEntry.maNCC, colorEntry.nhomMau) || null,
       }
       updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
@@ -600,6 +675,12 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               {/* Color card header */}
               <div className="fit-color-header">
                 <div className="fit-color-info">
+                  <ColorDot
+                    key={`dot-${cv.maNCC}-${colorOverrideRev}`}
+                    maNCC={cv.maNCC}
+                    nhomMau={cv.nhomMau}
+                    onChanged={() => setColorOverrideRev((r) => r + 1)}
+                  />
                   <span className="fit-color-name">{cv.nhomMau || cv.maNCC}</span>
                   <span className="fit-color-code">{cv.maNCC}</span>
                   {cv.maMrFabric && (

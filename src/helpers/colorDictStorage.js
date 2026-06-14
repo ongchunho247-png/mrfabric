@@ -1,37 +1,33 @@
 import { COLOR_GROUPS, findColorEntry } from '../data/colorGroups'
 
-const KEY = 'mrfabric_color_dict'
+const KEY         = 'mrfabric_color_dict'     // nhomMau overrides (per color group)
+const VARIANT_KEY = 'mrfabric_color_variant'  // per-maNCC overrides (highest priority)
+
+// ── nhomMau dictionary ────────────────────────────────────────────────────────
 
 function loadOverrides() {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || '{}')
-  } catch {
-    return {}
-  }
+  try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} }
 }
 
 export function saveColorHex(code, hex) {
-  const overrides = loadOverrides()
-  overrides[code] = hex
-  localStorage.setItem(KEY, JSON.stringify(overrides))
+  const o = loadOverrides(); o[code] = hex
+  localStorage.setItem(KEY, JSON.stringify(o))
 }
 
 export function resetColorHex(code) {
-  const overrides = loadOverrides()
-  delete overrides[code]
-  localStorage.setItem(KEY, JSON.stringify(overrides))
+  const o = loadOverrides(); delete o[code]
+  localStorage.setItem(KEY, JSON.stringify(o))
 }
 
-// Trả về HEX cho nhomMau — ưu tiên override, fallback về default colorGroups.js
+// HEX cho nhomMau — ưu tiên override, fallback về colorGroups.js
 export function getColorHex(nhomMau) {
   if (!nhomMau) return null
   const entry = findColorEntry(nhomMau)
   if (!entry) return null
-  const overrides = loadOverrides()
-  return overrides[entry.code] || entry.hex
+  return loadOverrides()[entry.code] || entry.hex
 }
 
-// Trả về toàn bộ bảng màu (20 màu) kèm trạng thái override
+// Toàn bộ bảng màu 20 nhóm kèm trạng thái override
 export function getAllColors() {
   const overrides = loadOverrides()
   return COLOR_GROUPS.map((c) => ({
@@ -40,4 +36,30 @@ export function getAllColors() {
     isOverridden: !!overrides[c.code],
     defaultHex: c.hex,
   }))
+}
+
+// ── Per-maNCC variant overrides ───────────────────────────────────────────────
+
+function loadVariants() {
+  try { return JSON.parse(localStorage.getItem(VARIANT_KEY) || '{}') } catch { return {} }
+}
+
+export function saveVariantHex(maNCC, hex) {
+  const v = loadVariants(); v[maNCC] = hex
+  localStorage.setItem(VARIANT_KEY, JSON.stringify(v))
+}
+
+export function resetVariantHex(maNCC) {
+  const v = loadVariants(); delete v[maNCC]
+  localStorage.setItem(VARIANT_KEY, JSON.stringify(v))
+}
+
+export function getVariantHex(maNCC) {
+  if (!maNCC) return null
+  return loadVariants()[maNCC] || null
+}
+
+// ── Hàm chính — ưu tiên: per-maNCC → nhomMau dict → null ────────────────────
+export function getEffectiveHex(maNCC, nhomMau) {
+  return getVariantHex(maNCC) || getColorHex(nhomMau) || null
 }
