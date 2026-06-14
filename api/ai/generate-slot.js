@@ -308,9 +308,14 @@ CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
   · FORBIDDEN: waves that flare/spread/widen toward the bottom (like a cone or skirt shape)
   · FORBIDDEN: waves that collapse, flatten, or taper toward the bottom
   · ALL waves: smooth taut fabric between crests — no bunching, no secondary creases anywhere
-- HANG: Ceiling-mounted concealed track — no visible rod or hardware at top
+- HANG: Recessed ceiling pelmet box (hộp rèm âm trần):
+  · Track is mounted INSIDE a recessed ceiling box (approx 20 cm deep)
+  · Fabric hangs from inside the box and emerges cleanly below the plasterboard/drywall bottom face
+  · 1–2 cm clearance between fabric and plasterboard edge — fabric does NOT rub or touch the ceiling face
+  · Result: curtain flows seamlessly from the ceiling — completely concealed track, no visible rod or bracket
+  · Ceiling line is clean and straight; fabric begins just below with a subtle shadow recess at top
 - HEM: Bottom hem EXACTLY 1 cm above floor — a clean straight horizontal gap between hem and floor
-  · The 1 cm gap must be visible and consistent across the full curtain width
+  · Visible and consistent gap across the full curtain width
   · NOT pooling on floor, NOT touching floor, NOT visibly too short
 - COVERAGE: Full wall-to-wall, floor-to-ceiling curtain panels
 
