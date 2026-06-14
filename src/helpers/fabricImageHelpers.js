@@ -72,8 +72,14 @@ export function getColorHex(colorName) {
 
 /**
  * Tìm tất cả màu variants của cùng 1 mẫu vải.
- * Logic: entries cùng nhaCungCap + tenCuon → các màu khác nhau của cùng bộ sưu tập.
- * Nếu không tìm được siblings, trả về chỉ entry gốc.
+ *
+ * Quy tắc bắt buộc (spec MrFabric):
+ *  - Dùng cột "Nhóm biến thể" (nhomBienThe) để gom nhóm — KHÔNG dùng tên cuốn mẫu.
+ *  - Tất cả mã có cùng nhomBienThe là biến thể màu của nhau.
+ *  - Nếu mã không có nhomBienThe → xử lý độc lập (trả về chỉ mã đó).
+ *
+ * Fallback legacy: nếu KHÔNG có field nhomBienThe trong data (data cũ),
+ *  mới dùng nhaCungCap + tenCuon để gom — để không break data cũ.
  */
 export function findColorVariants(maNCC, priceTable) {
   if (!maNCC || !priceTable?.length) return []
@@ -83,32 +89,87 @@ export function findColorVariants(maNCC, priceTable) {
   )
   if (!base) return []
 
-  // Tìm tất cả entries cùng nhà cung cấp + cuốn mẫu
-  if (base.nhaCungCap && base.tenCuon) {
-    const siblings = priceTable.filter(
+  // ── PRIMARY: dùng Nhóm biến thể (nhomBienThe) ──────────────────────────────
+  const nhomBienThe = (base.nhomBienThe || base.variantGroup || '').trim()
+  if (nhomBienThe) {
+    const variants = priceTable.filter(
       (e) =>
         !e.deletedAt &&
-        e.nhaCungCap === base.nhaCungCap &&
-        e.tenCuon === base.tenCuon &&
-        e.nhomMau,
+        ((e.nhomBienThe || e.variantGroup || '').trim() === nhomBienThe),
     )
-    if (siblings.length > 0) {
-      // Dedup by nhomMau, giữ thứ tự: entry gốc lên đầu
+    if (variants.length > 0) {
+      // Giữ thứ tự: base lên đầu, dedup by maNCC
       const seen = new Set()
       const result = []
-      for (const e of [base, ...siblings]) {
-        const key = (e.nhomMau || '').trim().toLowerCase()
-        if (!seen.has(key)) {
-          seen.add(key)
-          result.push(e)
-        }
+      for (const e of [base, ...variants]) {
+        const key = (e.maNCC || '').trim().toLowerCase()
+        if (!seen.has(key)) { seen.add(key); result.push(e) }
       }
       return result
     }
   }
 
-  // Fallback: chỉ entry gốc
+  // ── FALLBACK LEGACY: data cũ không có nhomBienThe → dùng nhaCungCap+tenCuon ─
+  if (base.nhaCungCap && base.tenCuon) {
+    const siblings = priceTable.filter(
+      (e) =>
+        !e.deletedAt &&
+        e.nhaCungCap === base.nhaCungCap &&
+        e.tenCuon === base.tenCuon,
+    )
+    if (siblings.length > 1) {
+      const seen = new Set()
+      const result = []
+      for (const e of [base, ...siblings]) {
+        const key = (e.maNCC || '').trim().toLowerCase()
+        if (!seen.has(key)) { seen.add(key); result.push(e) }
+      }
+      return result
+    }
+  }
+
+  // ── Mã độc lập (không có nhóm) ────────────────────────────────────────────
   return [base]
+}
+
+/**
+ * Áp dụng transform (xoay / lật) lên ảnh dataURL.
+ * Dùng để admin xác nhận chiều đúng của họa tiết / vân vải.
+ */
+export function applyImageTransform(dataUrl, transform) {
+  if (!dataUrl || !transform || transform === 'none') return Promise.resolve(dataUrl)
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const rot = transform === 'rotate90' || transform === 'rotate270'
+      const w = rot ? img.height : img.width
+      const h = rot ? img.width : img.height
+      const canvas = document.createElement('canvas')
+      canvas.width = w; canvas.height = h
+      const ctx = canvas.getContext('2d')
+      ctx.save()
+      if (transform === 'rotate90')  { ctx.translate(w, 0); ctx.rotate(Math.PI / 2) }
+      if (transform === 'rotate180') { ctx.translate(w, h); ctx.rotate(Math.PI) }
+      if (transform === 'rotate270') { ctx.translate(0, h); ctx.rotate(-Math.PI / 2) }
+      if (transform === 'flipH')     { ctx.translate(w, 0); ctx.scale(-1, 1) }
+      if (transform === 'flipV')     { ctx.translate(0, h); ctx.scale(1, -1) }
+      ctx.drawImage(img, 0, 0)
+      ctx.restore()
+      resolve(canvas.toDataURL('image/jpeg', 0.92))
+    }
+    img.onerror = reject
+    img.src = dataUrl
+  })
+}
+
+/** Tải ảnh dataURL xuống máy với tên file chỉ định */
+export function downloadImageAs(dataUrl, filename) {
+  const a = document.createElement('a')
+  a.href = dataUrl
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
 
 

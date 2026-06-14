@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { SLOT_KEYS } from '../../../helpers/fabricImageHelpers'
+import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -45,7 +45,7 @@ function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onSyncColor }) {
+export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, onSyncColor }) {
   const [colorData, setColorData] = useState(() => initColorData(colorVariants))
   const [globalRunning, setGlobalRunning] = useState(false)
   const [activeColor, setActiveColor] = useState(null) // maNCC đang generate
@@ -70,12 +70,19 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
   // ── Tạo surface_texture màu mới (gọi /api/ai/recolor-surface) ────────────
   const generateSurface = useCallback(
     async (colorEntry) => {
-      const targetColor = {
-        name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: null, // sẽ được server tự xử lý nếu cần
-      }
       updateSlot(colorEntry.maNCC, 'slot_1', { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
+
+      // Màu gốc: slot_1 là bề mặt thật, không cần AI recolor
+      if (baseNcc && colorEntry.maNCC === baseNcc) {
+        updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: baseSurfaceUrl })
+        return baseSurfaceUrl
+      }
+
+      const targetColor = {
+        name: colorEntry.nhomMau || colorEntry.maNCC,
+        hex: null,
+      }
       try {
         const res = await fetch('/api/ai/recolor-surface', {
           method: 'POST',
@@ -86,6 +93,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
             nccCode: colorEntry.maNCC,
             supplier: colorEntry.nhaCungCap || '',
             collection: colorEntry.tenCuon || '',
+            scaleMetadata: scaleMetadata || null,
           }),
         })
         const data = await res.json()
@@ -97,7 +105,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
         return null
       }
     },
-    [baseSurfaceUrl],
+    [baseSurfaceUrl, baseNcc, scaleMetadata],
   )
 
   // ── Tạo 1 slot ứng dụng (slot_2–slot_6) ─────────────────────────────────
@@ -118,6 +126,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
             targetColor,
             supplier: colorEntry.nhaCungCap || '',
             collection: colorEntry.tenCuon || '',
+            scaleMetadata: scaleMetadata || null,
             materialMetadata: {
               thanhPhan: colorEntry.thanhPhan || '',
               khoVai: colorEntry.khoVai || '',
@@ -306,6 +315,16 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
           const prog = colorProgress[cv.maNCC]
           const canSync = doneCount > 0
 
+          const fileBaseName = cv.maMrFabric || cv.maNCC
+          const allDoneSlots = SLOT_KEYS.filter((s) => slots[s.slot].status === S.DONE)
+
+          function downloadAll() {
+            allDoneSlots.forEach((sk) => {
+              const url = slots[sk.slot].imageUrl
+              if (url) downloadImageAs(url, `${fileBaseName}_${sk.slot}.jpg`)
+            })
+          }
+
           return (
             <div key={cv.maNCC} className={`fit-color-card${isRunning ? ' fit-color-card--active' : ''}`}>
               {/* Color card header */}
@@ -313,6 +332,14 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
                 <div className="fit-color-info">
                   <span className="fit-color-name">{cv.nhomMau || cv.maNCC}</span>
                   <span className="fit-color-code">{cv.maNCC}</span>
+                  {cv.maMrFabric && (
+                    <span className="fit-color-code" style={{ color: 'var(--color-accent)' }}>
+                      {cv.maMrFabric}
+                    </span>
+                  )}
+                  {!cv.maMrFabric && (
+                    <span className="fit-color-code" style={{ color: '#b45309' }}>⚠ chưa có mã MrFabric</span>
+                  )}
                   {doneCount > 0 && (
                     <span className="fit-color-done">{doneCount}/6 ảnh</span>
                   )}
@@ -334,6 +361,11 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
                       {syncStatus === 'syncing' ? '⏳…'
                         : syncStatus === 'synced' ? '✓ Đã lưu'
                         : '🔄 Đồng bộ'}
+                    </button>
+                  )}
+                  {allDoneSlots.length > 0 && (
+                    <button className="btn btn-secondary btn-xs" onClick={downloadAll}>
+                      ⬇ Tải xuống ({allDoneSlots.length})
                     </button>
                   )}
                 </div>
@@ -361,7 +393,16 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, onS
                       </div>
 
                       {slot.imageUrl ? (
-                        <img src={slot.imageUrl} alt={sk.label} className="fit-slot-img" />
+                        <>
+                          <img src={slot.imageUrl} alt={sk.label} className="fit-slot-img" />
+                          <button
+                            className="fit-download-slot-btn"
+                            onClick={() => downloadImageAs(slot.imageUrl, `${fileBaseName}_${sk.slot}.jpg`)}
+                            title={`Tải ${fileBaseName}_${sk.slot}.jpg`}
+                          >
+                            ⬇
+                          </button>
+                        </>
                       ) : slot.status === S.GENERATING ? (
                         <div className="fit-slot-ph fit-aig-ph--gen">⏳ Đang tạo…</div>
                       ) : slot.status === S.ERROR ? (

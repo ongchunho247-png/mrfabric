@@ -826,3 +826,236 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
 }
+
+/* ── Product info highlight row ──────────────────────────────────────────── */
+.fit-info-row--hl .fit-info-label { color: var(--color-text); font-weight: 600; }
+.fit-info-row--hl .fit-info-value { color: var(--color-accent); font-weight: 700; }
+
+/* ── Ruler detection card ────────────────────────────────────────────────── */
+.fit-ruler-card { gap: 10px; }
+
+.fit-ruler-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.fit-ruler-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.fit-ruler-status {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 4px 0;
+}
+
+.fit-ruler-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fit-ruler-msg {
+  font-size: 0.82rem;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+}
+
+.fit-ruler-msg--high   { background: #d1fae5; color: #065f46; border-left-color: #10b981; }
+.fit-ruler-msg--medium { background: #fef3c7; color: #92400e; border-left-color: #f59e0b; }
+.fit-ruler-msg--low    { background: #fee2e2; color: #991b1b; border-left-color: #ef4444; }
+.fit-ruler-msg--warn   { background: #fef3c7; color: #92400e; border-left-color: #f59e0b; }
+
+.fit-ruler-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.fit-ruler-manual-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.fit-ruler-manual-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+
+.fit-ruler-manual-row input {
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.fit-ruler-manual-row select {
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.fit-ruler-confirmed-card { background: var(--color-accent-light); }
+
+.fit-ruler-confirmed-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.fit-ruler-tag {
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--color-border-light);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* ── Orientation card ────────────────────────────────────────────────────── */
+.fit-orient-card { gap: 12px; }
+.fit-orient-card--done { background: var(--color-accent-light); }
+
+.fit-orient-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.fit-orient-preview {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+}
+
+.fit-orient-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  display: block;
+}
+
+.fit-orient-applying {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding: 16px;
+}
+
+.fit-orient-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── Scope selection card ────────────────────────────────────────────────── */
+.fit-scope-card { gap: 10px; }
+
+.fit-scope-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fit-scope-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.fit-scope-radio input[type='radio'] { flex-shrink: 0; }
+
+.fit-scope-tag {
+  font-size: 0.72rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-border-light);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.fit-scope-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.fit-scope-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.fit-scope-check-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text);
+}
+
+.fit-scope-check-code {
+  font-size: 0.72rem;
+  font-family: monospace;
+  color: var(--color-text-muted);
+}
+
+/* ── Color chip: base color ──────────────────────────────────────────────── */
+.fit-color-chip--base {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* ── Per-slot download button ────────────────────────────────────────────── */
+.fit-download-slot-btn {
+  display: block;
+  width: 100%;
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  opacity: 0.6;
+  transition: opacity 0.12s;
+}
+
+.fit-download-slot-btn:hover { opacity: 1; color: var(--color-accent); }

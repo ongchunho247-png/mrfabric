@@ -40,7 +40,19 @@ Be specific, factual, and concise. Max 3 sentences. English only.`,
 
 // ── Step 2: Prompt cho từng slot (dùng fabricAnalysis từ vision) ──────────────
 
-function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, collection, materialMetadata }) {
+function buildScaleLine(scaleMetadata) {
+  if (!scaleMetadata) return ''
+  const { reference_length_detected, reference_unit, pixel_per_mm, scale_source } = scaleMetadata
+  if (scale_source === 'skip' || (!reference_length_detected && !pixel_per_mm)) return ''
+  const parts = []
+  if (reference_length_detected) parts.push(`Scale reference: ${reference_length_detected}`)
+  if (pixel_per_mm) parts.push(`(${pixel_per_mm.toFixed(1)} px/mm)`)
+  return parts.length
+    ? `SCALE ACCURACY: ${parts.join(' ')}. Reproduce the pattern at the exact physical scale shown in the reference image — do not enlarge, shrink, or stretch the pattern repeat.`
+    : ''
+}
+
+function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, collection, materialMetadata, scaleMetadata }) {
   // targetColor overrides colorName when doing multi-color generation
   const activeColor = targetColor?.name || colorName || null
   const colorHex = targetColor?.hex || null
@@ -54,6 +66,8 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const colorLine = colorDesc
     ? `COLOR: The fabric is in ${colorDesc} — maintain this exact color throughout the entire image.`
     : ''
+
+  const scaleLine = buildScaleLine(scaleMetadata)
 
   const brandLine = [
     supplier ? `Supplier: ${supplier}.` : '',
@@ -87,6 +101,7 @@ LIGHTING:
 STYLE: Premium fabric swatch photography. Think Liberty Fabrics, Schumacher, Dedar, or Zimmer+Rohde fabric catalog closeups. The viewer should almost feel the texture through the screen.
 
 CRITICAL: Reproduce the exact pattern, colors, repeat layout, and weave structure of the reference fabric with maximum fidelity. This is the hero texture shot — quality and accuracy are paramount. Do not alter, simplify, or stylize the original design.
+${scaleLine}
 ${brandLine}
 ${noText}`,
 
@@ -251,6 +266,7 @@ export default async function handler(req, res) {
       supplier,
       collection,
       materialMetadata,
+      scaleMetadata,
     } = req.body || {}
 
     const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
@@ -283,6 +299,7 @@ export default async function handler(req, res) {
       supplier,
       collection,
       materialMetadata,
+      scaleMetadata,
       nccCode,
     })
 
