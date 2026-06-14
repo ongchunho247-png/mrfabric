@@ -305,8 +305,9 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
   )
 
   // ── Tạo 1 slot ứng dụng (slot_2–slot_6) ─────────────────────────────────
+  // colorMode: 'ref' = khớp màu reference (slot_1 đã render đúng màu); 'force' = đổi màu theo targetColor
   const generateAppSlot = useCallback(
-    async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis) => {
+    async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis, colorMode = 'force') => {
       const targetColor = { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null }
       updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
@@ -326,6 +327,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
             productType: productType || null,
             quality: slotQualities[slotKey] || 'medium',
             fabricAnalysis: cachedFabricAnalysis || null,
+            colorMode,
             materialMetadata: {
               thanhPhan: colorEntry.thanhPhan || '',
               khoVai: colorEntry.khoVai || '',
@@ -355,11 +357,14 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     setActiveColor(colorEntry.maNCC)
     // Bước 1: tạo surface màu mới (slot_1) — nhận về fabricAnalysis để tái sử dụng
     const { imageUrl: coloredSurface, fabricAnalysis: cachedAnalysis } = await generateSurface(colorEntry)
-    // Dùng surface màu mới làm tham chiếu; nếu thất bại dùng ảnh gốc
+    // Dùng slot_1 output làm reference — nếu slot_1 thất bại fallback về ảnh gốc
     const surfaceRef = coloredSurface || baseSurfaceUrl
-    // Bước 2: tạo slot ứng dụng tuần tự — truyền fabricAnalysis đã có, tiết kiệm GPT-4o calls
+    // Bước 2: tạo slot ứng dụng tuần tự
+    // colorMode='ref' khi slot_1 đã render đúng màu → slot 2-4 khớp màu reference thay vì đổi màu lại
+    // colorMode='force' khi slot_1 thất bại → slot 2-4 tự đổi màu từ targetColor
+    const appColorMode = coloredSurface ? 'ref' : 'force'
     for (const sk of APP_SLOT_KEYS) {
-      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis)
+      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis, appColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
@@ -422,8 +427,12 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         // (optional: giữ nguyên để user quyết định)
       }
     } else {
-      const currentSurface = colorData[colorEntry.maNCC]?.slot_1?.imageUrl || baseSurfaceUrl
-      await generateAppSlot(colorEntry, slotKey, currentSurface)
+      const slot1Image = colorData[colorEntry.maNCC]?.slot_1?.imageUrl
+      const currentSurface = slot1Image || baseSurfaceUrl
+      // Nếu slot_1 đã có output → dùng làm reference + 'ref' mode để khớp màu
+      // Nếu chưa có → fallback về ảnh gốc + 'force' mode để đổi màu
+      const regenColorMode = slot1Image ? 'ref' : 'force'
+      await generateAppSlot(colorEntry, slotKey, currentSurface, null, regenColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)

@@ -1108,10 +1108,14 @@ ${noText}`,
 const TYPE_SLOT_FNS = { CUR, FAB, CUR_FAB, BL, WB, AL, RM, HN, CB, BB }
 
 // ── Main prompt builder ───────────────────────────────────────────────────────
-function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, collection, materialMetadata, scaleMetadata, productType }) {
+// colorMode:
+//   'force' (default) — AI phải đổi màu sang targetColor (dùng cho slot_1)
+//   'ref'             — AI phải khớp màu reference image (dùng cho slot_2-4 sau khi slot_1 xong)
+function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, collection, materialMetadata, scaleMetadata, productType, colorMode }) {
   const activeColor = targetColor?.name || colorName || null
   const colorHex    = targetColor?.hex  || null
   const colorDesc   = activeColor ? `${activeColor}${colorHex ? ` (${colorHex})` : ''}` : null
+  const isRefMode   = colorMode === 'ref'
 
   // beMat = "Linen look", "Matte smooth", v.v. — phải inject vào desc để AI render đúng surface texture
   const beMat = materialMetadata?.beMat || ''
@@ -1126,15 +1130,18 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const baseDesc = fabricAnalysis
     || `material with exact texture from reference${colorDesc ? ` in ${colorDesc}` : ''}`
   // Đặt beMat trước analysis để AI ưu tiên surface type từ database
-  // Khi có targetColor: gắn nhãn rõ để AI không bị confused bởi màu gốc trong analysis
   const descBase = beMat ? `[Surface type: ${beMat}] ${baseDesc}` : baseDesc
   const desc = colorDesc
-    ? `${descBase} [IGNORE any color described above — color will be overridden per COLOR CHANGE instruction]`
+    ? isRefMode
+      ? `${descBase} [IGNORE any color text above — use REFERENCE IMAGE color exactly as shown]`
+      : `${descBase} [IGNORE any color described above — color will be overridden per COLOR CHANGE instruction]`
     : descBase
 
-  // Khi có targetColor: lệnh đổi màu tuyệt đối — ghi đè màu reference image
+  // colorLine: force = đổi màu hoàn toàn; ref = khớp chính xác màu reference image
   const colorLine = colorDesc
-    ? `!!!MANDATORY COLOR CHANGE: RECOLOR the ENTIRE fabric/material to ${colorDesc}. The reference image shows a DIFFERENT color — you MUST replace ALL fabric colors with ${colorDesc}. Do NOT preserve the original reference color. Preserve ONLY the weave structure, surface texture, and pattern/motif shapes. Every fiber, thread, and surface in the output must be ${colorDesc}.`
+    ? isRefMode
+      ? `!!!CRITICAL COLOR MATCH: The reference image has already been recolored to the exact target color (${colorDesc}). You MUST reproduce this color with ABSOLUTE PRECISION — same hue, same saturation, same lightness as visible in the reference image. Do NOT drift, shift, oversaturate, or reinterpret the color in any way. The reference image IS the color authority. Apply this exact color to every fiber, thread, and surface in the output.`
+      : `!!!MANDATORY COLOR CHANGE: RECOLOR the ENTIRE fabric/material to ${colorDesc}. The reference image shows a DIFFERENT color — you MUST replace ALL fabric colors with ${colorDesc}. Do NOT preserve the original reference color. Preserve ONLY the weave structure, surface texture, and pattern/motif shapes. Every fiber, thread, and surface in the output must be ${colorDesc}.`
     : ''
 
   const scaleLine = buildScaleLine(scaleMetadata)
@@ -1185,6 +1192,7 @@ export default async function handler(req, res) {
       productType,
       quality,                        // 'low' | 'medium' | 'high' — từ QualityCard
       fabricAnalysis: cachedAnalysis, // tái sử dụng từ slot trước, bỏ qua GPT-4o call
+      colorMode,                      // 'force' | 'ref' — cách xử lý màu
     } = req.body || {}
 
     const VALID_QUALITY = ['low', 'medium', 'high']
@@ -1225,6 +1233,7 @@ export default async function handler(req, res) {
       scaleMetadata,
       productType,
       nccCode,
+      colorMode,
     })
 
     // Step 3a: gpt-image-1 via images.edit() — preserves reference texture
