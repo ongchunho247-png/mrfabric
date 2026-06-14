@@ -47,16 +47,22 @@ export default function MaterialImageViewer({ material }) {
     setMainErr(false)
   }
 
+  const isDiagram = activeTab === 'detail_image'
+
   return (
     <div className="miv">
       {/* ── Main large image ── */}
-      <div className="miv-main-wrap">
+      <div
+        className="miv-main-wrap"
+        style={isDiagram ? { aspectRatio: '1/1', background: '#ffffff' } : undefined}
+      >
         {mainSrc && !mainErr ? (
           <img
             key={mainSrc}
             src={mainSrc}
             alt={activeTabObj?.label}
             className="miv-main-img"
+            style={isDiagram ? { objectFit: 'contain' } : undefined}
             onError={() => setMainErr(true)}
           />
         ) : (
