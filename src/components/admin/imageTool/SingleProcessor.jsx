@@ -10,6 +10,7 @@ import {
   STATUS_LABEL,
 } from '../../../helpers/fabricImageHelpers'
 import MultiColorGenerator from './MultiColorGenerator'
+import BudgetCard from './BudgetCard'
 import {
   detectProductType,
   getSlotTemplate,
@@ -735,6 +736,9 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
           </div>
         </div>
       )}
+
+      {/* Budget tracker — luôn hiện khi có tool AI */}
+      {showGenerator && <BudgetCard colorCount={activeVariants.length} />}
 
       {/* Phase 5+6: MultiColorGenerator */}
       {showGenerator && (

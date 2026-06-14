@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
+import { recordGeneration } from '../../../helpers/budgetStorage'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -435,6 +436,18 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         await idbSave(surfaceRefKey(colorEntry.maMrFabric), slots['slot_1'].imageUrl)
         setRefSaved((prev) => ({ ...prev, [colorEntry.maNCC]: true }))
       }
+
+      // Ghi nhận chi phí vào budget tracker
+      const activePreset = QUALITY_PRESETS.find((p) =>
+        Object.keys(slotQualities).every((k) => p.qualities[k] === slotQualities[k])
+      )
+      recordGeneration({
+        maNCC:      colorEntry.maNCC,
+        maMrFabric: colorEntry.maMrFabric || '',
+        preset:     activePreset?.label || 'custom',
+        qualities:  slotQualities,
+        colorCount: 1,
+      })
 
       setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'synced' }))
       setSyncMsgs((prev) => ({
