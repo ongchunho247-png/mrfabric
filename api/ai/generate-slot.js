@@ -123,63 +123,45 @@ ${noText}`
 }
 
 function slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine) {
-  const isGrainKho  = grainLine && grainLine.includes('HORIZONTALLY')
-  const isGrainCuon = grainLine && grainLine.includes('VERTICALLY')
-
-  // Icon cuộn vải: hình minh họa cylinder, mũi tên chỉ hướng, không text
-  const rollIcon = (isGrainKho || isGrainCuon) ? `
-GRAIN DIRECTION ICON — place in TOP-RIGHT corner, compact (approx 12% of image width):
-- STYLE: INVERTED/NEGATIVE — dark background (#1c1c1c), all lines and arrow in WHITE or light grey
-- Draw a fabric roll illustration (technical icon style):
-  · Cylindrical roll on the LEFT side of the icon: circular end with 2–3 concentric rings visible, dark fill, light outline
-  · Unrolled fabric panel extending ${isGrainKho ? 'to the RIGHT (landscape orientation)' : 'UPWARD (portrait orientation)'}
-    from the roll, bordered with a thin light-colored rectangle
-  · ONE bold directional arrow in WHITE:
-    ${isGrainKho
-      ? '→ horizontal arrow pointing RIGHT, drawn on the fabric panel surface'
-      : '↑ vertical arrow pointing UP, drawn on the fabric panel surface'}
-- NO text, NO labels anywhere on the icon — arrow and roll illustration only
-- Entire icon has dark background, all elements are light/white lines on dark
-- Compact, self-contained in top-right corner, does not overlap material or rulers` : ''
-
-  return `Technical fabric specification diagram — material sample fills the frame, thin L-shaped rulers at edges, grain direction icon.
+  return `Technical fabric specification diagram — fabric sample with L-shaped scale rulers.
 
 MATERIAL: ${desc}
 ${colorLine}
-${grainLine ? `GRAIN DIRECTION: ${grainLine}` : ''}
 
 LAYOUT — follow exactly:
 
 RULERS:
-- LEFT RULER (Y-axis): thin strip running the FULL HEIGHT of the image, flush to the LEFT EDGE, no gap
-  - Marks every 1 cm; ONLY these labels printed: 0, 5, 10, 15 — no other numbers
-  - Scale top=0, bottom=15 OR bottom=0, top=15 (consistent ascending direction)
-  - Ruler width: minimal — approx 5% of image width
-  - Tick style: short horizontal lines, black on white/light background
-- BOTTOM RULER (X-axis): thin strip running the FULL WIDTH of the image, flush to the BOTTOM EDGE, no gap
-  - Marks every 1 cm; ONLY these labels printed: 0, 5, 10, 15 — no other numbers
-  - Scale left=0, right=15 (left to right ascending)
-  - Ruler height: minimal — approx 5% of image height
-  - Tick style: short vertical lines, black on white/light background
-- Both rulers fill the entire image edge top-to-bottom / left-to-right
-- Rulers meet cleanly at BOTTOM-LEFT corner (origin 0,0)
+- LEFT RULER (Y-axis): white ruler strip running the FULL HEIGHT of the image, flush to the LEFT EDGE
+  · Pure white background, crisp sharp black tick marks and numbers
+  · Every 1 cm tick mark; NUMBER LABELS ONLY at: 0, 5, 10, 15 — absolutely no other numbers
+  · Numbers: large, bold, black, clearly legible — printed inside the white ruler strip
+  · Scale: 0 at bottom, 15 at top
+  · Ruler width: narrow — approx 6% of image width
+- BOTTOM RULER (X-axis): white ruler strip running the FULL WIDTH of the image, flush to the BOTTOM EDGE
+  · Pure white background, crisp sharp black tick marks and numbers
+  · Every 1 cm tick mark; NUMBER LABELS ONLY at: 0, 5, 10, 15 — absolutely no other numbers
+  · Numbers: large, bold, black, clearly legible — printed inside the white ruler strip
+  · Scale: 0 at left, 15 at right
+  · Ruler height: narrow — approx 6% of image height
+- Rulers meet at BOTTOM-LEFT corner (origin 0,0) — clean 90° joint
+- Both rulers extend edge-to-edge across the full image width/height with NO gaps
 
-MATERIAL:
-- Fills ALL remaining space after the two thin ruler strips — approximately 90% of the image
-- Flat, taut, completely square — no folds, no drape, no curled edges
-- Surface texture and pattern clearly visible
-${rollIcon}
+FABRIC SAMPLE:
+- Fills ALL remaining space — occupies the TOP-RIGHT area after the two ruler strips (~88% of image)
+- A perfectly square, flat fabric swatch with a SHARP crisp border on all 4 sides (thin dark outline)
+- Fabric lies completely flat — no folds, no drape, no curl, no shadow at edges
+- Surface texture and pattern reproduced faithfully, evenly lit
 
 BACKGROUND: Pure white.
-CAMERA: 90° top-down, perfectly level, zero perspective.
-LIGHTING: Bright flat even light — all ruler marks legible, material texture visible.
+CAMERA: 90° top-down, perfectly level, zero perspective distortion.
+LIGHTING: Bright, flat, shadowless — fabric surface evenly lit, ruler numbers fully legible.
 
 CRITICAL:
-1. Ruler labels ONLY at 0, 5, 10, 15 — no other numbers anywhere on the rulers
-2. Both rulers flush to image edges, filling the full edge length
-3. Material fills maximum space — flat, no folds
-4. 90° overhead only
-5. Grain icon (if present): INVERTED/NEGATIVE style — dark background, white/light lines and arrow, no text, top-right corner, compact (≈12% of image width)
+1. Ruler numbers at EXACTLY 0, 5, 10, 15 — bold, black, sharp — no other numbers
+2. Ruler strips extend full image edge, flush, no gaps
+3. Fabric swatch perfectly square with a clear sharp border
+4. No grain direction icons, no symbols, no labels on the fabric surface
+5. 90° overhead only, white background only
 ${brandLine}
 ${noText}`
 }
