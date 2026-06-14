@@ -350,19 +350,31 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     [scaleMetadata, productType, fabricGrain],
   )
 
-  // ── Tạo đầy đủ 6 slot cho 1 màu ─────────────────────────────────────────
+  // ── Tạo đầy đủ 4 slot cho 1 màu ─────────────────────────────────────────
   async function generateColor(colorEntry) {
     setActiveColor(colorEntry.maNCC)
     // Bước 1: tạo surface màu mới (slot_1) — nhận về fabricAnalysis để tái sử dụng
     const { imageUrl: coloredSurface, fabricAnalysis: cachedAnalysis } = await generateSurface(colorEntry)
     // Dùng surface màu mới làm tham chiếu; nếu thất bại dùng ảnh gốc
     const surfaceRef = coloredSurface || baseSurfaceUrl
-    // Bước 2: tạo 5 slot ứng dụng tuần tự — truyền fabricAnalysis đã có, tiết kiệm 5 GPT-4o calls
+    // Bước 2: tạo slot ứng dụng tuần tự — truyền fabricAnalysis đã có, tiết kiệm GPT-4o calls
     for (const sk of APP_SLOT_KEYS) {
       await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
+
+    // Ghi nhận chi phí ngay khi tạo xong — không đợi đồng bộ
+    const activePreset = QUALITY_PRESETS.find((p) =>
+      Object.keys(slotQualities).every((k) => p.qualities[k] === slotQualities[k])
+    )
+    recordGeneration({
+      maNCC:      colorEntry.maNCC,
+      maMrFabric: colorEntry.maMrFabric || '',
+      preset:     activePreset?.label || 'custom',
+      qualities:  slotQualities,
+      colorCount: 1,
+    })
   }
 
   // ── Tạo toàn bộ (tất cả màu, tuần tự) ───────────────────────────────────
@@ -441,18 +453,6 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         await idbSave(surfaceRefKey(colorEntry.maMrFabric), slots['slot_1'].imageUrl)
         setRefSaved((prev) => ({ ...prev, [colorEntry.maNCC]: true }))
       }
-
-      // Ghi nhận chi phí vào budget tracker
-      const activePreset = QUALITY_PRESETS.find((p) =>
-        Object.keys(slotQualities).every((k) => p.qualities[k] === slotQualities[k])
-      )
-      recordGeneration({
-        maNCC:      colorEntry.maNCC,
-        maMrFabric: colorEntry.maMrFabric || '',
-        preset:     activePreset?.label || 'custom',
-        qualities:  slotQualities,
-        colorCount: 1,
-      })
 
       setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'synced' }))
       setSyncMsgs((prev) => ({
