@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import {
   extractNccCode,
   detectImageType,
@@ -467,6 +467,8 @@ function ScopeCard({ colorVariants, baseEntry, scope, setScope, selectedNccs, se
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) {
+  const replaceFileInputRef = useRef(null)
+
   // File & NCC
   const [file, setFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -590,6 +592,20 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setScope('all'); setSelectedNccs(null)
   }
 
+  // Chọn lại: mở file dialog ngay, chỉ reset state khi user thật sự chọn file mới
+  // Không clear state nếu user huỷ dialog → ở lại workspace hiện tại
+  function handleChooseNew() {
+    replaceFileInputRef.current?.click()
+  }
+
+  function handleReplaceFile(e) {
+    const f = e.target.files?.[0]
+    e.target.value = '' // reset input để có thể chọn lại cùng file
+    if (!f) return
+    handleReset()
+    handleFile(f)
+  }
+
   const showGenerator = !!rawSurfaceUrl && colorVariants.length > 0
 
   return (
@@ -625,7 +641,14 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
             <img src={previewUrl} alt={file.name} className="fit-preview-img" />
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <TypeChip type={imageType} />
-              <button className="fit-reset-btn" onClick={handleReset}>↺ Chọn lại</button>
+              <button className="fit-reset-btn" onClick={handleChooseNew}>↺ Chọn lại</button>
+              <input
+                ref={replaceFileInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,image/*"
+                onChange={handleReplaceFile}
+                style={{ display: 'none' }}
+              />
             </div>
             <div className="fit-card">
               <div className="fit-card-title">Tên file</div>

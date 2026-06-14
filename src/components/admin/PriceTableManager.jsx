@@ -497,9 +497,8 @@ function NccPriceSection({ nccName, nccCode, nccCodes, entries, priceTable, onUp
                                         return (
                                           <span className="ptm-color">
                                             <span className="ptm-color-dot" style={{ background: varHex || ce.hex }} />
-                                            {varHex
-                                              ? <span style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{varHex.toUpperCase()}</span>
-                                              : ce.name_en}
+                                            {ce.name_en}
+                                            {varHex && <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--color-text-muted)', marginLeft: 4 }}>{varHex.toUpperCase()}</span>}
                                           </span>
                                         )
                                       }
