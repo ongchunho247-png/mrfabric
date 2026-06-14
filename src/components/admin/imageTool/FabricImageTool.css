@@ -1141,3 +1141,36 @@
 }
 
 .fit-template-slot-label { color: var(--color-text); }
+
+/* ── Direct Importer ─────────────────────────────────────────────────────── */
+.fit-di {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fit-di-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  padding: 10px 14px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent);
+}
+
+.fit-di-intro-conventions {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.fit-di-intro code {
+  font-family: monospace;
+  background: var(--color-border-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.82em;
+  color: var(--color-text);
+}
