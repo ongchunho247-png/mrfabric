@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { COLOR_GROUPS, findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import { getProductTypeCode } from '../../helpers/generateMrFabricCode'
 import { getNccCode } from '../../helpers/nccCodeStorage'
+import { getVariantHex } from '../../helpers/colorDictStorage'
 import './MaterialLibraryAdmin.css'
 
 const COLS = [
@@ -292,10 +293,15 @@ export default function MaterialLibraryAdmin({ priceTable = [], nccCodes = {} })
                           {!H.has('thanhPhan')   && <td>{e.thanhPhan || '—'}</td>}
                           {!H.has('nhomMau')     && (
                             <td>
-                              <span className="mla-color">
-                                {colorEntry && <span className="mla-color-dot" style={{ background: e.aiColorHex || colorEntry.hex }} />}
-                                {(e.aiColorHex ? findClosestColorEntry(e.aiColorHex)?.name_en : null) || (colorEntry ? colorEntry.name_en : (e.nhomMau || '—'))}
-                              </span>
+                              {(() => {
+                                const effectiveHex = getVariantHex(e.maNCC) || e.aiColorHex || null
+                                return (
+                                  <span className="mla-color">
+                                    {colorEntry && <span className="mla-color-dot" style={{ background: effectiveHex || colorEntry.hex }} />}
+                                    {(effectiveHex ? findClosestColorEntry(effectiveHex)?.name_en : null) || (colorEntry ? colorEntry.name_en : (e.nhomMau || '—'))}
+                                  </span>
+                                )
+                              })()}
                             </td>
                           )}
                           {!H.has('beMat')       && <td className="mla-td-long">{beMatStr}</td>}
