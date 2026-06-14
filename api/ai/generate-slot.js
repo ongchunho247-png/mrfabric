@@ -1084,8 +1084,12 @@ export default async function handler(req, res) {
       materialMetadata,
       scaleMetadata,
       productType,
+      quality,                        // 'low' | 'medium' | 'high' — từ QualityCard
       fabricAnalysis: cachedAnalysis, // tái sử dụng từ slot trước, bỏ qua GPT-4o call
     } = req.body || {}
+
+    const VALID_QUALITY = ['low', 'medium', 'high']
+    const imageQuality = VALID_QUALITY.includes(quality) ? quality : 'medium'
 
     const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
     if (!slot || !VALID_SLOTS.includes(slot)) {
@@ -1133,7 +1137,7 @@ export default async function handler(req, res) {
         prompt,
         n: 1,
         size: '1024x1024',
-        quality: 'medium',
+        quality: imageQuality,
       })
       const b64 = editResponse.data[0]?.b64_json
       if (!b64) throw new Error('images.edit trả về rỗng')

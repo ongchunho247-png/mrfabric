@@ -3,13 +3,72 @@ import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
-const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2–6
+const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2, 4, 6
 
 const SLOT_PROGRESS = {
   slot_1: 'Tạo bề mặt vải…',
   slot_2: 'Tạo ảnh cận chất liệu…',
   slot_4: 'Tạo ảnh không gian gần (~1m)…',
   slot_6: 'Tạo ảnh ruler tỉ lệ…',
+}
+
+// Giá ước tính USD per image (gpt-image-1, 1024×1024)
+const QUALITY_PRICE = { low: 0.011, medium: 0.042, high: 0.167 }
+const QUALITY_LABEL = { low: 'Thấp', medium: 'Trung bình', high: 'Cao' }
+
+// Default quality per slot
+const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_4: 'low', slot_6: 'low' }
+
+// ── QualityCard: chọn phân giải per slot + hiển thị chi phí ─────────────────
+function QualityCard({ qualities, onChange, colorCount }) {
+  const costPerSet = SLOT_KEYS.reduce((sum, sk) => sum + (QUALITY_PRICE[qualities[sk.slot]] || 0), 0)
+  const costPerGroup = colorCount > 1
+    ? costPerSet + (colorCount - 1) * (QUALITY_PRICE[qualities['slot_2']] + QUALITY_PRICE[qualities['slot_4']] + QUALITY_PRICE[qualities['slot_6']] + QUALITY_PRICE[qualities['slot_1']])
+    : costPerSet
+
+  return (
+    <div className="fit-card" style={{ marginBottom: 12 }}>
+      <div className="fit-card-title">Chế độ phân giải ảnh</div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+        <thead>
+          <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
+            <th style={{ textAlign: 'left', padding: '4px 0', fontWeight: 600 }}>Slot</th>
+            <th style={{ padding: '4px 8px' }}>Thấp<br /><span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>$0.011</span></th>
+            <th style={{ padding: '4px 8px' }}>Trung bình<br /><span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>$0.042</span></th>
+            <th style={{ padding: '4px 8px' }}>Cao<br /><span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>$0.167</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {SLOT_KEYS.map((sk) => (
+            <tr key={sk.slot} style={{ borderBottom: '1px solid var(--color-border-light, #f0f0f0)' }}>
+              <td style={{ padding: '5px 0' }}>
+                <span style={{ fontWeight: 500 }}>{sk.slot.replace('slot_', 'Slot ')}</span>
+                <span style={{ color: 'var(--color-text-muted)', marginLeft: 6 }}>{sk.label}</span>
+              </td>
+              {['low', 'medium', 'high'].map((q) => (
+                <td key={q} style={{ textAlign: 'center', padding: '5px 8px' }}>
+                  <input
+                    type="radio"
+                    name={`quality-${sk.slot}`}
+                    checked={qualities[sk.slot] === q}
+                    onChange={() => onChange(sk.slot, q)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ marginTop: 10, fontSize: '0.82rem', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <span>Chi phí/bộ: <strong>${costPerSet.toFixed(3)}</strong></span>
+        {colorCount > 1 && (
+          <span>Toàn nhóm ({colorCount} màu): <strong>${costPerGroup.toFixed(3)}</strong></span>
+        )}
+        <span style={{ color: 'var(--color-text-muted)' }}>≈ ${5 / costPerSet | 0} bộ/$5</span>
+      </div>
+    </div>
+  )
 }
 
 function initColorData(colorVariants) {
@@ -46,10 +105,15 @@ function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
 export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, fabricGrain, productType, slotTemplate, onSyncColor }) {
   const [colorData, setColorData] = useState(() => initColorData(colorVariants))
   const [globalRunning, setGlobalRunning] = useState(false)
-  const [activeColor, setActiveColor] = useState(null) // maNCC đang generate
-  const [colorProgress, setColorProgress] = useState({}) // { [maNCC]: string }
-  const [syncStatuses, setSyncStatuses] = useState({}) // { [maNCC]: null | 'syncing' | 'synced' | 'error' }
-  const [syncMsgs, setSyncMsgs] = useState({}) // { [maNCC]: string }
+  const [activeColor, setActiveColor] = useState(null)
+  const [colorProgress, setColorProgress] = useState({})
+  const [syncStatuses, setSyncStatuses] = useState({})
+  const [syncMsgs, setSyncMsgs] = useState({})
+  const [slotQualities, setSlotQualities] = useState(DEFAULT_QUALITIES)
+
+  function setSlotQuality(slotKey, quality) {
+    setSlotQualities((prev) => ({ ...prev, [slotKey]: quality }))
+  }
 
   function updateSlot(maNCC, slotKey, updates) {
     setColorData((prev) => ({
@@ -88,6 +152,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               collection: colorEntry.tenCuon || '',
               scaleMetadata: scaleMetadata || null,
               productType: productType || null,
+              quality: slotQualities['slot_1'] || 'medium',
               materialMetadata: {
                 thanhPhan: colorEntry.thanhPhan || '',
                 khoVai: colorEntry.khoVai || '',
@@ -159,7 +224,8 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
             collection: colorEntry.tenCuon || '',
             scaleMetadata: scaleMetadata || null,
             productType: productType || null,
-            fabricAnalysis: cachedFabricAnalysis || null, // tái sử dụng — bỏ qua GPT-4o call
+            quality: slotQualities[slotKey] || 'medium',
+            fabricAnalysis: cachedFabricAnalysis || null,
             materialMetadata: {
               thanhPhan: colorEntry.thanhPhan || '',
               khoVai: colorEntry.khoVai || '',
@@ -326,6 +392,13 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
           Cần xử lý ảnh thật trước (bấm ▶ Xử lý ảnh ở trên) để có ảnh tham chiếu.
         </div>
       )}
+
+      {/* Quality settings */}
+      <QualityCard
+        qualities={slotQualities}
+        onChange={setSlotQuality}
+        colorCount={colorVariants.length}
+      />
 
       {/* Global actions */}
       <div className="fit-mcg-actions">
