@@ -3,6 +3,7 @@ import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 import { recordGeneration } from '../../../helpers/budgetStorage'
 import { addRulerOverlay } from '../../../helpers/rulerOverlay'
+import { getColorHex } from '../../../helpers/colorDictStorage'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -247,7 +248,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               surfaceTextureUrl: baseSurfaceUrl,
               nccCode: colorEntry.maNCC,
               colorName: colorEntry.nhomMau || '',
-              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null },
+              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: getColorHex(colorEntry.nhomMau) || null },
               supplier: colorEntry.nhaCungCap || '',
               collection: colorEntry.tenCuon || '',
               scaleMetadata: scaleMetadata || null,
@@ -277,7 +278,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
       const targetColor = {
         name: colorEntry.nhomMau || colorEntry.maNCC,
-        hex: null,
+        hex: getColorHex(colorEntry.nhomMau) || null,
       }
       try {
         const res = await fetch('/api/ai/recolor-surface', {
@@ -308,7 +309,10 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
   // colorMode: 'ref' = khớp màu reference (slot_1 đã render đúng màu); 'force' = đổi màu theo targetColor
   const generateAppSlot = useCallback(
     async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis, colorMode = 'force') => {
-      const targetColor = { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null }
+      const targetColor = {
+        name: colorEntry.nhomMau || colorEntry.maNCC,
+        hex: getColorHex(colorEntry.nhomMau) || null,
+      }
       updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
       try {

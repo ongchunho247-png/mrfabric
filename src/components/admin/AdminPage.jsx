@@ -8,6 +8,7 @@ import MaterialLibraryAdmin from './MaterialLibraryAdmin'
 import VisibilityManager from './VisibilityManager'
 import BatchImageUpdater from './BatchImageUpdater'
 import FabricImageTool from './imageTool/FabricImageTool'
+import ColorDictEditor from './ColorDictEditor'
 import './AdminPage.css'
 
 export default function AdminPage({ allMaterials, adminMaterials, setAdminMaterials, onGoToLibrary, onUpdateMaterialImage }) {
@@ -250,6 +251,12 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
           >
             Fabric Image Tool
           </button>
+          <button
+            className={`admin-tab-btn${adminTab === 'color-dict' ? ' admin-tab-btn--active' : ''}`}
+            onClick={() => setAdminTab('color-dict')}
+          >
+            Bảng màu AI
+          </button>
         </div>
 
         {adminTab === 'price-table' && (
@@ -326,6 +333,10 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
             nccCodes={nccCodes}
             onSaveImages={handleSaveFabricImages}
           />
+        )}
+
+        {adminTab === 'color-dict' && (
+          <ColorDictEditor />
         )}
       </div>
     </div>
