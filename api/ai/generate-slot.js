@@ -306,13 +306,17 @@ FABRIC: ${desc}
 ${colorLine}
 
 CURTAIN SPECIFICATION (critical — follow exactly):
-- PLEAT STYLE: Wave/ripple pleat — uniform, evenly spaced S-curve waves running top to bottom
-  All waves identical in width and depth — perfectly regular, no irregular bunching, no heavy gathered folds
-- HANG: Perfectly vertical, straight hang from ceiling track or rod to floor
-- HEM: Bottom of curtain exactly 1 cm above floor — NOT pooling on floor, NOT visibly short
-- COVERAGE: Curtain panels span the full width of the window wall — floor-to-ceiling glass or large window fully covered
-- TRACK/ROD: Concealed ceiling track (preferred) or ultra-slim rod at ceiling level — minimal hardware
-- LIGHT: Soft daylight filtering through or beside the panels — curtains glow slightly from backlight if fabric is sheer or semi-sheer
+- PLEAT STYLE: Ripple fold / S-fold pleat — this is the defining feature of the image
+  · Each wave is a gentle, round S-curve — soft rounded peaks, soft rounded valleys
+  · ALL waves are IDENTICAL: same width, same depth, same spacing from left to right
+  · Waves run perfectly straight top to bottom — each fold is a continuous vertical column
+  · Fabric between peaks hangs straight and smooth — no bunching, no gathering
+  · Wave amplitude: moderate and consistent — NOT dramatic large folds, NOT tight micro pleats
+  · Reference style: ceiling track ripple-fold system (Kvadrat, Hunter Douglas Wave, Silent Gliss Metropole)
+- HANG: Perfectly vertical drop from ceiling-mounted track — each ripple column plumb straight
+- HEM: Bottom of curtain exactly 1 cm above floor — NOT pooling, NOT short
+- COVERAGE: Curtain panels span full width of window wall, floor to ceiling
+- TRACK: Concealed ceiling track — no visible rod or hardware at top
 
 ROOM — refined luxury interior (like a high-end residential project):
 - Large living space, high ceiling (2.8–3.2m)
@@ -327,11 +331,13 @@ CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximat
 STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home showroom quality. Calm, architectural, aspirational.
 
 CRITICAL:
-1. Curtain waves MUST be uniform and evenly spaced — ripple/wave pleat style, not irregular natural folds
+1. RIPPLE FOLD waves MUST be uniform — every single wave is round, soft, identical width and depth
+   Do NOT produce: large uneven folds, pinch-pleat bunching, or irregular dramatic draping
+   The correct look: a row of equal, gentle S-curves like a sine wave — consistent from edge to edge
 2. Hem exactly 1 cm from floor — precise, intentional
-3. Curtain fabric pattern and color clearly recognizable on the surface at this distance
+3. Curtain fabric color and any surface texture clearly visible at this distance
 4. Interior is refined and minimal — furniture supports, never dominates
-5. No sofa as the main subject — curtain and space are the heroes
+5. No sofa as the main subject — curtain wall is the hero
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
