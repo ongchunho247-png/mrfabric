@@ -325,6 +325,11 @@ function RulerCard({ file, onScaleConfirmed, confirmedScale }) {
 
 // ── Phase 3: Grain direction picker ──────────────────────────────────────────
 
+/*
+ * fabricGrain lưu dạng: 'kho' | 'cuon'
+ *   'kho'  = vân chạy theo chiều KHỔ VẢI (↔ ngang, vuông góc cuộn)
+ *   'cuon' = vân chạy theo chiều CUỘN VẢI (↕ dọc, song song cuộn)
+ */
 function GrainCard({ previewUrl, fabricGrain, onChange }) {
   return (
     <div className="fit-card fit-orient-card">
@@ -333,25 +338,27 @@ function GrainCard({ previewUrl, fabricGrain, onChange }) {
         <img src={previewUrl} alt="Ảnh gốc" className="fit-surface-thumb" style={{ marginBottom: 10 }} />
       )}
       <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
-        Khổ vải theo phương nào? (ảnh gốc giữ nguyên, không xử lý thêm)
+        Vân vải chạy theo hướng nào của cuộn vải?
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button
-          className={`btn btn-xs${fabricGrain === 'ngang' ? ' btn-primary' : ' btn-secondary'}`}
-          onClick={() => onChange('ngang')}
+          className={`btn btn-xs${fabricGrain === 'kho' ? ' btn-primary' : ' btn-secondary'}`}
+          onClick={() => onChange('kho')}
         >
-          Ngang
+          ↔ Theo khổ vải
         </button>
         <button
-          className={`btn btn-xs${fabricGrain === 'doc' ? ' btn-primary' : ' btn-secondary'}`}
-          onClick={() => onChange('doc')}
+          className={`btn btn-xs${fabricGrain === 'cuon' ? ' btn-primary' : ' btn-secondary'}`}
+          onClick={() => onChange('cuon')}
         >
-          Dọc
+          ↕ Theo chiều cuộn
         </button>
       </div>
       {fabricGrain && (
-        <div style={{ marginTop: 8, fontSize: '0.8rem', color: 'var(--color-success, #16a34a)' }}>
-          ✓ Khổ vải theo phương {fabricGrain === 'ngang' ? 'ngang' : 'dọc'}
+        <div style={{ marginTop: 10, fontSize: '0.8rem', color: 'var(--color-success, #16a34a)', lineHeight: 1.5 }}>
+          ✓ Vân chạy {fabricGrain === 'kho'
+            ? '↔ theo khổ vải — vuông góc với chiều cuộn'
+            : '↕ theo chiều cuộn — song song với chiều cuộn'}
         </div>
       )}
     </div>

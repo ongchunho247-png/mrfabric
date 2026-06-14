@@ -121,43 +121,57 @@ ${brandLine}
 ${noText}`
 }
 
-function slot6_ruler(desc, colorLine, brandLine, noText, productType) {
+function slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine) {
   const materialNote = ['WB', 'AL'].includes(productType)
     ? 'aluminum or wood slat sample (full width visible)'
     : 'flat fabric/material sample (approx 25cm × 20cm)'
-  return `Technical scale reference photography — material with ruler for measurement.
+
+  const isGrainKho  = grainLine && grainLine.includes('HORIZONTALLY')
+  const isGrainCuon = grainLine && grainLine.includes('VERTICALLY')
+
+  const grainArrows = (isGrainKho || isGrainCuon) ? `
+DIRECTIONAL ANNOTATIONS — render clearly on the image:
+- LEFT side of material: vertical double-headed arrow (↕) with label "Cuộn" — marks the roll/length direction (chiều cuộn vải)
+- BELOW material (above ruler gap): horizontal double-headed arrow (↔) with label "Khổ" — marks the fabric width direction (chiều khổ vải)
+- ON material surface: a bold grain direction arrow labeled "Vân":
+  ${isGrainKho ? '→ HORIZONTAL arrow (→) across the center of the material — grain runs left-to-right along the width' : '→ VERTICAL arrow (↓) down the center of the material — grain runs top-to-bottom along the roll length'}
+- All arrows: thin clean dark lines, filled arrowheads, clinical diagram style
+- All labels ("Cuộn", "Khổ", "Vân"): small crisp sans-serif Vietnamese text` : ''
+
+  return `Technical scale reference diagram — material sample with ruler and directional annotations.
 
 MATERIAL: ${desc}
 ${colorLine}
+${grainLine ? `GRAIN DIRECTION: ${grainLine}` : ''}
 
-COMPOSITION (follow exactly — this is critical):
-- ${materialNote} fills the upper 55% of the frame, laid flat on a pure white surface
-- A classic wooden ruler (30cm long) placed HORIZONTALLY in the lower 35% of the frame
-- RULER MUST BE FULLY WITHIN THE IMAGE — both left and right ends of the ruler are completely visible, NOT cut off by frame edges
-- The ruler is centered horizontally in the frame
-- Ruler graduation marks (numbers 1, 2, 3 … 25 cm) are LARGE, crisp, sharply readable black on wood
-- Small gap between the material bottom edge and the ruler top edge
-- Material surface texture clearly visible above the ruler
+COMPOSITION (follow exactly):
+- ${materialNote} fills the upper 50% of the frame, laid flat on a pure white surface
+- A classic wooden ruler (30cm long) placed HORIZONTALLY in the lower 30% of the frame
+- RULER MUST BE FULLY WITHIN THE IMAGE — both ends completely visible, NOT cut off
+- Ruler centered horizontally; graduation marks (1, 2, 3 … 25 cm) LARGE, crisp, readable black on wood
+- Small gap between material bottom edge and ruler top
+- Material surface texture clearly visible
+${grainArrows}
 
 LIGHTING:
-- Bright, flat, even overhead lighting — zero shadows anywhere
-- All ruler numbers and tick marks must be readable — no glare on ruler
-- Material surface texture must be visible (not blown out or washed out)
+- Bright, flat, even overhead lighting — zero shadows
+- All ruler numbers and tick marks readable, no glare
+- Material texture not blown out
 
 CAMERA:
 - Directly overhead, 90° top-down bird's-eye view
-- Perfectly level, zero perspective distortion, zero fisheye
-- Material and ruler together fill the frame
+- Perfectly level, zero perspective distortion
 
 BACKGROUND: Pure white seamless.
 
-STYLE: Technical specification / product catalogue photography. Clinical, precise, well-lit.
+STYLE: Technical specification sheet. Clinical diagram — similar to a fabric data card with dimension and grain annotations.
 
 CRITICAL:
 1. Ruler FULLY visible — NEVER cut off at any edge
 2. All cm numbers legible
 3. Material texture visible
-4. 90° overhead shot only — no angles
+4. 90° overhead only
+5. Annotation arrows (if present) must be clean thin lines, no decorative styling
 ${brandLine}
 ${noText}`
 }
@@ -1007,12 +1021,12 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
 
   // beMat = "Linen look", "Matte smooth", v.v. — phải inject vào desc để AI render đúng surface texture
   const beMat = materialMetadata?.beMat || ''
-  // grainDirection: 'ngang' = fabric grain runs horizontally, 'doc' = vertically
+  // grainDirection: 'kho' = grain along fabric width (↔ ngang), 'cuon' = grain along roll length (↕ dọc)
   const grainDir = materialMetadata?.grainDirection || ''
-  const grainLine = grainDir === 'ngang'
-    ? 'Fabric grain runs HORIZONTALLY — weave lines flow left-to-right across the width.'
-    : grainDir === 'doc'
-    ? 'Fabric grain runs VERTICALLY — weave lines flow top-to-bottom along the length.'
+  const grainLine = grainDir === 'kho'
+    ? 'Fabric grain runs HORIZONTALLY across the fabric width (↔ Khổ vải) — weave lines perpendicular to roll direction.'
+    : grainDir === 'cuon'
+    ? 'Fabric grain runs VERTICALLY along the roll length (↕ Chiều cuộn) — weave lines parallel to roll direction.'
     : ''
 
   const baseDesc = fabricAnalysis
@@ -1040,7 +1054,7 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   if (slot === 'slot_1') return slot1_surface(desc, colorLine, scaleLine, brandLine, noText)
-  if (slot === 'slot_6') return slot6_ruler(desc, colorLine, brandLine, noText, productType)
+  if (slot === 'slot_6') return slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine)
 
   const pType = productType || 'CUR'
   const typeFns = TYPE_SLOT_FNS[pType] || TYPE_SLOT_FNS.CUR
