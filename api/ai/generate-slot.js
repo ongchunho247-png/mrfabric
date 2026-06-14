@@ -1054,11 +1054,13 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   if (slot === 'slot_1') return slot1_surface(desc, colorLine, scaleLine, brandLine, noText)
-  if (slot === 'slot_6') return slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine)
+  if (slot === 'slot_4') return slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine)
 
   const pType = productType || 'CUR'
   const typeFns = TYPE_SLOT_FNS[pType] || TYPE_SLOT_FNS.CUR
-  const fn = typeFns?.[slot]
+  // slot_2 → slot_2 function; slot_3 (không gian gần ~1m) → maps to old slot_4 function
+  const internalSlot = slot === 'slot_3' ? 'slot_4' : slot
+  const fn = typeFns?.[internalSlot]
   return fn ? fn(desc, colorLine, brandLine, noText) : ''
 }
 
@@ -1091,7 +1093,7 @@ export default async function handler(req, res) {
     const VALID_QUALITY = ['low', 'medium', 'high']
     const imageQuality = VALID_QUALITY.includes(quality) ? quality : 'medium'
 
-    const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
+    const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4']
     if (!slot || !VALID_SLOTS.includes(slot)) {
       return res.status(400).json({ ok: false, error: `Slot không hợp lệ. Cần: ${VALID_SLOTS.join(', ')}.` })
     }

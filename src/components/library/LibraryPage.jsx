@@ -116,27 +116,17 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
     [libraryMaterials, search, filters],
   )
 
-  // Group by nhomVatLieu: one representative card per group, preserve order
-  const { displayMaterials, variantGroupsMap } = useMemo(() => {
+  // Build variant color strip map — all mã shown individually, no grouping
+  const variantGroupsMap = useMemo(() => {
     const groups = {}
-    for (const m of filteredMaterials) {
+    for (const m of libraryMaterials) {
       if (m.nhomVatLieu) {
         if (!groups[m.nhomVatLieu]) groups[m.nhomVatLieu] = []
         groups[m.nhomVatLieu].push(m)
       }
     }
-    const seen = new Set()
-    const displayMaterials = []
-    for (const m of filteredMaterials) {
-      if (!m.nhomVatLieu) {
-        displayMaterials.push(m)
-      } else if (!seen.has(m.nhomVatLieu)) {
-        seen.add(m.nhomVatLieu)
-        displayMaterials.push(m)
-      }
-    }
-    return { displayMaterials, variantGroupsMap: groups }
-  }, [filteredMaterials])
+    return groups
+  }, [libraryMaterials])
 
   function handleFilterChange(key, value, checked) {
     setFilters((prev) => {
@@ -220,13 +210,13 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
       <div className="library-content">
         <div className="library-count">
           {hasActiveFilters
-            ? <span><strong>{displayMaterials.length}</strong> / {libraryMaterials.length} vật liệu</span>
+            ? <span><strong>{filteredMaterials.length}</strong> / {libraryMaterials.length} vật liệu</span>
             : <span><strong>{libraryMaterials.length}</strong> vật liệu</span>
           }
         </div>
         <SearchBar value={search} onChange={setSearch} />
         <MaterialGrid
-          materials={displayMaterials}
+          materials={filteredMaterials}
           variantGroupsMap={variantGroupsMap}
           moodboardItems={moodboardItems}
           onCardClick={setSelectedMaterial}

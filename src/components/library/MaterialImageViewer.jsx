@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import './MaterialImageViewer.css'
 
 const IMAGE_TABS = [
@@ -7,24 +7,6 @@ const IMAGE_TABS = [
   { key: 'curtain_image',   fallback: 'curtain',      label: 'Không gian gần' },
   { key: 'detail_image',    fallback: 'renderTexture', label: 'Ruler tỉ lệ' },
 ]
-
-async function compressToBase64(file) {
-  return new Promise((resolve) => {
-    const img = new Image()
-    const url = URL.createObjectURL(file)
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      const MAX = 900
-      const scale = Math.min(1, MAX / Math.max(img.width, img.height))
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.round(img.width * scale)
-      canvas.height = Math.round(img.height * scale)
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
-      resolve(canvas.toDataURL('image/jpeg', 0.82))
-    }
-    img.src = url
-  })
-}
 
 function ThumbItem({ tabKey, label, src, active, onClick }) {
   const [err, setErr] = useState(false)
@@ -52,50 +34,13 @@ function getTabSrc(material, tab) {
   return material.images?.[tab.key]?.path || material.images?.[tab.fallback]?.path || null
 }
 
-export default function MaterialImageViewer({ material, onUpload }) {
+export default function MaterialImageViewer({ material }) {
   const [activeTab, setActiveTab] = useState('surface_texture')
   const [mainErr, setMainErr] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const fileInputRef = useRef(null)
-  const cameraInputRef = useRef(null)
 
   const activeTabObj = IMAGE_TABS.find((t) => t.key === activeTab)
   const mainSrc = getTabSrc(material, activeTabObj || IMAGE_TABS[0])
   useEffect(() => { setMainErr(false) }, [mainSrc])
-
-  // Clipboard paste → upload to active tab
-  useEffect(() => {
-    if (!onUpload) return
-    const handlePaste = async (e) => {
-      const items = [...e.clipboardData.items]
-      const imageItem = items.find((i) => i.type.startsWith('image/'))
-      if (!imageItem) return
-      const file = imageItem.getAsFile()
-      if (!file) return
-      setUploading(true)
-      try {
-        const dataUrl = await compressToBase64(file)
-        onUpload(activeTab, dataUrl)
-      } finally {
-        setUploading(false)
-      }
-    }
-    document.addEventListener('paste', handlePaste)
-    return () => document.removeEventListener('paste', handlePaste)
-  }, [activeTab, onUpload])
-
-  async function handleFileChange(e) {
-    const file = e.target.files?.[0]
-    if (!file || !onUpload) return
-    setUploading(true)
-    try {
-      const dataUrl = await compressToBase64(file)
-      onUpload(activeTab, dataUrl)
-    } finally {
-      setUploading(false)
-      e.target.value = ''
-    }
-  }
 
   function handleTabChange(key) {
     setActiveTab(key)
@@ -106,8 +51,7 @@ export default function MaterialImageViewer({ material, onUpload }) {
     <div className="miv">
       {/* ── Main large image ── */}
       <div className="miv-main-wrap">
-        {uploading && <div className="miv-uploading">Đang xử lý ảnh…</div>}
-        {!uploading && mainSrc && !mainErr ? (
+        {mainSrc && !mainErr ? (
           <img
             key={mainSrc}
             src={mainSrc}
@@ -116,14 +60,11 @@ export default function MaterialImageViewer({ material, onUpload }) {
             onError={() => setMainErr(true)}
           />
         ) : (
-          !uploading && (
-            <div className="miv-main-ph img-placeholder">
-              <span className="miv-ph-icon">📷</span>
-              <strong>{activeTabObj?.label}</strong>
-              <span>{material.maMrFabric}</span>
-              {onUpload && <span className="miv-ph-note">Thêm ảnh bên dưới hoặc Ctrl+V</span>}
-            </div>
-          )
+          <div className="miv-main-ph img-placeholder">
+            <span className="miv-ph-icon">📷</span>
+            <strong>{activeTabObj?.label}</strong>
+            <span>{material.maMrFabric}</span>
+          </div>
         )}
       </div>
 
@@ -140,23 +81,6 @@ export default function MaterialImageViewer({ material, onUpload }) {
           />
         ))}
       </div>
-
-      {/* ── Upload controls ── */}
-      {onUpload && (
-        <div className="miv-upload">
-          <div className="miv-upload-btns">
-            <label className="btn btn-ghost miv-upload-btn">
-              📁 File
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
-            </label>
-            <label className="btn btn-ghost miv-upload-btn">
-              📷 Camera
-              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} hidden />
-            </label>
-          </div>
-          <p className="miv-upload-hint">Ctrl+V để dán — cập nhật ảnh cho tab đang xem</p>
-        </div>
-      )}
 
       {/* ── Render texture download ── */}
       {activeTab === 'detail_image' && (

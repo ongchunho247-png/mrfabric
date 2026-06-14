@@ -3,13 +3,13 @@ import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
-const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2, 4, 6
+const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2, 3, 4
 
 const SLOT_PROGRESS = {
   slot_1: 'Tạo bề mặt vải…',
   slot_2: 'Tạo ảnh cận chất liệu…',
-  slot_4: 'Tạo ảnh không gian gần (~1m)…',
-  slot_6: 'Tạo ảnh ruler tỉ lệ…',
+  slot_3: 'Tạo ảnh không gian gần (~1m)…',
+  slot_4: 'Tạo ảnh ruler tỉ lệ…',
 }
 
 // Giá ước tính USD per image (gpt-image-1, 1024×1024)
@@ -17,13 +17,13 @@ const QUALITY_PRICE = { low: 0.011, medium: 0.042, high: 0.167 }
 const QUALITY_LABEL = { low: 'Thấp', medium: 'Trung bình', high: 'Cao' }
 
 // Default quality per slot
-const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_4: 'low', slot_6: 'low' }
+const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_3: 'low', slot_4: 'low' }
 
 // ── QualityCard: chọn phân giải per slot + hiển thị chi phí ─────────────────
 function QualityCard({ qualities, onChange, colorCount }) {
   const costPerSet = SLOT_KEYS.reduce((sum, sk) => sum + (QUALITY_PRICE[qualities[sk.slot]] || 0), 0)
   const costPerGroup = colorCount > 1
-    ? costPerSet + (colorCount - 1) * (QUALITY_PRICE[qualities['slot_2']] + QUALITY_PRICE[qualities['slot_4']] + QUALITY_PRICE[qualities['slot_6']] + QUALITY_PRICE[qualities['slot_1']])
+    ? costPerSet + (colorCount - 1) * (QUALITY_PRICE[qualities['slot_1']] + QUALITY_PRICE[qualities['slot_2']] + QUALITY_PRICE[qualities['slot_3']] + QUALITY_PRICE[qualities['slot_4']])
     : costPerSet
 
   return (
@@ -458,7 +458,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
                     <span className="fit-color-code" style={{ color: '#b45309' }}>⚠ chưa có mã MrFabric</span>
                   )}
                   {doneCount > 0 && (
-                    <span className="fit-color-done">{doneCount}/6 ảnh</span>
+                    <span className="fit-color-done">{doneCount}/4 ảnh</span>
                   )}
                 </div>
                 <div className="fit-color-actions">

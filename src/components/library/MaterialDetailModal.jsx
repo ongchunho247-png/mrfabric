@@ -53,11 +53,6 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
     }
   }, [onClose])
 
-  // Called by MaterialImageViewer with (imageKey, dataUrl) — viewer knows which tab is active
-  function handleUpload(imageKey, dataUrl) {
-    onUpdateImage?.(material.id, imageKey, dataUrl)
-  }
-
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-box mdm-box">
@@ -68,7 +63,6 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
           <div className="mdm-left">
             <MaterialImageViewer
               material={material}
-              onUpload={onUpdateImage ? handleUpload : undefined}
             />
 
             {/* Variant color dots — right below image viewer */}

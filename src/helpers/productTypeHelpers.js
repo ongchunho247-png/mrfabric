@@ -41,8 +41,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt' },
       { key: 'slot_2', label: 'Cận chất liệu' },
-      { key: 'slot_4', label: 'Rèm gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Rèm gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   FAB: {
@@ -50,8 +50,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt' },
       { key: 'slot_2', label: 'Cận chất liệu' },
-      { key: 'slot_4', label: 'Sofa gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Sofa gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   CUR_FAB: {
@@ -59,8 +59,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt' },
       { key: 'slot_2', label: 'Cận chất liệu' },
-      { key: 'slot_4', label: 'Sofa gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Sofa gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   BL: {
@@ -68,8 +68,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt' },
       { key: 'slot_2', label: 'Cận chất liệu' },
-      { key: 'slot_4', label: 'Rèm cuốn gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Rèm cuốn gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   WB: {
@@ -77,8 +77,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt vân gỗ' },
       { key: 'slot_2', label: 'Cận lá sáo' },
-      { key: 'slot_4', label: 'Sáo gỗ gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Sáo gỗ gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   AL: {
@@ -86,8 +86,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt nhôm' },
       { key: 'slot_2', label: 'Cận lá nhôm' },
-      { key: 'slot_4', label: 'Sáo nhôm gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Sáo nhôm gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   RM: {
@@ -95,8 +95,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt' },
       { key: 'slot_2', label: 'Cận chất liệu' },
-      { key: 'slot_4', label: 'Roman gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Roman gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   HN: {
@@ -104,8 +104,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt tổ ong' },
       { key: 'slot_2', label: 'Cận ô tổ ong' },
-      { key: 'slot_4', label: 'Tổ ong gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Tổ ong gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   CB: {
@@ -113,8 +113,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt cầu vồng' },
       { key: 'slot_2', label: 'Cận sọc vải' },
-      { key: 'slot_4', label: 'Cầu vồng gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Cầu vồng gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
   BB: {
@@ -122,8 +122,8 @@ export const SLOT_TEMPLATES = {
     slots: [
       { key: 'slot_1', label: 'Bề mặt trúc' },
       { key: 'slot_2', label: 'Cận thanh trúc' },
-      { key: 'slot_4', label: 'Rèm trúc gần (~1m)' },
-      { key: 'slot_6', label: 'Ruler tỉ lệ' },
+      { key: 'slot_3', label:'Rèm trúc gần (~1m)' },
+      { key: 'slot_4', label: 'Ruler tỉ lệ' },
     ],
   },
 }

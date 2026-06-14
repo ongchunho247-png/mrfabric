@@ -146,14 +146,13 @@ export function downloadImageAs(dataUrl, filename) {
 }
 
 
-/** Slot index → image field mapping — active slots: 1, 2, 4, 6 */
+/** Slot index → image field mapping */
 export const SLOT_KEYS = [
-  { slot: 'slot_1', field: 'surface_texture',  label: 'Bề mặt' },
-  { slot: 'slot_2', field: 'main_hand_image',  label: 'Cận chất liệu' },
-  { slot: 'slot_4', field: 'curtain_image',    label: 'Không gian gần' },
-  { slot: 'slot_6', field: 'detail_image',     label: 'Ruler tỉ lệ' },
+  { slot: 'slot_1', field: 'surface_texture', label: 'Bề mặt' },
+  { slot: 'slot_2', field: 'main_hand_image', label: 'Cận chất liệu' },
+  { slot: 'slot_3', field: 'curtain_image',   label: 'Không gian gần' },
+  { slot: 'slot_4', field: 'detail_image',    label: 'Ruler tỉ lệ' },
 ]
-// slot_3 (sofa_image) và slot_5 (ruler_image) đã bỏ khỏi luồng generate — field vẫn tồn tại trong DB
 
 export const BATCH_STATUS = {
   PENDING:    'pending',
