@@ -99,20 +99,6 @@ function TypeTemplateCard({ entry, productType, manualType, onSetManualType, slo
         )}
       </div>
 
-      {slotTemplate && (
-        <>
-          <div className="fit-type-tpl-name">{slotTemplate.name}</div>
-          <div className="fit-template-slots">
-            {slotTemplate.slots.map((s, i) => (
-              <div key={s.key} className="fit-template-slot">
-                <span className="fit-template-slot-num">{i + 1}</span>
-                <span className="fit-template-slot-label">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
       {!slotTemplate && (productType || manualType) && (
         <div className="fit-phase-notice">
           Chưa có template cho type &quot;{manualType || productType}&quot;.
@@ -604,7 +590,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setScope('all'); setSelectedNccs(null)
   }
 
-  const showGenerator = !!rawSurfaceUrl && !!fabricGrain && colorVariants.length > 0
+  const showGenerator = !!rawSurfaceUrl && colorVariants.length > 0
 
   return (
     <div className="fit-single">
@@ -702,13 +688,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               />
             )}
 
-            {/* Product info — extended */}
-            <ProductInfoCard
-              entry={selectedEntry}
-              nhomBienThe={nhomBienThe}
-              variantCount={colorVariants.length}
-            />
-
             {/* Variant group list */}
             {colorVariants.length > 1 && (
               <div className="fit-card">
@@ -765,17 +744,8 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               />
             )}
 
-            {/* Phase 3: Grain direction */}
-            {rawSurfaceUrl && (
-              <GrainCard
-                previewUrl={previewUrl}
-                fabricGrain={fabricGrain}
-                onChange={setFabricGrain}
-              />
-            )}
-
             {/* Phase 4: Scope selection */}
-            {rawSurfaceUrl && fabricGrain && colorVariants.length > 1 && (
+            {rawSurfaceUrl && colorVariants.length > 1 && (
               <ScopeCard
                 colorVariants={colorVariants}
                 baseEntry={selectedEntry}
