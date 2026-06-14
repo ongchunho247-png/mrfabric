@@ -731,14 +731,9 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                     </span>
                   ))}
                 </div>
-                {colorVariants.length > 1 && colorVariants[0].nhomBienThe && (
+                {colorVariants.length > 1 && (
                   <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
                     Nhóm: {nhomBienThe} — đọc từ cột "Nhóm biến thể"
-                  </div>
-                )}
-                {colorVariants.length > 1 && !colorVariants[0].nhomBienThe && (
-                  <div style={{ fontSize: '0.72rem', color: '#b45309', marginTop: 4 }}>
-                    ⚠ Dùng fallback nhaCungCap+tenCuon (chưa có cột "Nhóm biến thể" trong data)
                   </div>
                 )}
               </div>
@@ -748,8 +743,9 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               <div className="fit-card">
                 <div className="fit-card-title">Nhóm biến thể</div>
                 <div className="fit-phase-notice">
-                  Mã này chưa có nhóm biến thể hoặc là mã độc lập.
-                  Sẽ xử lý chỉ mã này.
+                  Mã này chưa có cột "Nhóm biến thể" trong Bảng đơn giá.
+                  Sẽ xử lý chỉ mã hiện tại. Để tạo ảnh cho nhiều màu cùng lúc,
+                  hãy điền cột "Nhóm biến thể" trong Bảng đơn giá.
                 </div>
               </div>
             )}

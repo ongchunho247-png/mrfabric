@@ -73,13 +73,11 @@ export function getColorHex(colorName) {
 /**
  * Tìm tất cả màu variants của cùng 1 mẫu vải.
  *
- * Quy tắc bắt buộc (spec MrFabric):
- *  - Dùng cột "Nhóm biến thể" (nhomBienThe) để gom nhóm — KHÔNG dùng tên cuốn mẫu.
- *  - Tất cả mã có cùng nhomBienThe là biến thể màu của nhau.
- *  - Nếu mã không có nhomBienThe → xử lý độc lập (trả về chỉ mã đó).
+ * Chỉ dùng cột "Nhóm biến thể" (nhomBienThe / variantGroup).
+ * Nếu field này trống → mã độc lập, trả về [base].
  *
- * Fallback legacy: nếu KHÔNG có field nhomBienThe trong data (data cũ),
- *  mới dùng nhaCungCap + tenCuon để gom — để không break data cũ.
+ * KHÔNG dùng nhaCungCap+tenCuon vì tenCuon là tên catalog (có thể chứa
+ * nhiều sản phẩm khác nhau), không phải tên thiết kế cụ thể.
  */
 export function findColorVariants(maNCC, priceTable) {
   if (!maNCC || !priceTable?.length) return []
@@ -89,47 +87,21 @@ export function findColorVariants(maNCC, priceTable) {
   )
   if (!base) return []
 
-  // ── PRIMARY: dùng Nhóm biến thể (nhomBienThe) ──────────────────────────────
   const nhomBienThe = (base.nhomBienThe || base.variantGroup || '').trim()
-  if (nhomBienThe) {
-    const variants = priceTable.filter(
-      (e) =>
-        !e.deletedAt &&
-        ((e.nhomBienThe || e.variantGroup || '').trim() === nhomBienThe),
-    )
-    if (variants.length > 0) {
-      // Giữ thứ tự: base lên đầu, dedup by maNCC
-      const seen = new Set()
-      const result = []
-      for (const e of [base, ...variants]) {
-        const key = (e.maNCC || '').trim().toLowerCase()
-        if (!seen.has(key)) { seen.add(key); result.push(e) }
-      }
-      return result
-    }
-  }
+  if (!nhomBienThe) return [base]
 
-  // ── FALLBACK LEGACY: data cũ không có nhomBienThe → dùng nhaCungCap+tenCuon ─
-  if (base.nhaCungCap && base.tenCuon) {
-    const siblings = priceTable.filter(
-      (e) =>
-        !e.deletedAt &&
-        e.nhaCungCap === base.nhaCungCap &&
-        e.tenCuon === base.tenCuon,
-    )
-    if (siblings.length > 1) {
-      const seen = new Set()
-      const result = []
-      for (const e of [base, ...siblings]) {
-        const key = (e.maNCC || '').trim().toLowerCase()
-        if (!seen.has(key)) { seen.add(key); result.push(e) }
-      }
-      return result
-    }
-  }
+  const variants = priceTable.filter(
+    (e) => !e.deletedAt && ((e.nhomBienThe || e.variantGroup || '').trim() === nhomBienThe),
+  )
 
-  // ── Mã độc lập (không có nhóm) ────────────────────────────────────────────
-  return [base]
+  // base lên đầu, dedup by maNCC
+  const seen = new Set()
+  const result = []
+  for (const e of [base, ...variants]) {
+    const key = (e.maNCC || '').trim().toLowerCase()
+    if (!seen.has(key)) { seen.add(key); result.push(e) }
+  }
+  return result
 }
 
 /**
