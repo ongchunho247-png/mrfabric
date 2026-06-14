@@ -172,9 +172,13 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
       <div className="fit-di-intro">
         <span>Kéo thả ảnh đã hoàn chỉnh vào đây để import thẳng vào thư viện, bỏ qua AI.</span>
         <span className="fit-di-intro-conventions">
-          <code>mãNCC.jpg</code> → slot 1 &nbsp;·&nbsp;
-          <code>mãNCC_master.jpg</code> → 4 slot &nbsp;·&nbsp;
-          <code>mãNCC_slot2.jpg</code> → slot 2
+          <code>mãNCC_1.jpg</code> → ô 1 (Bề mặt) &nbsp;·&nbsp;
+          <code>mãNCC_2.jpg</code> → ô 2 (Cận) &nbsp;·&nbsp;
+          <code>mãNCC_3.jpg</code> → ô 3 (Cầm) &nbsp;·&nbsp;
+          <code>mãNCC_4.jpg</code> → ô 4 &nbsp;·&nbsp;
+          <code>mãNCC_5.jpg</code> → ô 5 &nbsp;·&nbsp;
+          <code>mãNCC_6.jpg</code> → ô 6 &nbsp;·&nbsp;
+          <code>mãNCC_master.jpg</code> → tách 3×2 → 6 ô
         </span>
       </div>
 

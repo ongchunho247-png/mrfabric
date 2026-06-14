@@ -184,13 +184,16 @@ export const STATUS_LABEL = {
 
 /**
  * Đọc mã NCC từ tên file.
- * Quy tắc: bỏ extension → bỏ hậu tố _master / _slot1-6 → trim
- * Ví dụ: "ABC123_master.jpg" → "ABC123", "XY-01_slot3.png" → "XY-01"
+ * Hỗ trợ các quy ước đặt tên:
+ *   A15-15_1.jpg   → "A15-15"  (quy ước mới: số ô)
+ *   A15-15_slot2.jpg → "A15-15" (quy ước cũ: slot keyword)
+ *   A15-15_master.jpg → "A15-15"
+ *   A15-15.jpg     → "A15-15"  (single / ô 1)
  */
 export function extractNccCode(filename) {
   if (!filename) return null
   const noExt = filename.replace(/\.(jpg|jpeg|png|webp|gif|bmp)$/i, '')
-  const noSuffix = noExt.replace(/[_-](master|slot[1-6])$/i, '')
+  const noSuffix = noExt.replace(/[_-](master|slot[1-6]|[1-6])$/i, '')
   const code = noSuffix.trim()
   return code || null
 }
@@ -198,13 +201,20 @@ export function extractNccCode(filename) {
 /**
  * Xác định loại ảnh dựa trên tên file.
  * Trả về: 'master' | 'slot_1'…'slot_6' | 'single'
+ *
+ * Quy ước mới (ưu tiên): mãNCC_1 → slot_1, mãNCC_2 → slot_2 … mãNCC_6 → slot_6
+ * Quy ước cũ (vẫn hỗ trợ): _slot1…_slot6, _master
  */
 export function detectImageType(filename) {
   if (!filename) return 'single'
   const noExt = filename.replace(/\.(jpg|jpeg|png|webp|gif|bmp)$/i, '')
   if (/[_-]master$/i.test(noExt)) return 'master'
-  const m = noExt.match(/[_-](slot[1-6])$/i)
-  if (m) return m[1].toLowerCase()
+  // Quy ước mới: _1 → _6
+  const short = noExt.match(/[_-]([1-6])$/)
+  if (short) return `slot_${short[1]}`
+  // Quy ước cũ: _slot1 → _slot6
+  const full = noExt.match(/[_-](slot[1-6])$/i)
+  if (full) return full[1].toLowerCase()
   return 'single'
 }
 
