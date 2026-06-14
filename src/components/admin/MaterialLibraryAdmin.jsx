@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { COLOR_GROUPS, findColorEntry } from '../../data/colorGroups'
+import { COLOR_GROUPS, findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import { getProductTypeCode } from '../../helpers/generateMrFabricCode'
 import { getNccCode } from '../../helpers/nccCodeStorage'
 import './MaterialLibraryAdmin.css'
@@ -293,8 +293,8 @@ export default function MaterialLibraryAdmin({ priceTable = [], nccCodes = {} })
                           {!H.has('nhomMau')     && (
                             <td>
                               <span className="mla-color">
-                                {colorEntry && <span className="mla-color-dot" style={{ background: colorEntry.hex }} />}
-                                {colorEntry ? colorEntry.name_en : (e.nhomMau || '—')}
+                                {colorEntry && <span className="mla-color-dot" style={{ background: e.aiColorHex || colorEntry.hex }} />}
+                                {(e.aiColorHex ? findClosestColorEntry(e.aiColorHex)?.name_en : null) || (colorEntry ? colorEntry.name_en : (e.nhomMau || '—'))}
                               </span>
                             </td>
                           )}

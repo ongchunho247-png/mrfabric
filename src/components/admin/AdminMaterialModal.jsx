@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import MaterialImageViewer from '../library/MaterialImageViewer'
-import { COLOR_GROUPS, findColorEntry } from '../../data/colorGroups'
+import { COLOR_GROUPS, findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import './AdminMaterialModal.css'
 
 function Row({ label, value }) {
@@ -115,7 +115,8 @@ export default function AdminMaterialModal({ material, onClose, onEdit }) {
             <SectionBlock accent="design" icon="🎨" title="Thông tin Thiết kế">
               {(() => {
                 const colorEntry = findColorEntry(material.nhomMau)
-                return <Row label="Nhóm màu" value={colorEntry ? colorEntry.name_en : material.nhomMau} />
+                const colorDisplay = (material.aiColorHex ? findClosestColorEntry(material.aiColorHex)?.name_en : null) || (colorEntry ? colorEntry.name_en : material.nhomMau)
+                return <Row label="Nhóm màu" value={colorDisplay} />
               })()}
               <Row label="Tone màu" value={material.toneMau} />
               <Row label="Bề mặt" value={material.beMat} />

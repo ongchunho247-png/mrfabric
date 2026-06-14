@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import MaterialImageViewer from './MaterialImageViewer'
-import { COLOR_GROUPS, findColorEntry } from '../../data/colorGroups'
+import { COLOR_GROUPS, findColorEntry, findClosestColorEntry } from '../../data/colorGroups'
 import './MaterialDetailModal.css'
 
 function formatPrice(val, unit = 'đ/m') {
@@ -70,9 +70,8 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
               <div className="mdm-variant-dots">
                 {variants.map((v) => {
                   const vce = findColorEntry(v.nhomMau)
-                  // Ưu tiên aiColorHex (màu AI đã render thực tế) > nhomMau group color
                   const dotColor = v.aiColorHex || vce?.hex || '#ccc'
-                  const colorLabel = vce?.name_en || v.nhomMau || ''
+                  const colorLabel = (v.aiColorHex ? findClosestColorEntry(v.aiColorHex)?.name_en : null) || vce?.name_en || v.nhomMau || ''
                   return (
                     <span
                       key={v.id}
@@ -125,7 +124,7 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
             <InfoSection title="Thông tin Thiết kế">
               {(() => {
                 const colorEntry = findColorEntry(material.nhomMau)
-                const colorDisplay = colorEntry ? colorEntry.name_en : material.nhomMau
+                const colorDisplay = (material.aiColorHex ? findClosestColorEntry(material.aiColorHex)?.name_en : null) || (colorEntry ? colorEntry.name_en : material.nhomMau)
                 return (
                   <Row
                     label="Nhóm màu"
