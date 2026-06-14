@@ -27,7 +27,7 @@ export default function BudgetCard({ slotQualities, colorCount = 1 }) {
   const balance = fresh.balance
   const history = fresh.history
 
-  const estimatedCostPerSet = estimateCost(slotQualities || { slot_1: 'medium', slot_2: 'medium', slot_3: 'low', slot_4: 'low' })
+  const estimatedCostPerSet = estimateCost(slotQualities || { slot_1: 'medium', slot_2: 'medium', slot_3: 'medium', slot_4: 'medium', slot_5: 'low', slot_6: 'low' })
   const estimatedTotal      = +(estimatedCostPerSet * colorCount).toFixed(4)
   const setsLeft            = balance !== null ? Math.floor(balance / estimatedCostPerSet) : null
 

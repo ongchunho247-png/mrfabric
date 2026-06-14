@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import './MaterialImageViewer.css'
 
 const IMAGE_TABS = [
-  { key: 'surface_texture', fallback: 'closeup',      label: 'Bề mặt' },
-  { key: 'main_hand_image', fallback: null,            label: 'Thành phẩm ~1m' },
-  { key: 'curtain_image',   fallback: 'curtain',      label: 'Nội thất ~2m' },
-  { key: 'detail_image',    fallback: 'renderTexture', label: 'Sơ đồ kỹ thuật' },
+  { key: 'surface_texture', fallback: 'closeup',       label: 'Bề mặt' },
+  { key: 'macro_texture',   fallback: null,             label: 'Cận chất liệu' },
+  { key: 'hand_image',      fallback: null,             label: 'Cầm nắm' },
+  { key: 'main_hand_image', fallback: null,             label: 'Thành phẩm ~1m' },
+  { key: 'curtain_image',   fallback: 'curtain',       label: 'Nội thất ~2m' },
+  { key: 'detail_image',    fallback: 'renderTexture',  label: 'Sơ đồ kỹ thuật' },
 ]
 
 function ThumbItem({ tabKey, label, src, active, onClick }) {

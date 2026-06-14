@@ -16,11 +16,13 @@ const S = { PENDING: 'pending', PROCESSING: 'processing', DONE: 'done', ERROR: '
 
 const TYPE_LABEL = {
   single: 'Bề mặt (slot 1)',
-  master: 'Master 3×2 → 4 slot',
+  master: 'Master 3×2 → 6 slot',
   slot_1: 'Slot 1 — Bề mặt',
-  slot_2: 'Slot 2 — ~1m',
-  slot_3: 'Slot 3 — ~2m',
-  slot_4: 'Slot 4 — Kỹ thuật',
+  slot_2: 'Slot 2 — Cận chất liệu',
+  slot_3: 'Slot 3 — Cầm nắm',
+  slot_4: 'Slot 4 — Thành phẩm ~1m',
+  slot_5: 'Slot 5 — Nội thất ~2m',
+  slot_6: 'Slot 6 — Kỹ thuật',
 }
 
 function fieldForType(type) {

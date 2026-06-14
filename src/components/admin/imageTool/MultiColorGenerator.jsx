@@ -102,13 +102,15 @@ function ColorDot({ maNCC, nhomMau, onChanged }) {
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
-const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2, 3, 4
+const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2–6
 
 const SLOT_PROGRESS = {
   slot_1: 'Tạo bề mặt vải…',
-  slot_2: 'Tạo ảnh thành phẩm ~1m…',
-  slot_3: 'Tạo ảnh nội thất ~2m…',
-  slot_4: 'Tạo sơ đồ kỹ thuật…',
+  slot_2: 'Tạo cận chất liệu…',
+  slot_3: 'Tạo ảnh cầm nắm…',
+  slot_4: 'Tạo ảnh thành phẩm ~1m…',
+  slot_5: 'Tạo ảnh nội thất ~2m…',
+  slot_6: 'Tạo sơ đồ kỹ thuật…',
 }
 
 // Giá ước tính USD per image (gpt-image-1, 1024×1024)
@@ -116,7 +118,7 @@ const QUALITY_PRICE = { low: 0.011, medium: 0.042, high: 0.167 }
 const QUALITY_LABEL = { low: 'Thấp', medium: 'Trung bình', high: 'Cao' }
 
 // Default quality per slot
-const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_3: 'low', slot_4: 'low' }
+const DEFAULT_QUALITIES = { slot_1: 'medium', slot_2: 'medium', slot_3: 'medium', slot_4: 'medium', slot_5: 'low', slot_6: 'low' }
 
 // ── Preset chất lượng theo loại vật liệu ─────────────────────────────────────
 const QUALITY_PRESETS = [
@@ -196,10 +198,8 @@ function PresetSelector({ qualities, onApply }) {
 
 // ── QualityCard: chọn phân giải per slot + hiển thị chi phí ─────────────────
 function QualityCard({ qualities, onChange, onApplyPreset, colorCount }) {
-  const costPerSet = SLOT_KEYS.reduce((sum, sk) => sum + (QUALITY_PRICE[qualities[sk.slot]] || 0), 0)
-  const costPerGroup = colorCount > 1
-    ? costPerSet + (colorCount - 1) * (QUALITY_PRICE[qualities['slot_1']] + QUALITY_PRICE[qualities['slot_2']] + QUALITY_PRICE[qualities['slot_3']] + QUALITY_PRICE[qualities['slot_4']])
-    : costPerSet
+  const costPerSet   = SLOT_KEYS.reduce((sum, sk) => sum + (QUALITY_PRICE[qualities[sk.slot]] || 0), 0)
+  const costPerGroup = costPerSet * colorCount
 
   return (
     <div className="fit-card" style={{ marginBottom: 12 }}>
@@ -445,8 +445,8 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         })
         const data = await res.json()
         if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo ảnh AI')
-        // Slot 4: vẽ thước L bằng Canvas (AI không thể render số chính xác)
-        const imageUrl = slotKey === 'slot_4' && data.imageUrl
+        // Slot 6: vẽ thước L bằng Canvas (AI không thể render số chính xác)
+        const imageUrl = slotKey === 'slot_6' && data.imageUrl
           ? await addRulerOverlay(data.imageUrl)
           : data.imageUrl
         updateSlot(colorEntry.maNCC, slotKey, { status: S.DONE, imageUrl })
@@ -465,15 +465,15 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     // Dùng slot_1 output làm reference — nếu slot_1 thất bại fallback về ảnh gốc
     const surfaceRef = coloredSurface || baseSurfaceUrl
     // Bước 2: tạo slot ứng dụng tuần tự
-    // colorMode='ref' khi slot_1 đã render đúng màu → slot 2-4 khớp màu reference thay vì đổi màu lại
-    // colorMode='force' khi slot_1 thất bại → slot 2-4 tự đổi màu từ targetColor
+    // colorMode='ref' khi slot_1 đã render đúng màu → slot 2-6 khớp màu reference thay vì đổi màu lại
+    // colorMode='force' khi slot_1 thất bại → slot 2-6 tự đổi màu từ targetColor
     const appColorMode = coloredSurface ? 'ref' : 'force'
     for (const sk of APP_SLOT_KEYS) {
-      // slot_4 (flat overhead / sơ đồ kỹ thuật): luôn force + dùng ảnh GỐC làm reference
+      // slot_6 (flat overhead / sơ đồ kỹ thuật): luôn force + dùng ảnh GỐC làm reference
       // Lý do: force colorLine nói "reference shows DIFFERENT color" — cần ref thật sự khác màu
       // Nếu dùng slot_1 (đã đúng màu) làm ref + force → contradiction → AI sinh ra sai
-      const slotColorMode = sk.slot === 'slot_4' ? 'force' : appColorMode
-      const slotRef = sk.slot === 'slot_4' ? (baseSurfaceUrl || surfaceRef) : surfaceRef
+      const slotColorMode = sk.slot === 'slot_6' ? 'force' : appColorMode
+      const slotRef = sk.slot === 'slot_6' ? (baseSurfaceUrl || surfaceRef) : surfaceRef
       await generateAppSlot(colorEntry, sk.slot, slotRef, cachedAnalysis, slotColorMode)
     }
     setColorProg(colorEntry.maNCC, '')

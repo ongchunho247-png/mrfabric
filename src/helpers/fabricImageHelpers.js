@@ -146,12 +146,14 @@ export function downloadImageAs(dataUrl, filename) {
 }
 
 
-/** Slot index → image field mapping */
+/** Slot index → image field mapping (6 slots, maps to 3×2 master grid) */
 export const SLOT_KEYS = [
   { slot: 'slot_1', field: 'surface_texture', label: 'Bề mặt' },
-  { slot: 'slot_2', field: 'main_hand_image', label: 'Thành phẩm ~1m' },
-  { slot: 'slot_3', field: 'curtain_image',   label: 'Nội thất ~2m' },
-  { slot: 'slot_4', field: 'detail_image',    label: 'Sơ đồ kỹ thuật' },
+  { slot: 'slot_2', field: 'macro_texture',   label: 'Cận chất liệu' },
+  { slot: 'slot_3', field: 'hand_image',      label: 'Cầm nắm' },
+  { slot: 'slot_4', field: 'main_hand_image', label: 'Thành phẩm ~1m' },
+  { slot: 'slot_5', field: 'curtain_image',   label: 'Nội thất ~2m' },
+  { slot: 'slot_6', field: 'detail_image',    label: 'Sơ đồ kỹ thuật' },
 ]
 
 export const BATCH_STATUS = {

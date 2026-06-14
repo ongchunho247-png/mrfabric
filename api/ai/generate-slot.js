@@ -1158,13 +1158,13 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   if (slot === 'slot_1') return slot1_surface(desc, colorLine, scaleLine, brandLine, noText)
-  if (slot === 'slot_4') return slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine)
+  if (slot === 'slot_6') return slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine)
 
+  // slot_2 → macro close-up, slot_3 → hand touch, slot_4 → ~1m, slot_5 → ~2m
+  // Internal keys in TYPE_SLOT_FNS match slot numbers directly (slot_2…slot_5)
   const pType = productType || 'CUR'
   const typeFns = TYPE_SLOT_FNS[pType] || TYPE_SLOT_FNS.CUR
-  // slot_2 → ~1m product shot (typeFns.slot_4), slot_3 → ~2m room shot (typeFns.slot_5)
-  const internalSlot = slot === 'slot_2' ? 'slot_4' : slot === 'slot_3' ? 'slot_5' : slot
-  const fn = typeFns?.[internalSlot]
+  const fn = typeFns?.[slot]
   return fn ? fn(desc, colorLine, brandLine, noText) : ''
 }
 
@@ -1198,7 +1198,7 @@ export default async function handler(req, res) {
     const VALID_QUALITY = ['low', 'medium', 'high']
     const imageQuality = VALID_QUALITY.includes(quality) ? quality : 'medium'
 
-    const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4']
+    const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
     if (!slot || !VALID_SLOTS.includes(slot)) {
       return res.status(400).json({ ok: false, error: `Slot không hợp lệ. Cần: ${VALID_SLOTS.join(', ')}.` })
     }
