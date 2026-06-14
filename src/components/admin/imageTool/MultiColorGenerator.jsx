@@ -8,9 +8,9 @@ import { getColorHex, getEffectiveHex, getVariantHex, saveVariantHex, resetVaria
 // ── ColorDot: compact color picker per maNCC ─────────────────────────────────
 function ColorDot({ maNCC, nhomMau, onChanged }) {
   const [open, setOpen] = useState(false)
-  const variantHex  = getVariantHex(maNCC)
-  const groupHex    = getColorHex(nhomMau)
-  const displayHex  = variantHex || groupHex || '#cccccc'
+  const variantHex   = getVariantHex(maNCC)
+  const groupHex     = getColorHex(nhomMau)
+  const displayHex   = variantHex || groupHex || '#cccccc'
   const isOverridden = !!variantHex
   const source = variantHex ? 'Tùy chỉnh mã này' : groupHex ? `Nhóm ${nhomMau}` : 'Chưa có màu'
 
@@ -18,7 +18,6 @@ function ColorDot({ maNCC, nhomMau, onChanged }) {
     saveVariantHex(maNCC, e.target.value)
     onChanged()
   }
-
   function handleReset() {
     resetVariantHex(maNCC)
     onChanged()
@@ -26,48 +25,68 @@ function ColorDot({ maNCC, nhomMau, onChanged }) {
   }
 
   return (
-    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+      {/* Chip màu — hình chữ nhật bo góc, dễ thấy hơn dot tròn nhỏ */}
       <button
         onClick={() => setOpen((v) => !v)}
-        title={`${displayHex} — ${source}`}
+        title={`${displayHex.toUpperCase()} — ${source}. Click để đổi màu`}
         style={{
-          width: 16, height: 16, borderRadius: '50%',
-          background: displayHex,
-          border: isOverridden ? '2px solid var(--color-accent)' : '1.5px solid var(--color-border)',
-          cursor: 'pointer', padding: 0, flexShrink: 0,
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '2px 7px 2px 4px',
+          borderRadius: 20,
+          border: isOverridden
+            ? '1.5px solid var(--color-accent)'
+            : '1.5px solid var(--color-border)',
+          background: 'var(--color-surface)',
+          cursor: 'pointer', fontSize: '0.72rem',
+          color: isOverridden ? 'var(--color-accent)' : 'var(--color-text-muted)',
+          fontFamily: 'monospace', letterSpacing: 0,
+          whiteSpace: 'nowrap',
         }}
-      />
+      >
+        <span style={{
+          width: 14, height: 14, borderRadius: 3,
+          background: displayHex,
+          border: '1px solid rgba(0,0,0,0.15)',
+          flexShrink: 0, display: 'inline-block',
+        }} />
+        {displayHex.toUpperCase()}
+        {isOverridden && <span style={{ fontSize: '0.65rem' }}>✎</span>}
+      </button>
+
       {open && (
         <div
           style={{
-            position: 'absolute', top: 22, left: 0, zIndex: 50,
+            position: 'absolute', top: 28, left: 0, zIndex: 100,
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: 8, padding: '10px 12px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-            minWidth: 180, display: 'flex', flexDirection: 'column', gap: 8,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            minWidth: 190, display: 'flex', flexDirection: 'column', gap: 8,
           }}
         >
-          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            {source} — <span style={{ fontFamily: 'monospace' }}>{displayHex.toUpperCase()}</span>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
+            <strong style={{ color: 'var(--color-text)' }}>{maNCC}</strong>
+            {' — '}{source}<br />
+            <span style={{ fontFamily: 'monospace' }}>{displayHex.toUpperCase()}</span>
           </div>
           <input
             type="color"
             value={displayHex}
             onChange={handleChange}
-            style={{ width: '100%', height: 32, border: 'none', cursor: 'pointer', borderRadius: 4 }}
+            style={{ width: '100%', height: 36, border: 'none', cursor: 'pointer', borderRadius: 4 }}
           />
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               onClick={() => setOpen(false)}
-              style={{ flex: 1, fontSize: '0.75rem', padding: '3px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)' }}
+              style={{ flex: 1, fontSize: '0.75rem', padding: '4px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)' }}
             >
               Đóng
             </button>
             {isOverridden && (
               <button
                 onClick={handleReset}
-                style={{ flex: 1, fontSize: '0.75rem', padding: '3px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)', color: 'var(--color-text-muted)' }}
+                style={{ flex: 1, fontSize: '0.75rem', padding: '4px 0', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', background: 'var(--color-surface)', color: 'var(--color-text-muted)' }}
               >
                 Reset nhóm
               </button>
