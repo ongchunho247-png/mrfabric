@@ -297,16 +297,21 @@ FABRIC: ${desc}
 ${colorLine}
 
 CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
-- PLEAT STYLE: Steam-set ripple fold (S-fold / wave pleat) — factory steam-pressed permanent waves
-  · Wave pitch: 7 cm — each complete wave cycle (peak to peak) is exactly 7 cm wide
-  · Fullness ratio: 2.5× — fabric is 2.5 times the finished width, creating full, rounded waves
-  · Wave shape: each wave is a smooth, round cylinder-like column — soft rounded crest and soft rounded trough
-  · ALL waves IDENTICAL from left to right: same 7 cm width, same depth, same curvature — no variation
-  · Waves are PERMANENT (steam-set): hold their shape rigidly from header tape at top to hem at bottom
-  · Each wave column runs perfectly plumb vertical — straight from ceiling to floor without tapering or twisting
-  · Fabric surface between wave peaks: smooth, taut — no bunching, no gathering, no secondary creases
-- HANG: Ceiling-mounted concealed track — no visible rod or hardware
-- HEM: Bottom hem exactly 1 cm above floor — not pooling, not short
+- PLEAT STYLE: Steam-set ripple fold — factory steam-pressed, permanent cylindrical wave columns
+  · Each wave is a VERTICAL CYLINDER running from ceiling to floor
+  · Wave pitch: 7 cm — peak to peak distance is 7 cm, consistent at every height
+  · Fullness: 2.5× — creating full, round wave profile
+  · CRITICAL WAVE SHAPE: The wave cross-section is IDENTICAL at the top, middle, and bottom of the curtain
+    - View from above: a fixed S-curve repeating every 7 cm — does NOT widen or narrow at any height
+    - The bottom hem edge is a STRAIGHT HORIZONTAL LINE — not wavy, not flared, not spreading
+    - Each wave column is like a perfect round cylinder: same width at floor level as at ceiling
+  · FORBIDDEN: waves that flare/spread/widen toward the bottom (like a cone or skirt shape)
+  · FORBIDDEN: waves that collapse, flatten, or taper toward the bottom
+  · ALL waves: smooth taut fabric between crests — no bunching, no secondary creases anywhere
+- HANG: Ceiling-mounted concealed track — no visible rod or hardware at top
+- HEM: Bottom hem EXACTLY 1 cm above floor — a clean straight horizontal gap between hem and floor
+  · The 1 cm gap must be visible and consistent across the full curtain width
+  · NOT pooling on floor, NOT touching floor, NOT visibly too short
 - COVERAGE: Full wall-to-wall, floor-to-ceiling curtain panels
 
 ROOM — ${room.name}:
@@ -321,12 +326,13 @@ CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximat
 STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home quality. Calm, architectural, aspirational.
 
 CRITICAL:
-1. Waves MUST be uniform steam-set ripple fold: 7 cm pitch, 2.5× fullness, identical round columns top to bottom
-   WRONG: large irregular folds / pinch-pleat bunching / waves that vary in width or depth
-   CORRECT: a mechanical row of identical soft cylinders — like sine wave columns, edge to edge
-2. Waves identical from top header tape to bottom hem — no variation anywhere
-3. Hem exactly 1 cm from floor
-4. Curtain fabric color and texture clearly visible on the wave faces
+1. Wave columns are CYLINDRICAL — same width at ceiling AND at floor. They do NOT flare, spread, splay, or widen toward the bottom.
+   WRONG: waves that look like a cone or skirt (narrow at top, wide at bottom)
+   WRONG: bottom of curtain looks like irregular gathered fabric spreading on the floor
+   CORRECT: a row of perfect vertical cylinders — same 7 cm diameter from top header to bottom hem
+2. Bottom hem is a straight horizontal line 1 cm above floor — visible clean gap, consistent full width
+3. Waves are IDENTICAL top to bottom — no tapering, no flaring, no variation in width or depth at any height
+4. Curtain fabric color and texture clearly visible on the cylindrical wave surfaces
 5. Interior matches the ${room.name} style — curtain wall is the hero
 ${SCALE_NOTE}
 ${brandLine}
