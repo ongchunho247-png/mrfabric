@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import './MaterialImageViewer.css'
 
 const IMAGE_TABS = [
-  { key: 'surface_texture', fallback: 'closeup',      label: 'Bề mặt vải' },
-  { key: 'main_hand_image', fallback: null,            label: 'Cầm tay' },
-  { key: 'sofa_image',      fallback: 'sofaPillow',   label: 'Sofa / Gối' },
-  { key: 'curtain_image',   fallback: 'curtain',      label: 'Trên rèm' },
-  { key: 'ruler_image',     fallback: null,            label: 'Thước đo' },
-  { key: 'detail_image',    fallback: 'renderTexture', label: 'Chi tiết' },
+  { key: 'surface_texture', fallback: 'closeup',      label: 'Bề mặt' },
+  { key: 'main_hand_image', fallback: null,            label: 'Cận chất liệu' },
+  { key: 'sofa_image',      fallback: 'sofaPillow',   label: 'Cầm nắm' },
+  { key: 'curtain_image',   fallback: 'curtain',      label: 'Không gian gần' },
+  { key: 'ruler_image',     fallback: null,            label: 'Không gian tổng thể' },
+  { key: 'detail_image',    fallback: 'renderTexture', label: 'Ruler tỉ lệ' },
 ]
 
 async function compressToBase64(file) {

@@ -67,6 +67,8 @@ export default async function handler(req, res) {
 
     const prompt = `Professional premium fabric surface texture photography.
 
+!!!CRITICAL FIRST: The reference image may contain a ruler, measuring tape, or scale bar at the bottom or along any edge. YOU MUST COMPLETELY REMOVE IT from the output. The ruler is a measurement reference only — it must NOT appear in the generated image. The entire frame must be filled with fabric surface only.
+
 TASK: Generate this fabric in the color ${colorDesc}.
 
 FABRIC STRUCTURE: ${fabricAnalysis || 'Fabric with detailed weave pattern and texture.'}
@@ -77,6 +79,7 @@ COLOR TRANSFORMATION:
 - Keep EXACTLY the same weave structure and texture quality
 - Keep EXACTLY the same surface finish, sheen level, and fabric weight appearance
 - The result must look like the same fabric design produced in the ${targetColor.name} colorway
+- Fill any area that was occupied by the ruler with the fabric pattern — no gaps, no ruler ghost
 
 PHOTOGRAPHY:
 - Fabric fills the entire frame edge-to-edge
@@ -87,7 +90,11 @@ PHOTOGRAPHY:
 
 STYLE: Premium fabric swatch photography. Liberty Fabrics, Schumacher, Dedar quality level.
 
-CRITICAL: Reproduce the exact pattern and weave structure in ${colorDesc}. Do not simplify or alter the design. No text, no watermarks, no logos.
+CRITICAL OUTPUT RULES:
+1. NO ruler, NO measuring tape, NO scale bar, NO graduation marks anywhere in the image.
+2. Reproduce the exact pattern and weave structure in ${colorDesc}.
+3. Do not simplify or alter the design.
+4. No text, no watermarks, no logos.
 ${brandLine}`
 
     // ── Strategy 1: gpt-image-1 via images.edit() — ảnh thật làm tham chiếu ──

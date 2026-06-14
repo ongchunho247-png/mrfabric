@@ -55,13 +55,15 @@ const SCALE_NOTE = `SCALE PRINCIPLE: Maintain the exact real-world scale of the 
 function slot1_surface(desc, colorLine, scaleLine, brandLine, noText) {
   return `Professional premium material surface texture photography.
 
+!!!CRITICAL FIRST: The reference image may contain a ruler, measuring tape, or scale bar at the bottom or edge. YOU MUST COMPLETELY REMOVE IT from the output. The ruler is only used to determine scale — it must NOT appear in this image. Output: clean fabric/material surface only, no ruler, no measuring tools whatsoever.
+
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: The material displayed filling the entire frame as the sole subject. For flexible materials, a gentle natural drape or soft roll at one edge gives dimension. For rigid materials (slats, panels), flat precise arrangement.
+SCENE: The material displayed filling the entire frame as the sole subject. For flexible materials, a gentle natural drape or soft roll at one edge gives dimension. For rigid materials (slats, panels), flat precise arrangement. The area previously occupied by the ruler (if any) must be filled with the fabric pattern — no empty space, no ruler ghost.
 
 COMPOSITION & CAMERA:
-- Material fills 100% of the frame — no background, no props, no ruler
+- Material fills 100% of the frame — no background, no props, no ruler, no measuring tools
 - Slight overhead angle (75–80°) for subtle depth and perspective
 - Entire surface in sharp focus edge to edge
 - Pattern/grain/texture structure fully centered and visible
@@ -74,48 +76,99 @@ LIGHTING:
 
 STYLE: Premium material swatch photography. Liberty Fabrics / Schumacher / Maharam / Hunter Douglas catalog quality.
 
-CRITICAL: Reproduce exact pattern, colors, surface texture with maximum fidelity. This is the hero texture shot — no alterations, no simplification, no added props. No ruler, no hands, no furniture in this shot.
+CRITICAL OUTPUT RULES:
+1. NO ruler, NO measuring tape, NO scale bar, NO graduation marks anywhere in the image.
+2. Reproduce exact pattern, colors, surface texture with maximum fidelity.
+3. This is the hero texture shot — no props, no hands, no furniture, no labels.
+4. Fill the entire frame with fabric/material surface.
 ${scaleLine}
 ${brandLine}
 ${noText}`
 }
 
-function slot5_ruler(desc, colorLine, brandLine, noText, productType) {
-  const materialNote = ['WB', 'AL'].includes(productType)
-    ? 'a slat of this material — clearly showing the slat width in centimeters'
-    : 'a flat sample of this fabric or material'
-  return `Technical measurement reference photography.
+// ── Slot 2: Cận chất liệu — macro close-up, no hand, no interior ─────────────
+function slot2_fabric_closeup(desc, colorLine, brandLine, noText) {
+  return `Premium material surface macro photography — extreme close-up for texture analysis.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE:
-- ${materialNote} laid perfectly flat on a pure white surface
-- A classic wooden ruler (cm markings, 0–15cm clearly visible) placed horizontally across or alongside the material
-- Ruler markings crisp and readable (1, 2, 3... cm)
-- Material surface and texture visible clearly beside and around the ruler
+SCENE: An extreme macro close-up of the material surface, closer and more detailed than the hero surface shot. Shows:
+- Individual thread, fiber, grain, or structural element clearly visible
+- Weave direction, surface relief, texture quality and tactile character
+- Any surface finish, sheen, micro-pattern or coating effect
+- Clean top-down or slight overhead angle — material fills 100% of frame
+
+REQUIREMENTS:
+- No hands, no ruler, no measuring tape anywhere
+- No interior context, no background objects
+- No furniture or props — material surface only
+
+COMPOSITION & CAMERA:
+- Extreme macro framing: one section of material fills the entire frame
+- Angle: flat top-down or slight overhead (80°)
+- Razor-sharp focus edge to edge
 
 LIGHTING:
-- Bright, even, flat overhead lighting — zero harsh shadows, zero glare on ruler or material
-- Material surface texture must be visible (not blown out)
+- Raking sidelight at 20–30° from upper left to reveal three-dimensional surface structure
+- Emphasizes thread crossings, weave texture, surface relief
+- No glare, no blown-out highlights
+
+STYLE: Material specification macro photography. Maharam / Kvadrat / Dedar fabric detail quality.
+
+CRITICAL: Maximum surface texture clarity. Surface structure must be significantly more detailed than Slot 1. No props, no people, no interior.
+${brandLine}
+${noText}`
+}
+
+function slot6_ruler(desc, colorLine, brandLine, noText, productType) {
+  const materialNote = ['WB', 'AL'].includes(productType)
+    ? 'aluminum or wood slat sample (full width visible)'
+    : 'flat fabric/material sample (approx 25cm × 20cm)'
+  return `Technical scale reference photography — material with ruler for measurement.
+
+MATERIAL: ${desc}
+${colorLine}
+
+COMPOSITION (follow exactly — this is critical):
+- ${materialNote} fills the upper 55% of the frame, laid flat on a pure white surface
+- A classic wooden ruler (30cm long) placed HORIZONTALLY in the lower 35% of the frame
+- RULER MUST BE FULLY WITHIN THE IMAGE — both left and right ends of the ruler are completely visible, NOT cut off by frame edges
+- The ruler is centered horizontally in the frame
+- Ruler graduation marks (numbers 1, 2, 3 … 25 cm) are LARGE, crisp, sharply readable black on wood
+- Small gap between the material bottom edge and the ruler top edge
+- Material surface texture clearly visible above the ruler
+
+LIGHTING:
+- Bright, flat, even overhead lighting — zero shadows anywhere
+- All ruler numbers and tick marks must be readable — no glare on ruler
+- Material surface texture must be visible (not blown out or washed out)
 
 CAMERA:
-- Directly overhead (bird's eye view, 90° top-down)
-- Perfectly level, no perspective distortion
-- Material and ruler fill the frame
+- Directly overhead, 90° top-down bird's-eye view
+- Perfectly level, zero perspective distortion, zero fisheye
+- Material and ruler together fill the frame
 
-BACKGROUND: Pure white seamless surface.
+BACKGROUND: Pure white seamless.
 
-STYLE: Technical specification photography. Clinical, precise.
+STYLE: Technical specification / product catalogue photography. Clinical, precise, well-lit.
 
-CRITICAL: Ruler cm markings must be clearly legible. Material surface/texture must be shown.
+CRITICAL:
+1. Ruler FULLY visible — NEVER cut off at any edge
+2. All cm numbers legible
+3. Material texture visible
+4. 90° overhead shot only — no angles
 ${brandLine}
 ${noText}`
 }
 
 // ── CUR: Rèm vải (blackout / dimout / sheer) ─────────────────────────────────
 const CUR = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional textile showroom photography.
+  // slot_2: cận chất liệu — macro, no hand, no interior
+  slot_2: slot2_fabric_closeup,
+
+  // slot_3: cầm nắm — hand + light interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional textile lifestyle photography — fabric touch and drape.
 
 FABRIC: ${desc}
 ${colorLine}
@@ -127,525 +180,599 @@ COMPOSITION & CAMERA:
 - Shallow depth of field: fabric texture sharp, hand slightly soft
 - Fabric fills 70% of frame
 
-LIGHTING: Soft diffused studio key light from upper left. Reveals surface texture and weave.
+INTERIOR CONTEXT (subtle):
+- Warm natural indoor light, slightly soft-focused background
+- Hint of window light or airy room visible behind — very blurred, not dominant
 
-BACKGROUND: Clean seamless white or very light warm gray studio.
+LIGHTING: Soft diffused natural or studio key light from upper left. Reveals surface texture and weave.
+
+BACKGROUND: Warm airy interior — softly blurred window or room behind the fabric.
 
 STYLE: Luxury curtain fabric catalogue — Rubelli, Dedar quality.
 
-CRITICAL: Exact fabric pattern, weave, color must be faithfully reproduced. No sofa, no furniture in this shot.
+CRITICAL: Exact fabric pattern, weave, color must be faithfully reproduced. Fabric is the hero. No sofa visible. Background is soft context only.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional luxury window treatment photography — curtain panels.
+  // slot_4: không gian gần ~1m — product close shot in room
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional luxury curtain photography — close view at 1 metre distance.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: Elegant floor-to-ceiling curtain panels of this fabric:
+SCENE: A hanging curtain panel photographed from approximately 1 metre away:
+- One or two elegant natural wave folds clearly in frame
+- Panel catching soft side-light — fabric surface texture richly visible
+- No hardware visible — fabric and folds only
+- Camera distance: approximately 1 metre from the curtain face
+
+COMPOSITION & CAMERA:
+- Medium shot: curtain fabric fills 80% of frame
+- Slight diagonal angle showing drape depth and fold dimension
+- Sharp focus on center fold, very slight blur at extreme edges
+
+LIGHTING: Soft side-light from upper left or window. Reveals woven texture and gentle sheen. Gentle light-to-shadow gradient across the folds.
+
+BACKGROUND: Soft interior — plain wall or window light blurred behind curtain.
+
+STYLE: Editorial curtain detail. Fabric character and drape quality are the heroes.
+
+CRITICAL: Fabric weave, pattern and color must be clearly recognizable at this distance. Natural drape. No sofa. No wide-room context in this shot.
+${SCALE_NOTE}
+${brandLine}
+${noText}`,
+
+  // slot_5: không gian tổng thể ~2m — full room view
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional luxury window treatment photography — full room context at 2 metres.
+
+FABRIC: ${desc}
+${colorLine}
+
+SCENE: Elegant floor-to-ceiling curtain panels photographed from approximately 2 metres away — wide enough to show the full curtain in its room context:
 - 2 panels on a slim minimal rod (brushed gold or matte black)
 - Panels softly parted in the middle with relaxed natural wave folds
 - Full length from ceiling to floor, just grazing the floor
 - Soft diffused daylight filtering through or beside the panels
+- Camera distance: approximately 2 metres — full curtain and surrounding room visible
 
-ROOM: Light airy minimal interior. Warm white walls. Parquet or light wood floor. Morning light creating luminous effect through the curtain. Gentle fold shadows reveal fabric depth.
+ROOM: Light airy minimal interior. Warm white walls. Parquet or light wood floor. Morning light creating luminous effect. Furniture partially visible at sides (not dominant).
 
-CAMERA: Full vertical composition, slight 3/4 angle showing drape depth, wide enough for room context.
+CAMERA: Full vertical or near-vertical composition, slight 3/4 angle showing drape depth and room breadth.
 
 STYLE: High-end window treatment — Designers Guild, Colefax & Fowler. Elegant, airy, architectural.
 
-CRITICAL: Fabric pattern and color must be visible on the curtain surface. Natural soft drape — not stiff or synthetic. No sofa in this shot.
+CRITICAL: Fabric pattern and color must be visible on the curtain surface at this distance. Natural soft drape. No sofa as main subject.
 ${SCALE_NOTE}
-${brandLine}
-${noText}`,
-
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional luxury curtain close-up photography.
-
-FABRIC: ${desc}
-${colorLine}
-
-SCENE: A close-up of a hanging curtain panel:
-- One or two elegant natural wave folds in frame
-- Panel caught in soft side-light showing fabric surface texture
-- No hardware visible — fabric and folds only
-
-COMPOSITION & CAMERA:
-- Medium close-up: fabric fills 80% of frame
-- Slight diagonal angle showing drape depth
-- Sharp focus on center fold, slight blur at edges
-
-LIGHTING: Soft side-light revealing woven texture and sheen. Gentle gradient from light to shadow.
-
-BACKGROUND: Soft window light or unobtrusive plain interior wall.
-
-STYLE: Editorial curtain detail. Fabric character and drape quality are the heroes.
-
-CRITICAL: Fabric weave, pattern and color must be recognizable. Natural drape — no CGI perfection. No sofa.
-${SCALE_NOTE}
-${brandLine}
-${noText}`,
-
-  slot_6: (desc, colorLine, brandLine, noText) => `Luxury macro textile detail photography.
-
-FABRIC: ${desc}
-${colorLine}
-
-SCENE: The fabric folded at a crisp 90° angle showing:
-- FRONT face with full pattern and surface texture
-- Folded EDGE revealing interior weave structure and thread cross-section
-- Both surfaces simultaneously visible
-
-LIGHTING: Raking sidelight or macro ring light to emphasize three-dimensional woven structure. Crisp illumination with soft shadow in fold for depth.
-
-CAMERA: Extreme macro close-up — fold edge is primary subject. Razor-sharp focus at fold. Very shallow DOF, background fabric fades to soft blur. 45° angle to fold edge.
-
-BACKGROUND: Softly blurred neutral background (warm cream or matching palette).
-
-STYLE: Premium material sample — Maharam or Kvadrat quality.
-
-CRITICAL: Exact weave structure, fiber texture, pattern and color faithfully reproduced. Show tactile quality and depth.
 ${brandLine}
 ${noText}`,
 }
 
 // ── FAB: Sofa / Vải bọc ──────────────────────────────────────────────────────
 const FAB = {
-  slot_2: CUR.slot_2,
+  // slot_2: cận chất liệu
+  slot_2: slot2_fabric_closeup,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional luxury interior design photography — upholstered sofa.
+  // slot_3: cầm nắm — hand touching sofa fabric with interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional upholstery lifestyle photography — hand touching sofa fabric.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: A contemporary 2–3 seat sofa fully upholstered in this fabric:
-- Clean straight-lined silhouette, tight seat cushions, low-profile arms
-- 1 large square decorative pillow + 1 rectangular lumbar pillow in same fabric
-- Small round side table partially visible (light oak or marble top)
-- Minimal decor: one tall vase or subtle artwork in background
+SCENE: An elegant hand rests gently on the arm or seat cushion of a sofa upholstered in this fabric. Fingertips lightly feel the surface texture. The gesture is natural and refined.
 
-ROOM: Minimalist Scandinavian-inspired living space. Warm white textured walls. Light wood or matte concrete flooring. Soft natural daylight from left.
+COMPOSITION:
+- Medium close-up: sofa arm/cushion and hand fill 75% of frame
+- Slight overhead angle showing fabric surface texture
+- Shallow DOF: fabric surface sharp, hand soft, background pleasantly blurred
 
-CAMERA: 3/4 front view, slight low angle at seat-cushion eye level, showing full sofa.
+INTERIOR CONTEXT (subtle):
+- Warm living room light from the side or behind
+- Soft suggestion of room context in the background — blurred, not dominant
 
-STYLE: Interior design magazine — Architectural Digest, Elle Decor. Aspirational, warm, refined.
+LIGHTING: Soft natural or warm studio light from the side. Reveals fabric weave and texture.
 
-CRITICAL: Exact fabric pattern, texture and color must cover sofa and pillows faithfully. No curtains in this shot. Do not substitute with leather, velvet, or different material.
-${SCALE_NOTE}
+BACKGROUND: Blurred warm interior living room context.
+
+STYLE: Luxury upholstery lifestyle photography. Architectural Digest quality.
+
+CRITICAL: Fabric pattern, weave and color clearly visible on the sofa surface. Hand is a supporting element only. No curtains in this shot.
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional luxury sofa detail photography — cushion and fabric close-up.
+  // slot_4: không gian gần ~1m — sofa close shot
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional luxury sofa photography — close view at 1 metre distance.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: A close-up of the sofa arm and seat corner or a decorative throw pillow:
-- Fabric surface and weave texture are the primary subject
+SCENE: A contemporary sofa or cushion photographed from approximately 1 metre away:
+- Sofa arm and seat corner clearly in frame — fabric surface and weave texture are primary subjects
+- 1 decorative pillow in same fabric visible
 - Natural light catching the woven surface from a low angle
-- Cushion depth and any piping/seam detail visible
+- Camera distance: approximately 1 metre from the sofa
 
-COMPOSITION: Medium close-up, fabric and cushion fill 85% of frame. Slight overhead angle. Sharp focus on fabric surface, very shallow DOF.
+COMPOSITION: Medium shot, sofa and cushion fill 85% of frame. Slight overhead or eye-level angle. Sharp focus on fabric surface.
 
 LIGHTING: Soft natural side light from a window. Reveals fabric texture and depth without glare.
 
-BACKGROUND: Blurred sofa and warm residential living room context.
+BACKGROUND: Warm residential living room context, softly blurred.
 
-STYLE: Luxury upholstery detail photography.
+STYLE: Luxury upholstery detail photography. Aspirational, warm.
 
 CRITICAL: Fabric weave, texture and color must be clearly visible and recognizable. No curtains.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_6: CUR.slot_6,
+  // slot_5: không gian tổng thể ~2m — full sofa in room
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional luxury interior design photography — sofa in full room context at 2 metres.
+
+FABRIC: ${desc}
+${colorLine}
+
+SCENE: A contemporary 2–3 seat sofa fully upholstered in this fabric, photographed from approximately 2 metres away showing full room context:
+- Clean straight-lined silhouette, tight seat cushions, low-profile arms
+- 1 large square decorative pillow + 1 rectangular lumbar pillow in same fabric
+- Small round side table partially visible (light oak or marble top)
+- Minimal decor: one tall vase or subtle artwork in background
+- Camera distance: approximately 2 metres — full sofa and surrounding room visible
+
+ROOM: Minimalist Scandinavian-inspired living space. Warm white walls. Light wood or matte concrete flooring. Soft natural daylight from left.
+
+CAMERA: 3/4 front view, slight low angle at seat-cushion eye level, full sofa in frame.
+
+STYLE: Interior design magazine — Architectural Digest, Elle Decor. Aspirational, warm, refined.
+
+CRITICAL: Exact fabric pattern, texture and color must cover sofa and pillows faithfully. No curtains in this shot.
+${SCALE_NOTE}
+${brandLine}
+${noText}`,
 }
 
 // ── CUR_FAB: Rèm + Sofa hỗn hợp ─────────────────────────────────────────────
 const CUR_FAB = {
-  slot_2: CUR.slot_2,
-  slot_3: FAB.slot_3,
-  slot_4: CUR.slot_3,
-  slot_6: CUR.slot_6,
+  slot_2: slot2_fabric_closeup,
+  slot_3: CUR.slot_3,
+
+  // slot_4: sofa close-up at 1m (fabric visible, interior hint)
+  slot_4: FAB.slot_4,
+
+  // slot_5: full room with curtain at 2m (sofa also visible)
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional luxury interior photography — curtain and sofa in full room at 2 metres.
+
+FABRIC: ${desc}
+${colorLine}
+
+SCENE: A full interior room photographed from approximately 2 metres away showing both window treatment and upholstery in this fabric:
+- Floor-to-ceiling curtain panels on a slim rod — same fabric on curtains
+- A sofa partially visible in the foreground or mid-ground — same fabric on sofa and cushions
+- The composition shows the versatility of this fabric across both applications
+- Camera distance: approximately 2 metres — showing full room context
+
+ROOM: Elegant contemporary interior. Warm white walls. Parquet or light wood floor. Natural daylight from the curtained window. Tasteful furniture arrangement.
+
+CAMERA: 3/4 angle from inside room, wide enough to show curtain + sofa relationship.
+
+STYLE: Luxury interior design presentation. Shows fabric used across multiple furnishing elements.
+
+CRITICAL: Fabric pattern and color must be recognizable on BOTH curtains and sofa. Show the design harmony of using the same material for both.
+${SCALE_NOTE}
+${brandLine}
+${noText}`,
 }
 
 // ── BL: Rèm cuốn ─────────────────────────────────────────────────────────────
 const BL = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional roller blind material close-up photography.
+  // slot_2: cận chất liệu — flat material surface macro
+  slot_2: (desc, colorLine, brandLine, noText) => `Premium roller blind material macro photography — extreme close-up.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A hand gently touching or lightly gripping the edge of a roller blind fabric panel. The material is rolled out flat or hanging cleanly, showing its smooth surface and any texture. Hand gives scale and tactile context.
+SCENE: Extreme close-up of the roller blind material surface laid flat:
+- Material fills 100% of frame in a flat, taut configuration
+- Surface texture, coating finish, and any micro-pattern clearly visible
+- NOT showing mechanism, tube, or hem — material surface only
 
-COMPOSITION: Medium close-up, material fills most of frame. Hand at top edge showing the clean hem.
+COMPOSITION: Top-down or very slight overhead angle. Razor-sharp focus across the material surface.
 
-LIGHTING: Even soft studio light revealing surface texture.
+LIGHTING: Even soft light with slight side-rake to reveal surface texture and coating character.
 
-BACKGROUND: Clean white or light neutral studio.
+BACKGROUND: None visible — material fills frame entirely.
 
-STYLE: Premium roller blind fabric sample photography.
+STYLE: Technical material specification photography.
 
-CRITICAL: Reproduce exact material texture and color. No sofa, no draping curtain folds — flat clean surface only.
+CRITICAL: Flat, clean surface only. No hands, no ruler, no interior. Reproduce exact material texture and color.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — roller blind installed in a room.
+  // slot_3: cầm nắm — hand touching blind with interior hint
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional roller blind lifestyle photography — hand touching material.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A clean minimal interior window with a roller blind:
+SCENE: A hand gently touches or lightly grips the edge of a roller blind fabric panel. The material is hanging cleanly, showing its flat surface and texture. Hand gives scale and tactile context.
+
+COMPOSITION: Medium close-up, material fills 70% of frame. Hand at side or top edge.
+
+INTERIOR CONTEXT (subtle):
+- Soft indoor light visible in background
+- Hint of a clean modern interior window behind — very softly blurred
+
+LIGHTING: Even soft natural or studio light revealing surface texture.
+
+BACKGROUND: Softly blurred clean interior context.
+
+STYLE: Premium roller blind lifestyle photography.
+
+CRITICAL: Reproduce exact material texture and color. No sofa, no draping curtain folds. Background is subtle context only.
+${brandLine}
+${noText}`,
+
+  // slot_4: không gian gần ~1m — blind at window close
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional interior photography — roller blind installed at window, close view at 1 metre.
+
+MATERIAL: ${desc}
+${colorLine}
+
+SCENE: A clean minimal interior window with a roller blind, photographed from approximately 1 metre away:
 - Blind approximately 2/3 rolled down showing the flat fabric surface clearly
 - Roller tube and chain/cord mechanism visible at top bracket
 - Clean aluminum bottom bar at the hem
+- Camera distance: approximately 1 metre — blind fills most of frame
 - Soft filtered light through or beside the blind
 
-ROOM: Modern minimal interior — white walls, clean window frame, contemporary furniture partially visible. Natural daylight setting.
+ROOM: Modern minimal interior — white walls, clean window frame. Natural daylight.
 
-CAMERA: Front-facing at window height, showing full blind width.
+CAMERA: Front-facing at window height, blind fills the frame.
 
 STYLE: Premium roller blind installation photography.
 
-CRITICAL: Blind fabric must show actual material texture and color. NOT a draping curtain — flat, clean, taut surface. No sofa.
+CRITICAL: Blind fabric must show actual material texture and color. NOT a draping curtain — flat, clean, taut surface.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — roller blind side profile and mechanism.
+  // slot_5: không gian tổng thể ~2m — full room view
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — roller blind in full room context at 2 metres.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A roller blind from a side or 3/4 angle showing:
-- The rolled-up fabric on the roller tube at the top
-- The fabric dropping cleanly showing a few inches of flat surface
-- Chain or cord mechanism on the bracket side
-- Clean, precise, product-focused composition
+SCENE: A roller blind at a full window photographed from approximately 2 metres away — wide room context visible:
+- Blind fully or partially lowered, showing flat surface and straight hem
+- Full window and surrounding room visible in frame
+- Contemporary furniture partially visible (desk, chair, or minimal shelf)
+- Camera distance: approximately 2 metres — full window and room context in frame
 
-CAMERA: Side or 3/4 angle showing mechanism and fabric.
+ROOM: Modern minimal residential or office interior — white walls, clean window frame, natural daylight. Furniture at sides not dominant.
 
-LIGHTING: Clean product photography — even, no harsh shadows on fabric surface.
+CAMERA: Slight 3/4 or front angle, wide enough to show window + room context.
 
-BACKGROUND: Clean white or very light neutral.
+STYLE: Premium roller blind in situ photography showing full room integration.
 
-STYLE: Technical product catalog photography for roller blinds.
-
-CRITICAL: Material texture on the unrolled fabric section must be visible. Not a draping curtain.
+CRITICAL: Blind fabric texture and color still recognizable at this distance. Flat, taut surface — not curtain draping.
 ${SCALE_NOTE}
-${brandLine}
-${noText}`,
-
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — roller blind bottom bar and hem.
-
-MATERIAL: ${desc}
-${colorLine}
-
-SCENE: Close-up of the roller blind bottom area:
-- Clean aluminum bottom bar visible
-- Fabric edge where it meets the bottom bar
-- Material surface showing texture detail at the hem
-
-CAMERA: Close-up from slightly below and in front showing hem and bar.
-
-LIGHTING: Even bright light, no harsh shadows.
-
-BACKGROUND: Clean white or light neutral.
-
-STYLE: Product specification photography.
-
-CRITICAL: Show material surface texture and precise hem construction.
 ${brandLine}
 ${noText}`,
 }
 
 // ── WB: Sáo gỗ ───────────────────────────────────────────────────────────────
 const WB = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — wood blind slat close-up.
+  // slot_2: cận lá sáo — slat close-up, already material close-up, no hand
+  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — wood blind slat extreme close-up.
 
 MATERIAL: ${desc}
 ${colorLine}
 
 SCENE: 2–3 horizontal wood slats in extreme close-up:
-- Slats parallel with slight overlap showing depth
-- Wood grain texture prominently visible across slat face
-- Natural wood tones and finish clearly shown
+- Slats parallel, wood grain texture prominently visible across slat face
+- Natural wood tones, finish quality, and any grain variation clearly shown
+- No mechanism, no cord — slat surface only
 
 COMPOSITION: Slightly diagonal (15°), sharp focus across slat surfaces, frame filled with slat textures.
 
-LIGHTING: Raking side-light revealing wood grain three-dimensionally.
+LIGHTING: Raking side-light from upper left, revealing wood grain three-dimensionally.
 
-BACKGROUND: Softly blurred slats.
+BACKGROUND: Softly blurred slats in background.
 
-STYLE: Premium wood blind material sample photography.
+STYLE: Premium wood blind material specification photography.
 
-CRITICAL: Wood grain, color, and finish clearly and faithfully shown. Not fabric. Not aluminum.
+CRITICAL: Wood grain, color, finish clearly and faithfully shown. Not fabric. Not aluminum. No hands, no ruler.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — wood venetian blind in a room.
+  // slot_3: cầm chạm — hand adjusting slat with interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional lifestyle photography — hand adjusting wood blind slat.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A wood venetian blind at a full-height window:
-- Slats tilted approximately 45° letting in filtered natural light
-- Light and shadow playing through slats onto the interior
-- Warm residential interior context matching natural wood tones
+SCENE: A hand gently tilts or adjusts 2–3 horizontal wood slats:
+- Fingers lightly grip a slat to demonstrate the tilt adjustment
+- Natural wood grain visible on the slat surface beside the hand
+- Soft light from a window partially visible in background (blurred)
 
-ROOM: Sophisticated residential or boutique hospitality interior. Warm neutral walls. Natural materials (wood, linen, stone). Natural light from beside/behind the blind.
+COMPOSITION:
+- Medium close-up: slats fill 65% of frame, hand as supporting element
+- Slight diagonal, natural casual interaction
 
-CAMERA: 3/4 angle from inside, showing full blind width.
+INTERIOR CONTEXT (subtle):
+- Warm residential interior background, softly blurred
+- Natural daylight feeling from window area behind
 
-STYLE: Premium wood blind interior photography. Warm, sophisticated, architectural.
+LIGHTING: Soft natural side light revealing wood grain and depth.
 
-CRITICAL: Wood grain and color must be recognizable. Not fabric. Not aluminum. No sofa.
-${SCALE_NOTE}
+STYLE: Premium wood blind lifestyle photography. Warm, residential.
+
+CRITICAL: Wood grain and color clearly shown. Hand is supporting element only. Background subtle and warm.
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — wood blind tilt operation.
+  // slot_4: không gian gần ~1m — tilt mechanism shown close
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — wood blind tilt operation, close view at 1 metre.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A wood venetian blind showing the tilt operation:
+SCENE: A wood venetian blind showing the tilt operation from approximately 1 metre away:
 - Slats at two different tilt angles (some open, some tilting closed)
 - Ladder cord and tilt wand/cord clearly visible
-- 4–6 slats in frame showing the full louver arrangement
+- 4–6 slats in frame showing the full louver arrangement and mechanism
+- Camera distance: approximately 1 metre — product fills most of frame
 
-CAMERA: 3/4 front angle.
+CAMERA: 3/4 front angle, close enough to see slat material clearly.
 
 LIGHTING: Studio or window light showing slat depth and ladder cord.
 
-STYLE: Product operation photography.
+STYLE: Product operation photography showing mechanism and material detail.
 
 CRITICAL: Wood slat material, grain, and color clearly shown in both tilt positions.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — wood blind hardware and construction.
+  // slot_5: không gian tổng thể ~2m — full room view
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — wood venetian blind in full room at 2 metres.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A close-up detail showing one of:
-- Ladder tape running vertically between wood slats (if present)
-- Cord lock or tilt mechanism hardware at the headrail
-- Cross-section of 3–4 slats showing the slat edge thickness
+SCENE: A wood venetian blind at a full-height window, photographed from approximately 2 metres away:
+- Slats tilted approximately 45° letting in filtered natural light
+- Light and shadow playing through slats onto the interior
+- Full blind width and surrounding room context visible
+- Camera distance: approximately 2 metres — full window + room in frame
 
-LIGHTING: Sharp detailed product lighting.
+ROOM: Sophisticated residential or boutique hospitality interior. Warm neutral walls. Natural materials (wood, linen, stone). Natural light from the blind area.
 
-STYLE: Technical product detail photography.
+CAMERA: 3/4 angle from inside, wide enough to show full blind and room context.
 
-CRITICAL: Wood material quality and construction detail accurately shown.
+STYLE: Premium wood blind interior photography. Warm, sophisticated, architectural.
+
+CRITICAL: Wood grain and color recognizable at this distance. Show warm room integration.
+${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 }
 
 // ── AL: Sáo nhôm ─────────────────────────────────────────────────────────────
 const AL = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — aluminum blind slat close-up.
+  // slot_2: cận lá nhôm — slat close-up
+  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — aluminum blind slat extreme close-up.
 
 MATERIAL: ${desc}
 ${colorLine}
 
 SCENE: 2–3 horizontal aluminum slats in extreme close-up:
 - Powder-coated or anodized aluminum surface clearly shown
-- Smooth metallic finish, any subtle sheen or texture of the coating visible
-- Clean, precise metallic character
+- Smooth metallic finish, coating sheen or texture of the coating visible
+- Clean, precise, metallic character prominent
 
-COMPOSITION: Slightly diagonal, sharp focus across slat faces.
+COMPOSITION: Slightly diagonal, sharp focus across slat faces, filling the frame.
 
-LIGHTING: Even studio light showing aluminum surface finish and subtle metallic sheen.
+LIGHTING: Even studio light with slight side-rake showing aluminum surface finish and metallic sheen.
 
-BACKGROUND: Clean white.
+BACKGROUND: Clean neutral — softly blurred slats.
 
-STYLE: Premium aluminum blind sample photography. Precise, modern.
+STYLE: Premium aluminum blind specification photography. Precise, modern.
 
-CRITICAL: Aluminum surface, color, and finish clearly shown. Not fabric. Not wood.
+CRITICAL: Aluminum surface, color, finish clearly shown. Not fabric. Not wood. No hands, no ruler.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — aluminum venetian blind in a room.
+  // slot_3: cầm chạm — hand adjusting slat
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional lifestyle photography — hand adjusting aluminum blind slat.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Aluminum venetian blind at a window, slats tilted open (30–45°):
-- Clean metallic surface catching light cleanly
-- Linear light/shadow patterns through slats onto the interior
-- Modern clean interior context
+SCENE: A hand lightly tilts or adjusts 2–3 aluminum slats:
+- Fingers lightly grip a slat to show the tilt adjustment
+- Metallic surface catching light beside the hand
+- Clean modern interior window area in background (blurred)
 
-ROOM: Contemporary office or modern residential interior. Clean lines, minimal palette. Natural light from beside/behind the blind.
+COMPOSITION:
+- Medium close-up: slats fill 65% of frame, hand as supporting element
+- Slight diagonal, natural casual interaction
 
-CAMERA: 3/4 angle from inside the room.
+INTERIOR CONTEXT (subtle):
+- Clean modern or office interior background, softly blurred
+- Natural daylight feeling
 
-STYLE: Modern interior / premium window furnishing photography.
+LIGHTING: Even studio or natural light revealing metallic surface character.
 
-CRITICAL: Aluminum material character preserved — metallic, clean finish, not fabric-like, not wood-like. No sofa. No curtains.
-${SCALE_NOTE}
+STYLE: Modern premium product lifestyle photography.
+
+CRITICAL: Aluminum surface, color, finish clearly shown. Hand is supporting element only. Background minimal and clean.
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — aluminum blind tilt and mechanism.
+  // slot_4: không gian gần ~1m — tilt mechanism
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — aluminum blind tilt mechanism, close view at 1 metre.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Aluminum venetian blind showing tilt states:
+SCENE: Aluminum venetian blind showing tilt states from approximately 1 metre away:
 - Half slats tilted open, half tilted toward closed position
 - Ladder cord and wand/cord mechanism clearly visible
 - Clean angular aluminum surfaces catching light at different angles
+- Camera distance: approximately 1 metre
 
-CAMERA: Front or slight 3/4 angle showing multiple slats.
+CAMERA: Front or slight 3/4 angle showing multiple slats and mechanism.
 
-LIGHTING: Even product lighting showing metallic surface at different angles.
+LIGHTING: Even product lighting showing metallic surface at different tilt angles.
 
-STYLE: Product operation and mechanism photography.
+STYLE: Product operation photography showing mechanism and material detail.
 
-CRITICAL: Aluminum slat material — not fabric, not wood. Show angular, clean metallic character in both tilt states.
+CRITICAL: Aluminum slat material — not fabric, not wood. Show angular, clean metallic character.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — aluminum blind components.
+  // slot_5: không gian tổng thể ~2m — full room view
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — aluminum venetian blind in full room at 2 metres.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A close-up detail showing one of:
-- Cord ladder with aluminum slats showing slat edge profile (e.g. 25mm or 50mm width)
-- Bottom rail with cord lock and bottom bar detail
-- Headrail bracket and cord/wand mechanism
+SCENE: Aluminum venetian blind at a window, photographed from approximately 2 metres away:
+- Slats tilted open (30–45°), clean metallic surface catching light
+- Linear light/shadow patterns through slats onto interior
+- Full blind width and surrounding room visible
+- Camera distance: approximately 2 metres — full window + room context
 
-LIGHTING: Sharp, clean product lighting showing metallic precision.
+ROOM: Contemporary office or modern residential interior. Clean lines, minimal palette. Natural light.
 
-STYLE: Technical specification photography.
+CAMERA: 3/4 angle from inside the room, wide enough to see full blind and room context.
 
-CRITICAL: Show aluminum slat construction and quality accurately. Not fabric.
+STYLE: Modern interior / premium window furnishing photography.
+
+CRITICAL: Aluminum material character preserved at this distance — metallic, clean, precise.
+${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 }
 
 // ── RM: Roman blind ───────────────────────────────────────────────────────────
 const RM = {
-  slot_2: CUR.slot_2,
+  // slot_2: cận chất liệu — fabric macro, shared with CUR
+  slot_2: slot2_fabric_closeup,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — Roman blind in a room.
+  // slot_3: cầm nắm — hand holding roman fabric
+  slot_3: CUR.slot_3,
 
-FABRIC: ${desc}
-${colorLine}
-
-SCENE: A Roman blind fully lowered at a window:
-- Clean horizontal fold/pleat structure characteristic of Roman blinds
-- Fabric hanging straight with characteristic horizontal pleats visible at bottom
-- Full window width
-
-ROOM: Elegant residential interior — warm neutral palette. Window with natural daylight filtering through or beside the blind.
-
-CAMERA: Front-facing at room level showing full blind width.
-
-STYLE: Premium Roman blind catalog photography.
-
-CRITICAL: Fabric pattern and texture visible on the Roman blind surface. Horizontal fold/pleat structure clearly Roman blind style — not curtain, not roller blind. No sofa.
-${SCALE_NOTE}
-${brandLine}
-${noText}`,
-
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional detail photography — Roman blind fold structure.
+  // slot_4: không gian gần ~1m — roman close, fold detail
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional detail photography — Roman blind fold structure, close view at 1 metre.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: A Roman blind partially raised showing:
-- 3–5 horizontal folds visible as the blind lifts
+SCENE: A Roman blind partially raised, photographed from approximately 1 metre away:
+- 3–5 horizontal folds clearly visible as the blind lifts
 - Fabric accumulating in structured horizontal pleats
 - Lifting cord through rings visible at back edge if possible
 - Fabric texture clearly shown on the face of each fold
+- Camera distance: approximately 1 metre — fold structure fills frame
 
 COMPOSITION: 3/4 angle or slight side view showing fold depth and structure.
 
 LIGHTING: Side light revealing fold shadows and fabric texture.
 
-STYLE: Detail photography showing Roman blind construction quality.
+STYLE: Detail photography showing Roman blind construction quality and fabric character.
 
 CRITICAL: Roman pleat/fold structure clearly shown. Fabric pattern and texture recognizable on each pleat.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional detail photography — Roman blind construction detail.
+  // slot_5: không gian tổng thể ~2m — roman in full room
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — Roman blind in full room at 2 metres.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: Close-up of Roman blind construction showing one of:
-- Horizontal rod pocket seam stitching on the reverse side
-- Ring attachment detail showing lifting cord path
-- Front-facing view of bottom bar hem and fabric finish
+SCENE: A Roman blind fully lowered at a window, photographed from approximately 2 metres away:
+- Clean horizontal fold/pleat structure characteristic of Roman blinds
+- Fabric hanging straight with horizontal pleats visible
+- Full window width and surrounding room context visible
+- Camera distance: approximately 2 metres
 
-LIGHTING: Sharp, even close-up detail lighting.
+ROOM: Elegant residential interior — warm neutral palette. Window with natural daylight. Furniture and decor partially visible at sides.
 
-STYLE: Construction quality detail photography.
+CAMERA: Front-facing at room level showing full blind and room context.
 
-CRITICAL: Show fabric quality and sewing/construction precision.
+STYLE: Premium Roman blind catalog photography.
+
+CRITICAL: Fabric pattern and texture visible on the Roman blind surface. Roman blind style clearly distinct from curtain or roller blind.
+${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 }
 
 // ── HN: Tổ ong ───────────────────────────────────────────────────────────────
 const HN = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — honeycomb blind cell close-up.
+  // slot_2: cận ô tổ ong — honeycomb cell extreme close-up, no hand
+  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — honeycomb blind cell extreme close-up.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Extreme close-up of the honeycomb blind fabric:
-- Hexagonal cell structure visible across the frame
+SCENE: Extreme macro close-up of the honeycomb blind fabric:
+- Hexagonal cell structure visible across the entire frame
 - The cellular void depth creating a pronounced 3D structure
-- Front face or slight angled view of cells
+- Front face or slight angled view of cells showing depth
 
-COMPOSITION: Tight macro shot, cells fill the frame.
+COMPOSITION: Tight macro shot, cells fill 100% of the frame.
 
 LIGHTING: Back-lit or side-lit to reveal translucent cell walls and interior depth.
 
-STYLE: Technical material close-up photography.
+STYLE: Technical material specification close-up photography.
 
-CRITICAL: Honeycomb cell structure must be clearly visible as 3D cells with depth. Not flat fabric. Not slats.
+CRITICAL: Honeycomb cell structure must be clearly visible as 3D cells with depth. Not flat fabric. Not slats. No hands, no ruler.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — honeycomb blind in a room.
+  // slot_3: cầm chạm — hand touching honeycomb with interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional lifestyle photography — hand touching honeycomb blind.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A honeycomb (cellular) blind installed at a large window:
-- Blind fully lowered, clean face showing
-- Subtle cellular texture subtly visible from the room side
-- Soft diffused light through the cells (if light-filtering) or solid surface (if blackout)
+SCENE: A hand gently touches or lightly compresses the face of the honeycomb blind:
+- Fingertips lightly press the cellular surface demonstrating its soft, structured texture
+- Cell structure subtly visible around the hand
+- Clean window or room visible softly behind
 
-ROOM: Clean modern interior with white or neutral walls. Contemporary setting.
+COMPOSITION:
+- Medium close-up: blind fills 70% of frame, hand as supporting element
+- Slight overhead angle
 
-CAMERA: Front-facing from room level.
+INTERIOR CONTEXT (subtle):
+- Soft natural indoor light
+- Clean modern interior background, very softly blurred
 
-STYLE: Premium cellular shade interior photography.
+LIGHTING: Soft even light showing cellular texture.
 
-CRITICAL: The cellular blind is recognizable — not a flat roller blind, not a curtain. Cell structure subtly visible. No sofa. No curtains.
-${SCALE_NOTE}
+STYLE: Premium cellular shade lifestyle photography.
+
+CRITICAL: Cell structure visible. Hand is supporting element. Background is subtle context only.
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — honeycomb blind side section view.
+  // slot_4: không gian gần ~1m — cross-section / side view
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — honeycomb blind cross-section view at 1 metre.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Cross-sectional or extreme side-angle view of the honeycomb blind:
+SCENE: Cross-sectional or extreme side-angle view of the honeycomb blind from approximately 1 metre away:
 - Individual cells visible in cross-section from the side edge
 - Air pockets within each hexagonal cell clearly shown as depth
 - Multiple rows of cells visible showing the full pleat height
+- Camera distance: approximately 1 metre
 
 CAMERA: Pure side view or extreme 3/4 angle showing cell depth.
 
@@ -653,189 +780,218 @@ LIGHTING: Side light or back light illuminating cell interiors.
 
 STYLE: Technical cross-section photography demonstrating insulation cell structure.
 
-CRITICAL: Honeycomb cell interior structure must be clearly shown as hollow cells with depth. This distinguishes it from roller blinds.
+CRITICAL: Honeycomb cell interior structure must be clearly shown as hollow cells with depth.
 ${brandLine}
 ${noText}`,
 
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — honeycomb blind track and hardware.
+  // slot_5: không gian tổng thể ~2m — full room
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — honeycomb blind in full room at 2 metres.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Close-up detail showing one of:
-- Top track or bottom rail with blind fabric edge
-- Cord or cordless lifting mechanism detail
-- Close view of cell face showing texture and translucency quality
+SCENE: A honeycomb (cellular) blind installed at a large window, photographed from approximately 2 metres away:
+- Blind fully lowered, clean face showing
+- Subtle cellular texture visible from the room side
+- Full blind width and surrounding room context visible
+- Camera distance: approximately 2 metres
 
-LIGHTING: Sharp detail lighting.
+ROOM: Clean modern interior with white or neutral walls. Contemporary setting with minimal furniture partially visible.
 
-STYLE: Technical product photography.
+CAMERA: Front-facing from room level, wide enough to see full blind and room context.
 
-CRITICAL: Show cellular blind construction quality accurately.
+STYLE: Premium cellular shade interior photography.
+
+CRITICAL: Cellular blind recognizable at this distance. Not a flat roller blind, not a curtain.
+${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 }
 
 // ── CB: Cầu vồng / Zebra ─────────────────────────────────────────────────────
 const CB = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — zebra blind fabric close-up.
+  // slot_2: cận sọc vải — stripe macro, no hand
+  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — zebra blind fabric stripe extreme close-up.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: Close-up of the zebra (dual-layer day/night) blind fabric:
+SCENE: Extreme macro close-up of the zebra (dual-layer day/night) blind fabric:
 - Alternating sheer (translucent) and opaque horizontal stripes clearly visible
-- Stripe pattern filling the frame
-- Natural light difference between sheer and opaque bands visible
+- Stripe pattern fills the frame edge-to-edge
+- Natural light transmission difference between sheer and opaque bands prominent
 
-COMPOSITION: Front or slight angle, stripes running horizontally.
+COMPOSITION: Front or very slight overhead, stripes running horizontally, filling frame.
 
-LIGHTING: Back-lit or diffused to distinguish sheer vs opaque stripes.
+LIGHTING: Back-lit or diffused from behind to distinguish sheer vs opaque stripes clearly.
 
-STYLE: Premium zebra blind fabric sample photography.
+STYLE: Premium zebra blind fabric specification photography.
 
-CRITICAL: Alternating sheer/opaque stripe structure must be clearly shown. Not solid fabric. Not venetian slats.
+CRITICAL: Alternating sheer/opaque stripe structure clearly shown. Not solid fabric. Not venetian slats. No hands, no ruler.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — zebra blind in a room.
+  // slot_3: cầm nắm — hand touching zebra fabric with interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional lifestyle photography — hand touching zebra blind fabric.
 
 FABRIC: ${desc}
 ${colorLine}
 
-SCENE: A zebra (day/night) blind installed at a window:
+SCENE: A hand lightly touches or holds the edge of the zebra blind fabric:
+- Alternating sheer and opaque stripes visible beside the hand
+- Fabric hanging cleanly from a roller mechanism
+- Clean modern interior window background visible (blurred)
+
+COMPOSITION:
+- Medium close-up: fabric fills 70% of frame, hand as supporting element
+
+INTERIOR CONTEXT (subtle):
+- Modern clean interior or office background, softly blurred
+- Natural daylight feeling
+
+LIGHTING: Even soft light, slightly back-lit to show stripe translucency.
+
+STYLE: Premium zebra blind lifestyle photography.
+
+CRITICAL: Sheer/opaque stripe character recognizable. Hand is supporting element. Background is subtle.
+${brandLine}
+${noText}`,
+
+  // slot_4: không gian gần ~1m — stripe alignment mechanism
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — zebra blind open/close demonstration at 1 metre.
+
+FABRIC: ${desc}
+${colorLine}
+
+SCENE: The zebra blind demonstrating stripe alignment from approximately 1 metre away:
+- One position: stripes aligned (sheer on sheer) = maximum light
+- Other position: stripes offset (opaque covering sheer) = closed
+- Chain cord mechanism visible at side
+- Camera distance: approximately 1 metre — blind fills most of frame
+
+LIGHTING: Backlighting to demonstrate light transmission difference between stripe states.
+
+STYLE: Product operation demonstration photography.
+
+CRITICAL: Stripe alignment/offset mechanism clearly shown. Demonstrate light control function.
+${brandLine}
+${noText}`,
+
+  // slot_5: không gian tổng thể ~2m — full room
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — zebra blind in full room at 2 metres.
+
+FABRIC: ${desc}
+${colorLine}
+
+SCENE: A zebra (day/night) blind installed at a window, photographed from approximately 2 metres away:
 - Sheer and opaque bands partially aligned for soft filtered light
-- Dual-layer fabric hanging cleanly from the roller mechanism
-- Modern clean interior context
+- Full blind width and surrounding room visible
+- Camera distance: approximately 2 metres — full window + room context
 
 ROOM: Modern minimal residential or boutique hospitality interior.
 
-CAMERA: Front-facing or slight 3/4 angle.
+CAMERA: Front-facing or slight 3/4 angle, wide enough to show full blind and room.
 
-STYLE: Premium zebra blind interior photography.
+STYLE: Premium zebra blind in situ photography.
 
-CRITICAL: Alternating sheer/opaque stripe character must be recognizable. Not a plain roller blind. Not a curtain. No sofa.
+CRITICAL: Alternating sheer/opaque stripe character recognizable at this distance. Not a plain roller blind.
 ${SCALE_NOTE}
-${brandLine}
-${noText}`,
-
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — zebra blind open/close operation.
-
-FABRIC: ${desc}
-${colorLine}
-
-SCENE: The zebra blind demonstrating the stripe alignment mechanism:
-- One position: stripes aligned (sheer on sheer) = maximum light through sheer bands
-- Other position: stripes offset (opaque covering sheer) = closed/darkened
-- Chain cord mechanism visible at side
-- Both states or transition state visible
-
-LIGHTING: Backlighting to demonstrate light transmission difference between states.
-
-STYLE: Operation demonstration photography.
-
-CRITICAL: The stripe alignment/offset mechanism clearly shown. Demonstrate how blind controls light through stripe position.
-${brandLine}
-${noText}`,
-
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — zebra blind stripe detail.
-
-FABRIC: ${desc}
-${colorLine}
-
-SCENE: Close-up showing:
-- The bottom hem of the zebra blind with the aluminum bottom bar
-- Stripe pattern at hem clearly showing sheer/opaque alternation
-- OR extreme close-up of the sheer-to-opaque stripe transition zone
-
-LIGHTING: Even close-up lighting.
-
-STYLE: Product detail photography.
-
-CRITICAL: Sheer/opaque stripe character must be preserved and recognizable at close range.
 ${brandLine}
 ${noText}`,
 }
 
 // ── BB: Trúc / Bamboo ─────────────────────────────────────────────────────────
 const BB = {
-  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — bamboo blind material close-up.
+  // slot_2: cận thanh trúc — bamboo material macro, no hand
+  slot_2: (desc, colorLine, brandLine, noText) => `Professional product photography — bamboo blind material extreme close-up.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Extreme close-up of the bamboo/reed blind material:
-- Individual bamboo or reed slats or woven structure clearly visible
-- Natural bamboo grain, color variation, and weave/binding pattern shown
-- Organic natural character of the material prominent
+SCENE: Extreme macro close-up of the bamboo/reed blind material:
+- Individual bamboo or reed slats or woven structure fills the frame
+- Natural bamboo grain, color variation, organic texture, and weave/binding pattern shown
+- Organic natural character of the material at maximum detail
 
-COMPOSITION: Tight macro, material filling the frame.
+COMPOSITION: Tight macro, material filling 100% of frame.
 
-LIGHTING: Natural or raking side light revealing material texture and dimension.
+LIGHTING: Natural or raking side light revealing material texture and organic dimension.
 
-STYLE: Natural materials sample photography.
+STYLE: Natural materials specification photography.
 
-CRITICAL: Bamboo/reed material character clearly shown — organic, textured, not synthetic fabric, not metal.
+CRITICAL: Bamboo/reed material character clearly shown — organic, textured, not synthetic, not metal. No hands, no ruler.
 ${brandLine}
 ${noText}`,
 
-  slot_3: (desc, colorLine, brandLine, noText) => `Professional interior photography — bamboo blind in a room.
+  // slot_3: cầm chạm — hand touching bamboo with interior context
+  slot_3: (desc, colorLine, brandLine, noText) => `Professional lifestyle photography — hand touching bamboo blind material.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A bamboo (or woven wood/reed) blind installed at a window:
-- Blind in rolled-down position, full width visible
-- Natural bamboo or reed texture visible from the room side
-- Organic warmth of the material complementing the interior palette
+SCENE: A hand lightly touches or holds the edge of the bamboo blind:
+- Natural bamboo texture visible beside the hand
+- Blind in rolled-down or partially raised position
+- Warm natural interior or outdoor-adjacent space in background
 
-ROOM: Warm natural interior — wooden furniture, natural textiles, organic color palette. Tropical, coastal, or biophilic design theme.
+COMPOSITION:
+- Medium close-up: material fills 70% of frame, hand as supporting element
 
-CAMERA: 3/4 angle from room level.
+INTERIOR CONTEXT (subtle):
+- Warm natural interior — wood tones, natural textiles visible very softly behind
+- Tropical or biophilic interior feeling
 
-STYLE: Natural interior photography.
+LIGHTING: Soft natural light revealing bamboo texture.
 
-CRITICAL: Bamboo/reed material character recognizable — organic, textured. Not fabric, not aluminum. Show natural grain.
-${SCALE_NOTE}
+STYLE: Natural lifestyle photography. Warm, organic, tactile.
+
+CRITICAL: Bamboo/reed material character clearly visible. Hand is supporting element. Background warm and natural.
 ${brandLine}
 ${noText}`,
 
-  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — bamboo blind rolling and operation.
+  // slot_4: không gian gần ~1m — rolling operation
+  slot_4: (desc, colorLine, brandLine, noText) => `Professional product photography — bamboo blind rolling operation at 1 metre.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: A bamboo blind partially rolled upward:
+SCENE: A bamboo blind partially rolled upward, photographed from approximately 1 metre away:
 - Material rolling from the bottom upward, showing the roll form
 - Natural cotton cord and wooden cleat or cord mechanism visible
-- The rolled material showing bamboo/reed cross-section as it curves in the roll
+- The rolled material showing bamboo/reed cross-section as it curves
+- Camera distance: approximately 1 metre
 
 COMPOSITION: 3/4 angle showing roll form and operating cord.
 
-LIGHTING: Natural soft lighting showing bamboo texture.
+LIGHTING: Natural soft lighting showing bamboo texture and roll structure.
 
 STYLE: Product operation photography.
 
-CRITICAL: Bamboo/reed rolling structure clearly shown — not fabric folding, not aluminum tilting. Show organic natural material character.
+CRITICAL: Bamboo/reed rolling structure clearly shown — organic natural material character visible.
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  slot_6: (desc, colorLine, brandLine, noText) => `Professional product detail photography — bamboo blind edge and weave detail.
+  // slot_5: không gian tổng thể ~2m — full room
+  slot_5: (desc, colorLine, brandLine, noText) => `Professional interior photography — bamboo blind in full room at 2 metres.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: Close-up showing:
-- The edge binding (fabric tape binding the sides) with bamboo slats beside it
-- OR a cross-section view of the woven structure where slats/reeds meet
-- OR a detail of the bottom hanging bar or ring
+SCENE: A bamboo (or woven wood/reed) blind installed at a window, photographed from approximately 2 metres away:
+- Blind in rolled-down position, full width visible
+- Natural bamboo or reed texture recognizable from room side
+- Organic warmth complementing the interior palette
+- Camera distance: approximately 2 metres — full window + room context
 
-LIGHTING: Sharp natural detail lighting.
+ROOM: Warm natural interior — wooden furniture, natural textiles, organic color palette. Tropical, coastal, or biophilic design theme.
 
-STYLE: Construction quality detail photography.
+CAMERA: 3/4 angle from room level, wide enough to show blind + room context.
 
-CRITICAL: Bamboo/reed weave or construction quality and natural material character must be shown.
+STYLE: Natural interior photography.
+
+CRITICAL: Bamboo/reed material character recognizable at 2m distance. Show organic warmth in room context.
+${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 }
@@ -849,8 +1005,14 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const colorHex    = targetColor?.hex  || null
   const colorDesc   = activeColor ? `${activeColor}${colorHex ? ` (${colorHex})` : ''}` : null
 
-  const desc = fabricAnalysis
-    || `material with exact pattern${colorDesc ? `, ${colorDesc} color` : ''}, and texture from the reference image`
+  // beMat = "Linen look", "Matte smooth", v.v. — phải inject vào desc để AI render đúng surface texture
+  const beMat = materialMetadata?.beMat || ''
+  const baseDesc = fabricAnalysis
+    || `material with exact texture from reference${colorDesc ? ` in ${colorDesc}` : ''}`
+  // Đặt beMat trước analysis để AI ưu tiên surface type từ database
+  const desc = beMat
+    ? `[Surface type: ${beMat}] ${baseDesc}`
+    : baseDesc
 
   const colorLine = colorDesc
     ? `COLOR: The material is in ${colorDesc} — maintain this exact color throughout the entire image.`
@@ -859,16 +1021,17 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const scaleLine = buildScaleLine(scaleMetadata)
 
   const brandLine = [
-    supplier                    ? `Supplier: ${supplier}.`                   : '',
-    collection                  ? ` Collection: ${collection}.`               : '',
-    activeColor                 ? ` Colorway: ${activeColor}.`                : '',
+    supplier                    ? `Supplier: ${supplier}.`                    : '',
+    collection                  ? ` Collection: ${collection}.`                : '',
+    activeColor                 ? ` Colorway: ${activeColor}.`                 : '',
     materialMetadata?.thanhPhan ? ` Composition: ${materialMetadata.thanhPhan}.` : '',
+    beMat                       ? ` Surface: ${beMat}.`                        : '',
   ].join('')
 
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   if (slot === 'slot_1') return slot1_surface(desc, colorLine, scaleLine, brandLine, noText)
-  if (slot === 'slot_5') return slot5_ruler(desc, colorLine, brandLine, noText, productType)
+  if (slot === 'slot_6') return slot6_ruler(desc, colorLine, brandLine, noText, productType)
 
   const pType = productType || 'CUR'
   const typeFns = TYPE_SLOT_FNS[pType] || TYPE_SLOT_FNS.CUR

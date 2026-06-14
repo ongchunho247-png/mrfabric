@@ -148,12 +148,12 @@ export function downloadImageAs(dataUrl, filename) {
 
 /** Slot index → image field mapping (template: fabric_6_grid_A, 3×2 grid) */
 export const SLOT_KEYS = [
-  { slot: 'slot_1', field: 'surface_texture',  label: 'Slot 1 — Bề mặt vải' },
-  { slot: 'slot_2', field: 'main_hand_image',  label: 'Slot 2 — Cầm tay' },
-  { slot: 'slot_3', field: 'sofa_image',        label: 'Slot 3 — Sofa / Gối' },
-  { slot: 'slot_4', field: 'curtain_image',     label: 'Slot 4 — Trên rèm' },
-  { slot: 'slot_5', field: 'ruler_image',       label: 'Slot 5 — Thước đo' },
-  { slot: 'slot_6', field: 'detail_image',      label: 'Slot 6 — Chi tiết' },
+  { slot: 'slot_1', field: 'surface_texture',  label: 'Bề mặt' },
+  { slot: 'slot_2', field: 'main_hand_image',  label: 'Cận chất liệu' },
+  { slot: 'slot_3', field: 'sofa_image',        label: 'Cầm nắm' },
+  { slot: 'slot_4', field: 'curtain_image',     label: 'Không gian gần' },
+  { slot: 'slot_5', field: 'ruler_image',       label: 'Không gian tổng thể' },
+  { slot: 'slot_6', field: 'detail_image',      label: 'Ruler tỉ lệ' },
 ]
 
 export const BATCH_STATUS = {

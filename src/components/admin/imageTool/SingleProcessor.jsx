@@ -14,7 +14,6 @@ import {
   STATUS_LABEL,
 } from '../../../helpers/fabricImageHelpers'
 import MultiColorGenerator from './MultiColorGenerator'
-import AIAssistPanel from './AIAssistPanel'
 import {
   detectProductType,
   getSlotTemplate,
@@ -485,6 +484,36 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   const [baseSurfaceUrl, setBaseSurfaceUrl] = useState(null)   // sau crop/enhance
   const [finalSurfaceUrl, setFinalSurfaceUrl] = useState(null) // sau xác nhận chiều
 
+  // Auto-process khi file thay đổi (không cần button thủ công)
+  useEffect(() => {
+    if (!file) return
+    let cancelled = false
+    setProcessing(true)
+    setBaseSurfaceUrl(null)
+    setFinalSurfaceUrl(null)
+    ;(async () => {
+      try {
+        let surface
+        if (imageType === 'master') {
+          const slots = await processMasterImage(file)
+          surface = slots.surface_texture
+        } else if (imageType.startsWith('slot_')) {
+          const slots = await processSlotImage(file, imageType)
+          surface = slots.surface_texture || Object.values(slots)[0]
+        } else {
+          surface = await processSingleImage(file)
+        }
+        if (!cancelled) setBaseSurfaceUrl(surface)
+      } catch (err) {
+        console.error('[FIT] Auto-process error:', err)
+      } finally {
+        if (!cancelled) setProcessing(false)
+      }
+    })()
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file])
+
   // Phase 4: Scope
   const [scope, setScope] = useState('all')
   const [selectedNccs, setSelectedNccs] = useState(null)
@@ -568,30 +597,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     [priceTable],
   )
 
-  async function handleProcess() {
-    if (!file) return
-    setProcessing(true)
-    setBaseSurfaceUrl(null)
-    setFinalSurfaceUrl(null)
-    try {
-      let surface
-      if (imageType === 'master') {
-        const slots = await processMasterImage(file)
-        surface = slots.surface_texture
-      } else if (imageType.startsWith('slot_')) {
-        const slots = await processSlotImage(file, imageType)
-        surface = slots.surface_texture || Object.values(slots)[0]
-      } else {
-        surface = await processSingleImage(file)
-      }
-      setBaseSurfaceUrl(surface)
-    } catch (err) {
-      console.error('[FIT] Process error:', err)
-    } finally {
-      setProcessing(false)
-    }
-  }
-
   function handleReset() {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(null); setPreviewUrl(null)
@@ -603,7 +608,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setScope('all'); setSelectedNccs(null)
   }
 
-  const canProcess = !!file && !processing
   const showGenerator = !!finalSurfaceUrl && colorVariants.length > 0
 
   return (
@@ -765,26 +769,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               />
             )}
 
-            {/* Phase 3: Process image */}
-            <div className="fit-card">
-              <div className="fit-card-title">Xử lý ảnh gốc → bề mặt vải chuẩn</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                Crop vuông · cân sáng · làm nét kết cấu · giữ nguyên họa tiết gốc.
-                {!scaleMetadata && (
-                  <span style={{ color: '#b45309', marginLeft: 4 }}>
-                    ⚠ Chưa xác nhận tỉ lệ thước — khuyến nghị đọc thước trước.
-                  </span>
-                )}
-              </div>
-              <button
-                className="btn btn-primary btn-xs"
-                disabled={!canProcess}
-                onClick={handleProcess}
-              >
-                {processing ? 'Đang xử lý…' : '▶ Xử lý ảnh'}
-              </button>
-            </div>
-
             {/* Phase 3: Orientation control */}
             {baseSurfaceUrl && (
               <OrientationCard
@@ -822,15 +806,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
         />
       )}
 
-      {/* AI text assistant */}
-      {file && (
-        <AIAssistPanel
-          nccCode={selectedEntry?.maNCC || nccExtracted}
-          color={selectedEntry?.nhomMau || ''}
-          surfaceTextureUrl={finalSurfaceUrl || ''}
-          scaleMetadata={scaleMetadata}
-        />
-      )}
     </div>
   )
 }

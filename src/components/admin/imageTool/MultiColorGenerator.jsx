@@ -6,12 +6,12 @@ const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error'
 const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2–6
 
 const SLOT_PROGRESS = {
-  slot_1: 'Tạo bề mặt vải theo màu…',
-  slot_2: 'Tạo ảnh tay cầm vải…',
-  slot_3: 'Tạo ảnh sofa…',
-  slot_4: 'Tạo ảnh rèm…',
-  slot_5: 'Tạo ảnh thước đo…',
-  slot_6: 'Tạo ảnh chi tiết…',
+  slot_1: 'Tạo bề mặt vải (chất lượng cao)…',
+  slot_2: 'Tạo ảnh cận chất liệu…',
+  slot_3: 'Tạo ảnh cầm nắm…',
+  slot_4: 'Tạo ảnh không gian gần (~1m)…',
+  slot_5: 'Tạo ảnh không gian tổng thể (~2m)…',
+  slot_6: 'Tạo ảnh ruler tỉ lệ…',
 }
 
 function initColorData(colorVariants) {
@@ -67,18 +67,50 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     setColorProgress((prev) => ({ ...prev, [maNCC]: msg }))
   }
 
-  // ── Tạo surface_texture màu mới (gọi /api/ai/recolor-surface) ────────────
+  // ── Tạo surface_texture màu mới ─────────────────────────────────────────
   const generateSurface = useCallback(
     async (colorEntry) => {
       updateSlot(colorEntry.maNCC, 'slot_1', { status: S.GENERATING, error: null })
-      setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
 
-      // Màu gốc: slot_1 là bề mặt thật, không cần AI recolor
+      // Màu gốc: dùng generate-slot (slot_1) để làm sạch thước đo khỏi ảnh thật
+      // Prompt slot_1 đã yêu cầu AI xóa thước — AI giữ nguyên pattern + màu gốc
       if (baseNcc && colorEntry.maNCC === baseNcc) {
-        updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: baseSurfaceUrl })
-        return baseSurfaceUrl
+        setColorProg(colorEntry.maNCC, 'Làm sạch bề mặt vải (xóa thước đo)…')
+        try {
+          const res = await fetch('/api/ai/generate-slot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              slot: 'slot_1',
+              surfaceTextureUrl: baseSurfaceUrl,
+              nccCode: colorEntry.maNCC,
+              colorName: colorEntry.nhomMau || '',
+              targetColor: { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null },
+              supplier: colorEntry.nhaCungCap || '',
+              collection: colorEntry.tenCuon || '',
+              scaleMetadata: scaleMetadata || null,
+              productType: productType || null,
+              materialMetadata: {
+                thanhPhan: colorEntry.thanhPhan || '',
+                khoVai: colorEntry.khoVai || '',
+                beMat: Array.isArray(colorEntry.beMat) ? colorEntry.beMat.join(', ') : colorEntry.beMat || '',
+              },
+            }),
+          })
+          const data = await res.json()
+          if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo slot_1')
+          updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: data.imageUrl })
+          return data.imageUrl
+        } catch (err) {
+          // Fallback về ảnh gốc nếu API lỗi
+          console.warn('[MCG] generate-slot slot_1 thất bại, fallback ảnh gốc:', err.message)
+          updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: baseSurfaceUrl })
+          return baseSurfaceUrl
+        }
       }
 
+      // Màu biến thể: recolor surface sang màu mới
+      setColorProg(colorEntry.maNCC, SLOT_PROGRESS.slot_1)
       const targetColor = {
         name: colorEntry.nhomMau || colorEntry.maNCC,
         hex: null,
@@ -105,7 +137,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         return null
       }
     },
-    [baseSurfaceUrl, baseNcc, scaleMetadata],
+    [baseSurfaceUrl, baseNcc, scaleMetadata, productType],
   )
 
   // ── Tạo 1 slot ứng dụng (slot_2–slot_6) ─────────────────────────────────

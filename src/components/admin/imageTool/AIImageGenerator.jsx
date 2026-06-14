@@ -7,12 +7,12 @@ const AI_SLOT_KEYS = SLOT_KEYS
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
 const PROGRESS_LABELS = {
-  slot_1: 'Đang tạo ảnh bề mặt vải…',
-  slot_2: 'Đang tạo ảnh tay cầm vải…',
-  slot_3: 'Đang tạo ảnh sofa…',
-  slot_4: 'Đang tạo ảnh rèm…',
-  slot_5: 'Đang tạo ảnh thước đo…',
-  slot_6: 'Đang tạo ảnh chi tiết…',
+  slot_1: 'Đang tạo bề mặt (chất lượng cao)…',
+  slot_2: 'Đang tạo cận chất liệu…',
+  slot_3: 'Đang tạo ảnh cầm nắm…',
+  slot_4: 'Đang tạo không gian gần (~1m)…',
+  slot_5: 'Đang tạo không gian tổng thể (~2m)…',
+  slot_6: 'Đang tạo ruler tỉ lệ…',
 }
 
 function initSlots() {
