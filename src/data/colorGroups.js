@@ -33,3 +33,23 @@ export function findColorEntry(nhomMau) {
            c.name_vi.toLowerCase() === low
   ) ?? null
 }
+
+// Tìm color entry gần nhất theo HEX (RGB Euclidean distance)
+// Dùng khi có per-maNCC variant override để hiển thị đúng tên màu mới
+export function findClosestColorEntry(hex) {
+  if (!hex || hex.length < 7) return null
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  let best = null, minD = Infinity
+  for (const c of COLOR_GROUPS) {
+    const ch = c.hex.replace('#', '')
+    const dr = r - parseInt(ch.slice(0, 2), 16)
+    const dg = g - parseInt(ch.slice(2, 4), 16)
+    const db = b - parseInt(ch.slice(4, 6), 16)
+    const d = dr * dr + dg * dg + db * db
+    if (d < minD) { minD = d; best = c }
+  }
+  return best
+}
