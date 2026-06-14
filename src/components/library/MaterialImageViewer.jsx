@@ -82,21 +82,6 @@ export default function MaterialImageViewer({ material }) {
         ))}
       </div>
 
-      {/* ── Render texture download ── */}
-      {activeTab === 'detail_image' && (
-        <div className="miv-texture-action">
-          {material.files?.renderTexture?.path ? (
-            <a href={material.files.renderTexture.path} download className="btn btn-primary">
-              ↓ Tải map render
-            </a>
-          ) : (
-            <button className="btn btn-secondary" disabled>↓ Tải map render</button>
-          )}
-          <p className="miv-texture-note">
-            File texture gốc dùng cho render/diễn họa khi dữ liệu ảnh thật được cập nhật.
-          </p>
-        </div>
-      )}
     </div>
   )
 }
