@@ -1,6 +1,6 @@
 // Vẽ thước L (trái + đáy) lên ảnh vải bằng Canvas
 // AI tạo mặt vải full frame, hàm này overlay thước pixel-perfect lên trên
-export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 44, fontSize = 13 } = {}) {
+export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 56, fontSize = 17 } = {}) {
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () => {
@@ -45,13 +45,13 @@ export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 44, fontSize 
       // Tick marks + số
       ctx.fillStyle = '#111111'
       ctx.strokeStyle = '#111111'
-      ctx.lineWidth = 1
+      ctx.lineWidth = 1.2
 
       // Trục Y (thước trái): 0 ở dưới, scale ở trên
       for (let cm = 0; cm <= scale; cm++) {
         const y = fabH - (fabH * cm) / scale
         const isMajor = cm % 5 === 0
-        const tickLen = isMajor ? 11 : 5
+        const tickLen = isMajor ? 14 : 6
 
         ctx.beginPath()
         ctx.moveTo(rulerSize, y)
@@ -63,7 +63,7 @@ export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 44, fontSize 
           ctx.font = `bold ${fontSize}px Arial, sans-serif`
           ctx.textAlign = 'right'
           ctx.textBaseline = 'middle'
-          ctx.fillText(String(cm), rulerSize - 13, y)
+          ctx.fillText(String(cm), rulerSize - 16, y)
           ctx.restore()
         }
       }
@@ -72,7 +72,7 @@ export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 44, fontSize 
       for (let cm = 0; cm <= scale; cm++) {
         const x = rulerSize + (fabW * cm) / scale
         const isMajor = cm % 5 === 0
-        const tickLen = isMajor ? 11 : 5
+        const tickLen = isMajor ? 14 : 6
 
         ctx.beginPath()
         ctx.moveTo(x, H - rulerSize)
@@ -84,10 +84,19 @@ export function addRulerOverlay(dataUrl, { scale = 15, rulerSize = 44, fontSize 
           ctx.font = `bold ${fontSize}px Arial, sans-serif`
           ctx.textAlign = 'center'
           ctx.textBaseline = 'top'
-          ctx.fillText(String(cm), x, H - rulerSize + 13)
+          ctx.fillText(String(cm), x, H - rulerSize + 16)
           ctx.restore()
         }
       }
+
+      // Đơn vị "cm" ở góc dưới trái (giao 2 thước)
+      ctx.save()
+      ctx.font = `bold ${fontSize - 2}px Arial, sans-serif`
+      ctx.fillStyle = '#444444'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('cm', rulerSize / 2, H - rulerSize / 2)
+      ctx.restore()
 
       resolve(canvas.toDataURL('image/jpeg', 0.93))
     }
