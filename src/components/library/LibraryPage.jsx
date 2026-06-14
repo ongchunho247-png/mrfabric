@@ -7,6 +7,7 @@ import { loadPriceTable } from '../../helpers/priceTableStorage'
 import { loadNccCodes, getNccCode } from '../../helpers/nccCodeStorage'
 import { getProductTypeCode } from '../../helpers/generateMrFabricCode'
 import { filterByVisibility } from '../../helpers/materialVisibilityStorage'
+import { diversifyMaterials } from '../../helpers/diversifyMaterials'
 import SearchBar from './SearchBar'
 import FilterPanel from './FilterPanel'
 import MaterialGrid from './MaterialGrid'
@@ -116,6 +117,13 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
     [libraryMaterials, search, filters],
   )
 
+  // Sắp xếp đa dạng: xen kẽ màu/bề mặt/chất liệu khác nhau cho trải nghiệm thị giác tốt hơn
+  // Khi search có từ khóa cụ thể, giữ nguyên thứ tự gốc để kết quả có tính liên quan rõ
+  const displayMaterials = useMemo(
+    () => (search.trim() ? filteredMaterials : diversifyMaterials(filteredMaterials)),
+    [filteredMaterials, search],
+  )
+
 
   function handleFilterChange(key, value, checked) {
     setFilters((prev) => {
@@ -199,13 +207,13 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
       <div className="library-content">
         <div className="library-count">
           {hasActiveFilters
-            ? <span><strong>{filteredMaterials.length}</strong> / {libraryMaterials.length} vật liệu</span>
+            ? <span><strong>{displayMaterials.length}</strong> / {libraryMaterials.length} vật liệu</span>
             : <span><strong>{libraryMaterials.length}</strong> vật liệu</span>
           }
         </div>
         <SearchBar value={search} onChange={setSearch} />
         <MaterialGrid
-          materials={filteredMaterials}
+          materials={displayMaterials}
           moodboardItems={moodboardItems}
           onCardClick={setSelectedMaterial}
           onSave={handleSaveToMoodboard}
