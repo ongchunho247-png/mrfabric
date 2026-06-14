@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
+import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -110,6 +111,22 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
   const [syncStatuses, setSyncStatuses] = useState({})
   const [syncMsgs, setSyncMsgs] = useState({})
   const [slotQualities, setSlotQualities] = useState(DEFAULT_QUALITIES)
+  const [saveReference, setSaveReference] = useState(false)
+  const [refSaved, setRefSaved] = useState({}) // maNCC → bool
+
+  // Kiểm tra mã nào đã có surface_reference lưu trong IndexedDB
+  useEffect(() => {
+    async function checkRefs() {
+      const result = {}
+      for (const cv of colorVariants) {
+        if (cv.maMrFabric) {
+          result[cv.maNCC] = await idbHas(surfaceRefKey(cv.maMrFabric))
+        }
+      }
+      setRefSaved(result)
+    }
+    checkRefs()
+  }, [colorVariants])
 
   function setSlotQuality(slotKey, quality) {
     setSlotQualities((prev) => ({ ...prev, [slotKey]: quality }))
@@ -331,10 +348,17 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
       }
       onSyncColor?.(colorEntry.maNCC, imageMap)
+
+      // Lưu surface_reference vào IndexedDB nếu toggle bật + có slot_1 + có maMrFabric
+      if (saveReference && slots['slot_1']?.imageUrl && colorEntry.maMrFabric) {
+        await idbSave(surfaceRefKey(colorEntry.maMrFabric), slots['slot_1'].imageUrl)
+        setRefSaved((prev) => ({ ...prev, [colorEntry.maNCC]: true }))
+      }
+
       setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'synced' }))
       setSyncMsgs((prev) => ({
         ...prev,
-        [colorEntry.maNCC]: `✓ Đã lưu ${Object.keys(imageMap).length} ảnh cho mã ${colorEntry.maNCC} (${colorEntry.nhomMau})`,
+        [colorEntry.maNCC]: `✓ Đã lưu ${Object.keys(imageMap).length} ảnh cho mã ${colorEntry.maNCC} (${colorEntry.nhomMau})${saveReference && colorEntry.maMrFabric ? ' · tham chiếu đã lưu' : ''}`,
       }))
     } catch (err) {
       setSyncStatuses((prev) => ({ ...prev, [colorEntry.maNCC]: 'error' }))
@@ -400,6 +424,22 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         colorCount={colorVariants.length}
       />
 
+      {/* Save reference toggle */}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', cursor: 'pointer', marginBottom: 8 }}>
+        <input
+          type="checkbox"
+          checked={saveReference}
+          onChange={(e) => setSaveReference(e.target.checked)}
+          style={{ width: 15, height: 15, cursor: 'pointer' }}
+        />
+        <span>
+          Lưu tham chiếu gốc khi sync
+          <span style={{ color: 'var(--color-text-muted)', marginLeft: 6 }}>
+            — dùng để nâng cấp slot lên chất lượng cao hơn sau này (lưu vào trình duyệt, không ảnh hưởng thư viện)
+          </span>
+        </span>
+      </label>
+
       {/* Global actions */}
       <div className="fit-mcg-actions">
         <button
@@ -459,6 +499,11 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
                   )}
                   {doneCount > 0 && (
                     <span className="fit-color-done">{doneCount}/4 ảnh</span>
+                  )}
+                  {refSaved[cv.maNCC] && (
+                    <span className="fit-color-code" style={{ background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0' }}>
+                      ✓ tham chiếu
+                    </span>
                   )}
                 </div>
                 <div className="fit-color-actions">
