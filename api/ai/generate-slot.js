@@ -1121,45 +1121,44 @@ export default async function handler(req, res) {
       nccCode,
     })
 
-    // Step 3a: gpt-image-1 via images.edit()
+    // Step 3a: gpt-image-1 via images.edit() — preserves reference texture
     try {
       const imageFile = await toFile(imageBuffer, `texture.${imageType}`, { type: `image/${imageType}` })
-      const response = await client.images.edit({
+      const editResponse = await client.images.edit({
         model: 'gpt-image-1',
         image: imageFile,
         prompt,
+        n: 1,
         size: '1024x1024',
+        quality: 'high',
       })
-      const b64 = response.data[0]?.b64_json
-      if (!b64) throw new Error('gpt-image-1 không trả về b64_json')
+      const b64 = editResponse.data[0]?.b64_json
+      if (!b64) throw new Error('images.edit trả về rỗng')
       return res.status(200).json({
         ok: true, slot,
         imageUrl: `data:image/png;base64,${b64}`,
-        model: 'gpt-image-1',
+        model: 'gpt-image-1-edit',
         fabricAnalysis,
         productType: productType || null,
       })
     } catch (e1) {
-      console.warn(`[generate-slot:${slot}] gpt-image-1 thất bại — ${e1.status || ''} ${e1.message}`)
+      console.warn(`[generate-slot:${slot}] images.edit thất bại — HTTP ${e1.status || '?'}: ${e1.message}`)
     }
 
-    // Step 3b: dall-e-3 fallback (response_format removed — API now returns url by default)
+    // Step 3b: gpt-image-1 generate fallback (không cần reference image)
     const genResponse = await client.images.generate({
-      model: 'dall-e-3',
-      prompt: prompt.slice(0, 4000),
+      model: 'gpt-image-1',
+      prompt,
+      n: 1,
       size: '1024x1024',
-      quality: 'hd',
+      quality: 'high',
     })
-    const imgUrl = genResponse.data[0]?.url
-    if (!imgUrl) throw new Error('dall-e-3 không trả về url')
-    // Fetch URL về buffer và encode base64 để lưu lâu dài (URL của OpenAI expire sau ~1h)
-    const fetchRes = await fetch(imgUrl)
-    const imgBuffer = Buffer.from(await fetchRes.arrayBuffer())
-    const b64Fallback = imgBuffer.toString('base64')
+    const b64Gen = genResponse.data[0]?.b64_json
+    if (!b64Gen) throw new Error('images.generate trả về rỗng')
     return res.status(200).json({
       ok: true, slot,
-      imageUrl: `data:image/png;base64,${b64Fallback}`,
-      model: 'dall-e-3',
+      imageUrl: `data:image/png;base64,${b64Gen}`,
+      model: 'gpt-image-1-gen',
       fabricAnalysis,
       productType: productType || null,
     })

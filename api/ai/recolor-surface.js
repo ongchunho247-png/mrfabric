@@ -100,43 +100,44 @@ ${brandLine}`
     // ── Strategy 1: gpt-image-1 via images.edit() — ảnh thật làm tham chiếu ──
     try {
       const imageFile = await toFile(imageBuffer, `texture.${imageType}`, { type: `image/${imageType}` })
-      const response = await client.images.edit({
+      const editResponse = await client.images.edit({
         model: 'gpt-image-1',
         image: imageFile,
         prompt,
+        n: 1,
         size: '1024x1024',
+        quality: 'high',
       })
-      const b64 = response.data[0]?.b64_json
-      if (!b64) throw new Error('gpt-image-1 không trả về b64_json')
+      const b64 = editResponse.data[0]?.b64_json
+      if (!b64) throw new Error('images.edit trả về rỗng')
 
       return res.status(200).json({
         ok: true,
         imageUrl: `data:image/png;base64,${b64}`,
-        model: 'gpt-image-1',
+        model: 'gpt-image-1-edit',
         targetColor,
       })
     } catch (e1) {
-      console.warn(`[recolor-surface] gpt-image-1 thất bại — ${e1.status || ''} ${e1.message}`)
+      console.warn(`[recolor-surface] images.edit thất bại — HTTP ${e1.status || '?'}: ${e1.message}`)
     }
 
-    // ── Strategy 2: dall-e-3 fallback (response_format removed — API returns url by default) ──
+    // ── Strategy 2: gpt-image-1 generate fallback ────────────────────────────
     const fallbackPrompt = `Professional fabric surface texture photography. ${fabricAnalysis || 'Fabric with detailed woven pattern.'} The fabric is in ${colorDesc} color. Fabric fills the entire frame. Sidelight reveals weave texture. Maximum sharpness. Premium textile catalog quality. No text, no logos.`
 
     const genResponse = await client.images.generate({
-      model: 'dall-e-3',
-      prompt: fallbackPrompt.slice(0, 4000),
+      model: 'gpt-image-1',
+      prompt: fallbackPrompt,
+      n: 1,
       size: '1024x1024',
-      quality: 'hd',
+      quality: 'high',
     })
-    const imgUrl = genResponse.data[0]?.url
-    if (!imgUrl) throw new Error('dall-e-3 không trả về url')
-    const fetchRes = await fetch(imgUrl)
-    const imgBuffer2 = Buffer.from(await fetchRes.arrayBuffer())
+    const b64Gen = genResponse.data[0]?.b64_json
+    if (!b64Gen) throw new Error('images.generate trả về rỗng')
 
     return res.status(200).json({
       ok: true,
-      imageUrl: `data:image/png;base64,${imgBuffer2.toString('base64')}`,
-      model: 'dall-e-3',
+      imageUrl: `data:image/png;base64,${b64Gen}`,
+      model: 'gpt-image-1-gen',
       targetColor,
     })
   } catch (error) {
