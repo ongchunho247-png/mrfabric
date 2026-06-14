@@ -16,6 +16,14 @@ import {
   getSlotTemplate,
   ALL_PRODUCT_TYPES,
 } from '../../../helpers/productTypeHelpers'
+import { findColorEntry, findClosestColorEntry } from '../../../data/colorGroups'
+import { getVariantHex } from '../../../helpers/colorDictStorage'
+
+function resolveVariantColorName(cv) {
+  const hex = getVariantHex(cv.maNCC)
+  if (hex) return findClosestColorEntry(hex)?.name_en || findColorEntry(cv.nhomMau)?.name_en || cv.nhomMau || '—'
+  return findColorEntry(cv.nhomMau)?.name_en || cv.nhomMau || '—'
+}
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
@@ -424,7 +432,7 @@ function ScopeCard({ colorVariants, baseEntry, scope, setScope, selectedNccs, se
           <input type="radio" name="scope" value="current" checked={scope === 'current'}
             onChange={() => setScope('current')} />
           Chỉ mã hiện tại
-          <span className="fit-scope-tag">{baseEntry?.maNCC} — {baseEntry?.nhomMau}</span>
+          <span className="fit-scope-tag">{baseEntry?.maNCC} — {baseEntry ? resolveVariantColorName(baseEntry) : ''}</span>
         </label>
         <label className="fit-scope-radio">
           <input type="radio" name="scope" value="all" checked={scope === 'all'}
@@ -452,7 +460,7 @@ function ScopeCard({ colorVariants, baseEntry, scope, setScope, selectedNccs, se
                 onChange={(e) => toggleNcc(cv.maNCC, e.target.checked)}
               />
               <span className="fit-scope-check-label">
-                {cv.nhomMau || '—'}
+                {resolveVariantColorName(cv)}
                 <span className="fit-scope-check-code">{cv.maNCC}</span>
                 {cv.maMrFabric && <span className="fit-scope-check-code">{cv.maMrFabric}</span>}
               </span>
