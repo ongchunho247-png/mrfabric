@@ -116,17 +116,6 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
     [libraryMaterials, search, filters],
   )
 
-  // Build variant color strip map — all mã shown individually, no grouping
-  const variantGroupsMap = useMemo(() => {
-    const groups = {}
-    for (const m of libraryMaterials) {
-      if (m.nhomVatLieu) {
-        if (!groups[m.nhomVatLieu]) groups[m.nhomVatLieu] = []
-        groups[m.nhomVatLieu].push(m)
-      }
-    }
-    return groups
-  }, [libraryMaterials])
 
   function handleFilterChange(key, value, checked) {
     setFilters((prev) => {
@@ -217,7 +206,6 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
         <SearchBar value={search} onChange={setSearch} />
         <MaterialGrid
           materials={filteredMaterials}
-          variantGroupsMap={variantGroupsMap}
           moodboardItems={moodboardItems}
           onCardClick={setSelectedMaterial}
           onSave={handleSaveToMoodboard}

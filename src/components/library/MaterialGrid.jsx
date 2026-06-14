@@ -37,7 +37,7 @@ function Pagination({ page, totalPages, onChange }) {
   )
 }
 
-export default function MaterialGrid({ materials, variantGroupsMap, moodboardItems, onCardClick, onSave }) {
+export default function MaterialGrid({ materials, moodboardItems, onCardClick, onSave }) {
   const [page, setPage] = useState(1)
 
   useEffect(() => { setPage(1) }, [materials])
@@ -63,19 +63,15 @@ export default function MaterialGrid({ materials, variantGroupsMap, moodboardIte
   return (
     <>
       <div className="mg-grid">
-        {paged.map((m) => {
-          const variants = m.nhomVatLieu ? (variantGroupsMap?.[m.nhomVatLieu] || null) : null
-          return (
-            <MaterialCard
-              key={m.id}
-              material={m}
-              variants={variants}
-              isSaved={savedCodes.has(m.maMrFabric)}
-              onCardClick={onCardClick}
-              onSave={onSave}
-            />
-          )
-        })}
+        {paged.map((m) => (
+          <MaterialCard
+            key={m.id}
+            material={m}
+            isSaved={savedCodes.has(m.maMrFabric)}
+            onCardClick={onCardClick}
+            onSave={onSave}
+          />
+        ))}
       </div>
       <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
     </>

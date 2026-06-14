@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { findColorEntry } from '../../data/colorGroups'
+import { useEffect } from 'react'
 import './MaterialCard.css'
 
 function MainImage({ material }) {
@@ -20,50 +19,22 @@ function MainImage({ material }) {
   )
 }
 
-export default function MaterialCard({ material, variants, isSaved, onCardClick, onSave }) {
-  const [hoveredVariant, setHoveredVariant] = useState(null)
-
+export default function MaterialCard({ material, isSaved, onCardClick, onSave }) {
   function handleSave(e) {
     e.stopPropagation()
     onSave(material)
   }
-
-  const displayMaterial = hoveredVariant || material
-  const showVariants = variants && variants.length > 1
 
   return (
     <div className="mc" onClick={() => onCardClick(material)} role="button" tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onCardClick(material)}>
 
       {/* Slot 1 only — surface_texture (fallback: closeup) */}
-      <MainImage material={displayMaterial} />
-
-      {/* Color variant dots — right below image frame */}
-      {showVariants && (
-        <div className="mc-variants" onClick={(e) => e.stopPropagation()}>
-          {variants.slice(0, 10).map((v) => {
-            const entry = findColorEntry(v.nhomMau)
-            return (
-              <span
-                key={v.id}
-                className={`mc-variant-dot${hoveredVariant?.id === v.id ? ' mc-variant-dot--active' : ''}`}
-                style={{ background: entry?.hex || '#ccc' }}
-                title={entry?.name_en || v.nhomMau || ''}
-                onMouseEnter={() => setHoveredVariant(v)}
-                onMouseLeave={() => setHoveredVariant(null)}
-                onClick={(e) => { e.stopPropagation(); onCardClick(v) }}
-              />
-            )
-          })}
-          {variants.length > 10 && (
-            <span className="mc-variant-more">+{variants.length - 10}</span>
-          )}
-        </div>
-      )}
+      <MainImage material={material} />
 
       {/* Body */}
       <div className="mc-body">
-        <div className="mc-code">{hoveredVariant ? hoveredVariant.maMrFabric : material.maMrFabric}</div>
+        <div className="mc-code">{material.maMrFabric}</div>
         {material.phanKhuc && (
           <div className="mc-phankhuc">{material.phanKhuc}</div>
         )}
