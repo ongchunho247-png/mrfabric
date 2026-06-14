@@ -128,57 +128,58 @@ function slot4_technical_diagram(desc, colorLine, brandLine, noText, productType
 
   // Icon cuộn vải: hình minh họa cylinder, mũi tên chỉ hướng, không text
   const rollIcon = (isGrainKho || isGrainCuon) ? `
-FABRIC ROLL ICON — place in TOP-RIGHT corner, compact (approx 12–15% of image width):
-- Draw a fabric roll illustration in the style of a technical diagram icon:
-  A cylindrical roll (viewed from the side) on the LEFT of the icon, with fabric unrolling out to the RIGHT
-  showing the material pattern/texture on the unrolled surface
-- The roll cylinder: circular end visible, concentric rings suggesting wound layers, dark outline, light fill
-- Unrolled fabric panel extends to the right from the roll, bordered with a thin rectangular frame
-- ONE bold directional arrow drawn on the unrolled fabric surface:
-  ${isGrainKho
-    ? '→ A single horizontal arrow pointing RIGHT (→) — grain runs horizontally along the fabric width'
-    : '↑ A single vertical arrow pointing UP (↑) — grain runs vertically along the roll length'}
-- NO text, NO labels anywhere on the icon — arrow only
-- Style: clean line illustration, dark outline on white/light background, like a textile spec sheet icon
-- Must be small, self-contained, and placed neatly in the top-right corner without overlapping material or rulers` : ''
+GRAIN DIRECTION ICON — place in TOP-RIGHT corner, compact (approx 12% of image width):
+- STYLE: INVERTED/NEGATIVE — dark background (#1c1c1c), all lines and arrow in WHITE or light grey
+- Draw a fabric roll illustration (technical icon style):
+  · Cylindrical roll on the LEFT side of the icon: circular end with 2–3 concentric rings visible, dark fill, light outline
+  · Unrolled fabric panel extending ${isGrainKho ? 'to the RIGHT (landscape orientation)' : 'UPWARD (portrait orientation)'}
+    from the roll, bordered with a thin light-colored rectangle
+  · ONE bold directional arrow in WHITE:
+    ${isGrainKho
+      ? '→ horizontal arrow pointing RIGHT, drawn on the fabric panel surface'
+      : '↑ vertical arrow pointing UP, drawn on the fabric panel surface'}
+- NO text, NO labels anywhere on the icon — arrow and roll illustration only
+- Entire icon has dark background, all elements are light/white lines on dark
+- Compact, self-contained in top-right corner, does not overlap material or rulers` : ''
 
-  return `Technical fabric specification diagram — material sample with L-shaped scale rulers and grain direction icon.
+  return `Technical fabric specification diagram — material sample fills the frame, thin L-shaped rulers at edges, grain direction icon.
 
 MATERIAL: ${desc}
 ${colorLine}
 ${grainLine ? `GRAIN DIRECTION: ${grainLine}` : ''}
 
-LAYOUT (follow precisely):
-- MATERIAL SAMPLE fills the MAXIMUM area possible — approximately 82% of the total image
-  Flat, taut, no folds, no drape — material surface and pattern clearly visible
-- LEFT RULER (Y-axis): thin flat ruler flush against the LEFT EDGE of the image, vertical
-  - Range: 0 cm (bottom) to 15 cm (top) — USE EXACTLY 15 cm, no other value
-  - Tick marks: every 1 cm; numbered labels at 0, 5, 10, 15 — bold, crisp, black
-  - Ruler is THIN (≈ 3–4% of image width) to maximize material display area
-  - Flush to the left border — no gap between ruler and image edge
-- BOTTOM RULER (X-axis): thin flat ruler flush against the BOTTOM EDGE of the image, horizontal
-  - Range: 0 cm (left) to 15 cm (right) — USE EXACTLY 15 cm, no other value
-  - Tick marks: every 1 cm; numbered labels at 0, 5, 10, 15 — bold, crisp, black
-  - Ruler is THIN (≈ 3–4% of image height) to maximize material display area
-  - Flush to the bottom border — no gap between ruler and image edge
-- Rulers meet at BOTTOM-LEFT corner (origin = 0,0)
-- Ruler style: flat measuring tape or thin metal/plastic ruler — modern, minimal, not bulky wooden
+LAYOUT — follow exactly:
+
+RULERS:
+- LEFT RULER (Y-axis): thin strip running the FULL HEIGHT of the image, flush to the LEFT EDGE, no gap
+  - Marks every 1 cm; ONLY these labels printed: 0, 5, 10, 15 — no other numbers
+  - Scale top=0, bottom=15 OR bottom=0, top=15 (consistent ascending direction)
+  - Ruler width: minimal — approx 5% of image width
+  - Tick style: short horizontal lines, black on white/light background
+- BOTTOM RULER (X-axis): thin strip running the FULL WIDTH of the image, flush to the BOTTOM EDGE, no gap
+  - Marks every 1 cm; ONLY these labels printed: 0, 5, 10, 15 — no other numbers
+  - Scale left=0, right=15 (left to right ascending)
+  - Ruler height: minimal — approx 5% of image height
+  - Tick style: short vertical lines, black on white/light background
+- Both rulers fill the entire image edge top-to-bottom / left-to-right
+- Rulers meet cleanly at BOTTOM-LEFT corner (origin 0,0)
+
+MATERIAL:
+- Fills ALL remaining space after the two thin ruler strips — approximately 90% of the image
+- Flat, taut, completely square — no folds, no drape, no curled edges
+- Surface texture and pattern clearly visible
 ${rollIcon}
 
-BACKGROUND: Pure white seamless.
+BACKGROUND: Pure white.
+CAMERA: 90° top-down, perfectly level, zero perspective.
+LIGHTING: Bright flat even light — all ruler marks legible, material texture visible.
 
-CAMERA: Directly overhead, 90° top-down, perfectly level, zero perspective distortion.
-
-LIGHTING: Bright, flat, even — zero shadows, zero glare. All ruler numbers legible, material texture visible.
-
-STYLE: Professional textile technical specification card. Clean, minimal, clinical.
-
-CRITICAL RULES:
-1. Rulers show EXACTLY 0–15 cm — numbers 5, 10, 15 must be present and clearly legible. No invented scale.
-2. Both rulers THIN and flush to image edges — material occupies maximum space
-3. Material completely FLAT — no folds, no drape, no curled edges
-4. 90° overhead only — no perspective
-5. Roll icon (if present): illustration style, arrow only, no text, top-right corner, compact
+CRITICAL:
+1. Ruler labels ONLY at 0, 5, 10, 15 — no other numbers anywhere on the rulers
+2. Both rulers flush to image edges, filling the full edge length
+3. Material fills maximum space — flat, no folds
+4. 90° overhead only
+5. Grain icon (if present): INVERTED/NEGATIVE style — dark background, white/light lines and arrow, no text, top-right corner, compact (≈12% of image width)
 ${brandLine}
 ${noText}`
 }

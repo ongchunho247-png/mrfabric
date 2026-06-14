@@ -328,9 +328,48 @@ function RulerCard({ file, onScaleConfirmed, confirmedScale }) {
 
 /*
  * fabricGrain lưu dạng: 'kho' | 'cuon'
- *   'kho'  = vân chạy theo chiều KHỔ VẢI (↔ ngang, vuông góc cuộn)
- *   'cuon' = vân chạy theo chiều CUỘN VẢI (↕ dọc, song song cuộn)
+ *   'kho'  = vân chạy theo chiều KHỔ VẢI (→ ngang, vuông góc cuộn)
+ *   'cuon' = vân chạy theo chiều CUỘN VẢI (↑ dọc, song song cuộn)
  */
+
+// Icon âm bản: cuộn vải nằm bên trái, vải trải ngang sang phải, mũi tên →
+function GrainIconKho({ size = 100 }) {
+  const h = Math.round(size * 0.65)
+  return (
+    <svg viewBox="0 0 100 65" width={size} height={h} xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="65" rx="5" fill="#1c1c1c"/>
+      {/* cylinder */}
+      <ellipse cx="14" cy="32" rx="9" ry="14" fill="#2e2e2e" stroke="#ccc" strokeWidth="1.2"/>
+      <ellipse cx="14" cy="32" rx="5.5" ry="8.5" fill="#252525" stroke="#aaa" strokeWidth="0.9"/>
+      <ellipse cx="14" cy="32" rx="2" ry="3.5" fill="#1c1c1c" stroke="#888" strokeWidth="0.7"/>
+      {/* fabric panel — landscape */}
+      <rect x="23" y="10" width="68" height="43" rx="1" fill="#262626" stroke="#bbb" strokeWidth="1"/>
+      {/* horizontal arrow → */}
+      <line x1="30" y1="52" x2="78" y2="52" stroke="#fff" strokeWidth="1.8"/>
+      <polygon points="78,49 84,52 78,55" fill="#fff"/>
+    </svg>
+  )
+}
+
+// Icon âm bản: cuộn vải nằm bên trái, vải trải dọc lên trên, mũi tên ↑
+function GrainIconCuon({ size = 100 }) {
+  const h = Math.round(size * 0.65)
+  return (
+    <svg viewBox="0 0 100 65" width={size} height={h} xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="65" rx="5" fill="#1c1c1c"/>
+      {/* cylinder */}
+      <ellipse cx="14" cy="32" rx="9" ry="14" fill="#2e2e2e" stroke="#ccc" strokeWidth="1.2"/>
+      <ellipse cx="14" cy="32" rx="5.5" ry="8.5" fill="#252525" stroke="#aaa" strokeWidth="0.9"/>
+      <ellipse cx="14" cy="32" rx="2" ry="3.5" fill="#1c1c1c" stroke="#888" strokeWidth="0.7"/>
+      {/* fabric panel — portrait */}
+      <rect x="28" y="5" width="60" height="55" rx="1" fill="#262626" stroke="#bbb" strokeWidth="1"/>
+      {/* vertical arrow ↑ */}
+      <line x1="48" y1="52" x2="48" y2="14" stroke="#fff" strokeWidth="1.8"/>
+      <polygon points="45,14 48,8 51,14" fill="#fff"/>
+    </svg>
+  )
+}
+
 function GrainCard({ previewUrl, fabricGrain, onChange }) {
   return (
     <div className="fit-card fit-orient-card">
@@ -341,25 +380,38 @@ function GrainCard({ previewUrl, fabricGrain, onChange }) {
       <div style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 10 }}>
         Vân vải chạy theo hướng nào của cuộn vải?
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <button
-          className={`btn btn-xs${fabricGrain === 'kho' ? ' btn-primary' : ' btn-secondary'}`}
-          onClick={() => onChange('kho')}
-        >
-          ↔ Theo khổ vải
-        </button>
-        <button
-          className={`btn btn-xs${fabricGrain === 'cuon' ? ' btn-primary' : ' btn-secondary'}`}
-          onClick={() => onChange('cuon')}
-        >
-          ↕ Theo chiều cuộn
-        </button>
+      <div style={{ display: 'flex', gap: 12 }}>
+        {[
+          { value: 'kho',  Icon: GrainIconKho },
+          { value: 'cuon', Icon: GrainIconCuon },
+        ].map(({ value, Icon }) => (
+          <button
+            key={value}
+            onClick={() => onChange(value)}
+            style={{
+              padding: 0,
+              border: fabricGrain === value
+                ? '2px solid var(--color-primary, #3b82f6)'
+                : '2px solid #444',
+              borderRadius: 8,
+              background: 'none',
+              cursor: 'pointer',
+              opacity: fabricGrain && fabricGrain !== value ? 0.4 : 1,
+              transition: 'border-color 0.15s, opacity 0.15s',
+              display: 'block',
+              lineHeight: 0,
+            }}
+            title={value === 'kho' ? '→ Vân theo khổ vải' : '↑ Vân theo chiều cuộn'}
+          >
+            <Icon size={110} />
+          </button>
+        ))}
       </div>
       {fabricGrain && (
         <div style={{ marginTop: 10, fontSize: '0.8rem', color: 'var(--color-success, #16a34a)', lineHeight: 1.5 }}>
-          ✓ Vân chạy {fabricGrain === 'kho'
-            ? '↔ theo khổ vải — vuông góc với chiều cuộn'
-            : '↕ theo chiều cuộn — song song với chiều cuộn'}
+          ✓ {fabricGrain === 'kho'
+            ? '→ Vân theo khổ vải — vuông góc chiều cuộn'
+            : '↑ Vân theo chiều cuộn — song song chiều cuộn'}
         </div>
       )}
     </div>
