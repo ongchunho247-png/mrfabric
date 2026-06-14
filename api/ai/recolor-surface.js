@@ -104,7 +104,6 @@ ${brandLine}`
         model: 'gpt-image-1',
         image: imageFile,
         prompt,
-        n: 1,
         size: '1024x1024',
       })
       const b64 = response.data[0]?.b64_json
@@ -117,26 +116,26 @@ ${brandLine}`
         targetColor,
       })
     } catch (e1) {
-      console.warn(`[recolor-surface] gpt-image-1 thất bại (${e1.message}) — fallback dall-e-3`)
+      console.warn(`[recolor-surface] gpt-image-1 thất bại — ${e1.status || ''} ${e1.message}`)
     }
 
-    // ── Strategy 2: dall-e-3 fallback ────────────────────────────────────────
+    // ── Strategy 2: dall-e-3 fallback (response_format removed — API returns url by default) ──
     const fallbackPrompt = `Professional fabric surface texture photography. ${fabricAnalysis || 'Fabric with detailed woven pattern.'} The fabric is in ${colorDesc} color. Fabric fills the entire frame. Sidelight reveals weave texture. Maximum sharpness. Premium textile catalog quality. No text, no logos.`
 
-    const response = await client.images.generate({
+    const genResponse = await client.images.generate({
       model: 'dall-e-3',
       prompt: fallbackPrompt.slice(0, 4000),
-      n: 1,
       size: '1024x1024',
-      response_format: 'b64_json',
       quality: 'hd',
     })
-    const b64 = response.data[0]?.b64_json
-    if (!b64) throw new Error('dall-e-3 không trả về b64_json')
+    const imgUrl = genResponse.data[0]?.url
+    if (!imgUrl) throw new Error('dall-e-3 không trả về url')
+    const fetchRes = await fetch(imgUrl)
+    const imgBuffer2 = Buffer.from(await fetchRes.arrayBuffer())
 
     return res.status(200).json({
       ok: true,
-      imageUrl: `data:image/png;base64,${b64}`,
+      imageUrl: `data:image/png;base64,${imgBuffer2.toString('base64')}`,
       model: 'dall-e-3',
       targetColor,
     })
