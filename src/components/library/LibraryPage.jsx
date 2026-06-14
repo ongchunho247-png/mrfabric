@@ -98,6 +98,7 @@ export default function LibraryPage({ allMaterials, moodboardItems, setMoodboard
           images: adminMat?.images || {},
           soTrang: e.soTrang || '',
           catalogue: e.catalogue || '',
+          aiColorHex: adminMat?.aiColorHex || null,
         }
       })
 
