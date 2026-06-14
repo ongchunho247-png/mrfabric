@@ -11,7 +11,12 @@ import './App.css'
 import DevNoteOverlay from './components/dev/DevNoteOverlay'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('library')
+  const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem('mrfabric_active_tab') || 'library')
+
+  function handleTabChange(tab) {
+    sessionStorage.setItem('mrfabric_active_tab', tab)
+    setActiveTab(tab)
+  }
   const [adminMaterials, setAdminMaterials] = useState(() => loadAdminMaterials())
   const [moodboardItems, setMoodboardItems] = useState(() => loadMoodboard())
 
@@ -38,7 +43,7 @@ function App() {
 
   return (
     <div className="app">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
+      <Header activeTab={activeTab} onTabChange={handleTabChange} />
       <main className="app-main">
         {activeTab === 'library' ? (
           <LibraryPage
@@ -52,7 +57,7 @@ function App() {
             allMaterials={allMaterials}
             adminMaterials={adminMaterials}
             setAdminMaterials={setAdminMaterials}
-            onGoToLibrary={() => setActiveTab('library')}
+            onGoToLibrary={() => handleTabChange('library')}
             onUpdateMaterialImage={handleUpdateMaterialImage}
           />
         )}

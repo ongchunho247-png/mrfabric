@@ -12,7 +12,12 @@ import ColorDictEditor from './ColorDictEditor'
 import './AdminPage.css'
 
 export default function AdminPage({ allMaterials, adminMaterials, setAdminMaterials, onGoToLibrary, onUpdateMaterialImage }) {
-  const [adminTab, setAdminTab] = useState('price-table')
+  const [adminTab, setAdminTab] = useState(() => sessionStorage.getItem('mrfabric_admin_tab') || 'price-table')
+
+  function changeAdminTab(tab) {
+    sessionStorage.setItem('mrfabric_admin_tab', tab)
+    setAdminTab(tab)
+  }
   const [nccCodes, setNccCodes] = useState(() => loadNccCodes())
   const [priceTable, setPriceTable] = useState(() => loadPriceTable())
 
@@ -229,33 +234,33 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
         <div className="admin-tabs">
           <button
             className={`admin-tab-btn${adminTab === 'price-table' ? ' admin-tab-btn--active' : ''}`}
-            onClick={() => setAdminTab('price-table')}
+            onClick={() => changeAdminTab('price-table')}
           >
             Bảng đơn giá
             <span className="admin-tab-count">{Object.keys(nccCodes).length} NCC</span>
           </button>
           <button
             className={`admin-tab-btn${adminTab === 'lib-overview' ? ' admin-tab-btn--active' : ''}`}
-            onClick={() => setAdminTab('lib-overview')}
+            onClick={() => changeAdminTab('lib-overview')}
           >
             Thư viện tổng hợp
             <span className="admin-tab-count">{priceTable.filter((e) => !e.deletedAt).length}</span>
           </button>
           <button
             className={`admin-tab-btn${adminTab === 'library-views' ? ' admin-tab-btn--active' : ''}`}
-            onClick={() => setAdminTab('library-views')}
+            onClick={() => changeAdminTab('library-views')}
           >
             Cài đặt Thư viện
           </button>
           <button
             className={`admin-tab-btn${adminTab === 'fabric-image-tool' ? ' admin-tab-btn--active' : ''}`}
-            onClick={() => setAdminTab('fabric-image-tool')}
+            onClick={() => changeAdminTab('fabric-image-tool')}
           >
             Fabric Image Tool
           </button>
           <button
             className={`admin-tab-btn${adminTab === 'color-dict' ? ' admin-tab-btn--active' : ''}`}
-            onClick={() => setAdminTab('color-dict')}
+            onClick={() => changeAdminTab('color-dict')}
           >
             Bảng màu AI
           </button>
