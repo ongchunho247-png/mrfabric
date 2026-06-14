@@ -60,7 +60,7 @@ function slot1_surface(desc, colorLine, scaleLine, brandLine, noText) {
 MATERIAL: ${desc}
 ${colorLine}
 
-SCENE: The material displayed filling the entire frame as the sole subject. For flexible materials, a gentle natural drape or soft roll at one edge gives dimension. For rigid materials (slats, panels), flat precise arrangement. The area previously occupied by the ruler (if any) must be filled with the fabric pattern — no empty space, no ruler ghost.
+SCENE: The material displayed filling the entire frame as the sole subject. Material must be completely FLAT and taut — no folds, no drapes, no rolls, no curled edges anywhere. For all materials (fabric or rigid panels), the surface lies perfectly flat across the entire frame. The area previously occupied by the ruler (if any) must be filled with the fabric pattern — no empty space, no ruler ghost.
 
 COMPOSITION & CAMERA:
 - Material fills 100% of the frame — no background, no props, no ruler, no measuring tools
@@ -81,6 +81,7 @@ CRITICAL OUTPUT RULES:
 2. Reproduce exact pattern, colors, surface texture with maximum fidelity.
 3. This is the hero texture shot — no props, no hands, no furniture, no labels.
 4. Fill the entire frame with fabric/material surface.
+5. Material COMPLETELY FLAT — absolutely NO folds, NO drapes, NO curled edges, NO rolls anywhere in the image.
 ${scaleLine}
 ${brandLine}
 ${noText}`
