@@ -70,12 +70,15 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
               <div className="mdm-variant-dots">
                 {variants.map((v) => {
                   const vce = findColorEntry(v.nhomMau)
+                  // Ưu tiên aiColorHex (màu AI đã render thực tế) > nhomMau group color
+                  const dotColor = v.aiColorHex || vce?.hex || '#ccc'
+                  const colorLabel = vce?.name_en || v.nhomMau || ''
                   return (
                     <span
                       key={v.id}
                       className="mdm-variant-dot-btn"
-                      style={{ background: vce?.hex || '#ccc' }}
-                      title={`${vce?.name_en || v.nhomMau || ''} · ${v.maMrFabric}`}
+                      style={{ background: dotColor }}
+                      title={`${colorLabel} · ${v.maMrFabric}${v.aiColorHex ? ` · ${v.aiColorHex}` : ''}`}
                       onClick={() => onSwitchVariant?.(v)}
                     />
                   )
@@ -123,7 +126,20 @@ export default function MaterialDetailModal({ material, moodboardItems, onSave, 
               {(() => {
                 const colorEntry = findColorEntry(material.nhomMau)
                 const colorDisplay = colorEntry ? colorEntry.name_en : material.nhomMau
-                return <Row label="Nhóm màu" value={colorDisplay} />
+                return (
+                  <Row
+                    label="Nhóm màu"
+                    value={
+                      material.aiColorHex
+                        ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            {colorDisplay}
+                            <span style={{ width: 14, height: 14, borderRadius: 3, background: material.aiColorHex, border: '1px solid rgba(0,0,0,0.15)', display: 'inline-block', flexShrink: 0 }} />
+                            <span style={{ fontFamily: 'monospace', fontSize: '0.8em', color: 'var(--color-text-muted)' }}>{material.aiColorHex.toUpperCase()}</span>
+                          </span>
+                        : colorDisplay
+                    }
+                  />
+                )
               })()}
               <Row label="Tone màu" value={material.toneMau} />
               <Row label="Bề mặt" value={material.beMat} />

@@ -558,7 +558,9 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
       for (const s of doneSlots) {
         imageMap[s.field] = await compressDataUrl(slots[s.slot].imageUrl, 600, 0.82)
       }
-      onSyncColor?.(colorEntry.maNCC, imageMap)
+      // Truyền màu AI đã render để cập nhật vào material data
+      const aiColorHex = buildTargetColor(colorEntry).hex || null
+      onSyncColor?.(colorEntry.maNCC, imageMap, { aiColorHex })
 
       // Lưu surface_reference vào IndexedDB nếu toggle bật + có slot_1 + có maMrFabric
       if (saveReference && slots['slot_1']?.imageUrl && colorEntry.maMrFabric) {

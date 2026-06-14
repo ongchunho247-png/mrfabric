@@ -160,9 +160,9 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
   }, [])
 
   // ── Lưu ảnh đã xử lý từ Fabric Image Tool vào adminMaterials ────────────────
-  function handleSaveFabricImages(maNCC, slotImages) {
+  function handleSaveFabricImages(maNCC, slotImages, meta = {}) {
     // slotImages: { surface_texture: dataUrl, main_hand_image: dataUrl, … }
-    // Ảnh nên được nén trước khi gọi để tránh localStorage quota
+    // meta: { aiColorHex } — màu AI đã render, để hiển thị đúng trong library
     const key = (maNCC || '').trim().toLowerCase()
     setAdminMaterials((prev) => {
       const existingIdx = prev.findIndex(
@@ -175,10 +175,11 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
           Object.entries(slotImages).map(([k, url]) => [k, { path: url }]),
         ),
       }
+      const colorPatch = meta.aiColorHex ? { aiColorHex: meta.aiColorHex } : {}
       let next
       if (existing) {
         next = [...prev]
-        next[existingIdx] = { ...existing, images: updatedImages }
+        next[existingIdx] = { ...existing, images: updatedImages, ...colorPatch }
       } else {
         const newMat = {
           id: `fit-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -186,6 +187,7 @@ export default function AdminPage({ allMaterials, adminMaterials, setAdminMateri
           images: updatedImages,
           trangThai: 'active',
           source: { type: 'fabric-image-tool', createdAt: new Date().toISOString() },
+          ...colorPatch,
         }
         next = [...prev, newMat]
       }
