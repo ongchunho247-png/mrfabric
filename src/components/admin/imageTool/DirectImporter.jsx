@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { unzip } from 'fflate'
 import {
   extractNccCode,
   detectImageType,
@@ -15,14 +16,15 @@ import {
 const S = { PENDING: 'pending', PROCESSING: 'processing', DONE: 'done', ERROR: 'error' }
 
 const TYPE_LABEL = {
-  single: 'Bề mặt (slot 1)',
-  master: 'Master 3×2 → 6 slot',
-  slot_1: 'Slot 1 — Bề mặt',
-  slot_2: 'Slot 2 — Cận chất liệu',
-  slot_3: 'Slot 3 — Cầm nắm',
-  slot_4: 'Slot 4 — Thành phẩm ~1m',
-  slot_5: 'Slot 5 — Nội thất ~2m',
-  slot_6: 'Slot 6 — Kỹ thuật',
+  single: 'Bề mặt (ô 1)',
+  master: 'Master 3×2 → 6 ô',
+  zip:    'ZIP → tối đa 6 ô',
+  slot_1: 'Ô 1 — Bề mặt',
+  slot_2: 'Ô 2 — Cận chất liệu',
+  slot_3: 'Ô 3 — Cầm nắm',
+  slot_4: 'Ô 4 — Thành phẩm ~1m',
+  slot_5: 'Ô 5 — Nội thất ~2m',
+  slot_6: 'Ô 6 — Kỹ thuật',
 }
 
 function fieldForType(type) {
@@ -32,14 +34,16 @@ function fieldForType(type) {
   return sk?.field || null
 }
 
-function createEntry(file, priceTable) {
+// ── Entry factories ───────────────────────────────────────────────────────────
+
+function createImageEntry(file, priceTable) {
   const ncc   = extractNccCode(file.name) || ''
   const type  = detectImageType(file.name)
   const match = ncc
     ? matchNccInPriceTable(ncc, priceTable)
     : { type: BATCH_STATUS.INVALID, matches: [] }
   return {
-    id:         `${file.name}-${Math.random().toString(36).slice(2, 8)}`,
+    id:         `img-${file.name}-${Math.random().toString(36).slice(2, 8)}`,
     file,
     previewUrl: URL.createObjectURL(file),
     ncc,
@@ -51,21 +55,78 @@ function createEntry(file, priceTable) {
   }
 }
 
-async function processEntry(entry) {
-  const { file, type } = entry
-  if (type === 'master') {
-    return await processMasterImage(file)
+function createZipEntry(file, priceTable) {
+  const ncc   = file.name.replace(/\.zip$/i, '').trim()
+  const match = ncc
+    ? matchNccInPriceTable(ncc, priceTable)
+    : { type: BATCH_STATUS.INVALID, matches: [] }
+  return {
+    id:         `zip-${file.name}-${Math.random().toString(36).slice(2, 8)}`,
+    file,
+    previewUrl: null,
+    ncc,
+    type:       'zip',
+    match,
+    status:     S.PENDING,
+    result:     null,
+    error:      null,
   }
+}
+
+// ── Processing ────────────────────────────────────────────────────────────────
+
+// Bọc unzip (callback-based) thành Promise
+function unzipAsync(uint8) {
+  return new Promise((resolve, reject) => {
+    unzip(uint8, (err, result) => { err ? reject(err) : resolve(result) })
+  })
+}
+
+async function processZipFile(entry) {
+  const buffer  = await entry.file.arrayBuffer()
+  const files   = await unzipAsync(new Uint8Array(buffer))
+
+  // Lọc file ảnh (bỏ thư mục ẩn macOS __MACOSX)
+  const images = Object.entries(files).filter(
+    ([path]) => !/^__MACOSX/i.test(path) && /\.(jpg|jpeg|png|webp)$/i.test(path),
+  )
+
+  if (!images.length) throw new Error('Không tìm thấy ảnh trong ZIP')
+
+  // Sắp xếp theo số đầu tiên trong tên file
+  images.sort(([a], [b]) => {
+    const basename = (p) => p.split('/').pop()
+    const num = (p) => parseInt(basename(p).match(/\d+/)?.[0] ?? '9999')
+    const diff = num(a) - num(b)
+    return diff !== 0 ? diff : basename(a).localeCompare(basename(b))
+  })
+
+  // Gán lần lượt vào slot 1 → 6
+  const result = {}
+  const limit  = Math.min(images.length, SLOT_KEYS.length)
+  for (let i = 0; i < limit; i++) {
+    const [path, bytes] = images[i]
+    const ext      = path.match(/\.(png|webp)$/i)?.[1]?.toLowerCase()
+    const mimeType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
+    const blob     = new Blob([bytes], { type: mimeType })
+    const imgFile  = new File([blob], path.split('/').pop(), { type: mimeType })
+    result[SLOT_KEYS[i].field] = await loadImageAsDataUrl(imgFile, 1400)
+  }
+
+  return result
+}
+
+async function processImageEntry(entry) {
+  const { file, type } = entry
+  if (type === 'master') return await processMasterImage(file)
   const field = fieldForType(type)
   if (!field) throw new Error(`Loại ảnh không hỗ trợ: ${type}`)
-  const url = await loadImageAsDataUrl(file, 1400)
-  return { [field]: url }
+  return { [field]: await loadImageAsDataUrl(file, 1400) }
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function SlotThumbs({ result }) {
-  if (!result) return null
   const filled = SLOT_KEYS.filter((sk) => result[sk.field])
   if (!filled.length) return null
   return (
@@ -85,7 +146,7 @@ function SlotThumbs({ result }) {
 
 function MatchBadge({ match }) {
   const { type } = match
-  if (type === BATCH_STATUS.FOUND) return <span className="fit-badge fit-badge--found">✓ Tìm thấy</span>
+  if (type === BATCH_STATUS.FOUND)     return <span className="fit-badge fit-badge--found">✓ Tìm thấy</span>
   if (type === BATCH_STATUS.NOT_FOUND) return <span className="fit-badge fit-badge--not_found">Không thấy</span>
   if (type === BATCH_STATUS.MULTIPLE)  return <span className="fit-badge fit-badge--multiple">Nhiều kết quả</span>
   if (type === BATCH_STATUS.PARTIAL)   return <span className="fit-badge fit-badge--partial">Gần đúng</span>
@@ -102,16 +163,22 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
   // ── File ingestion ─────────────────────────────────────────────────────────
 
   function addFiles(fileList) {
-    const arr = Array.from(fileList).filter((f) => f.type.startsWith('image/'))
-    if (!arr.length) return
-    setEntries((prev) => [...prev, ...arr.map((f) => createEntry(f, priceTable))])
+    const newEntries = []
+    for (const f of Array.from(fileList)) {
+      if (/\.zip$/i.test(f.name)) {
+        newEntries.push(createZipEntry(f, priceTable))
+      } else if (f.type.startsWith('image/')) {
+        newEntries.push(createImageEntry(f, priceTable))
+      }
+    }
+    if (newEntries.length) setEntries((prev) => [...prev, ...newEntries])
   }
 
   function removeEntry(id) {
     setEntries((prev) => {
-      const entry = prev.find((e) => e.id === id)
-      if (entry?.previewUrl) URL.revokeObjectURL(entry.previewUrl)
-      return prev.filter((e) => e.id !== id)
+      const e = prev.find((x) => x.id === id)
+      if (e?.previewUrl) URL.revokeObjectURL(e.previewUrl)
+      return prev.filter((x) => x.id !== id)
     })
   }
 
@@ -132,8 +199,10 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
     for (const entry of pending) {
       setEntries((prev) => prev.map((e) => e.id === entry.id ? { ...e, status: S.PROCESSING } : e))
       try {
-        const result = await processEntry(entry)
-        const maNCC  = entry.match.type === BATCH_STATUS.FOUND
+        const result = entry.type === 'zip'
+          ? await processZipFile(entry)
+          : await processImageEntry(entry)
+        const maNCC = entry.match.type === BATCH_STATUS.FOUND
           ? entry.match.matches[0].maNCC
           : entry.ncc
         if (maNCC && onSaveImages) onSaveImages(maNCC, result)
@@ -170,15 +239,13 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
 
       {/* Intro */}
       <div className="fit-di-intro">
-        <span>Kéo thả ảnh đã hoàn chỉnh vào đây để import thẳng vào thư viện, bỏ qua AI.</span>
+        <span>Kéo thả file ZIP hoặc ảnh để import thẳng vào thư viện, bỏ qua AI.</span>
         <span className="fit-di-intro-conventions">
-          <code>mãNCC_1.jpg</code> → ô 1 (Bề mặt) &nbsp;·&nbsp;
-          <code>mãNCC_2.jpg</code> → ô 2 (Cận) &nbsp;·&nbsp;
-          <code>mãNCC_3.jpg</code> → ô 3 (Cầm) &nbsp;·&nbsp;
-          <code>mãNCC_4.jpg</code> → ô 4 &nbsp;·&nbsp;
-          <code>mãNCC_5.jpg</code> → ô 5 &nbsp;·&nbsp;
-          <code>mãNCC_6.jpg</code> → ô 6 &nbsp;·&nbsp;
-          <code>mãNCC_master.jpg</code> → tách 3×2 → 6 ô
+          <strong>ZIP (khuyến nghị):</strong>&nbsp;
+          <code>A15-5.zip</code> chứa <code>1.jpg</code> → ô 1, <code>2.jpg</code> → ô 2 … <code>6.jpg</code> → ô 6
+          &nbsp;·&nbsp;
+          <strong>Ảnh rời:</strong>&nbsp;
+          <code>A15-5_1.jpg</code> → ô 1 &nbsp;·&nbsp; <code>A15-5_master.jpg</code> → tách 3×2
         </span>
       </div>
 
@@ -191,11 +258,11 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
         onDrop={onDrop}
       >
         <div className="fit-upload-icon">📥</div>
-        <div className="fit-upload-label">Kéo thả nhiều ảnh vào đây hoặc click để chọn</div>
-        <div className="fit-upload-hint">Hỗ trợ JPG · PNG · WebP — nhiều file cùng lúc</div>
+        <div className="fit-upload-label">Kéo thả file ZIP hoặc ảnh vào đây</div>
+        <div className="fit-upload-hint">ZIP · JPG · PNG · WebP — nhiều file cùng lúc</div>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,.zip,application/zip"
           multiple
           onChange={(e) => { addFiles(e.target.files); e.target.value = '' }}
         />
@@ -204,7 +271,6 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
       {/* File list */}
       {entries.length > 0 && (
         <>
-          {/* Action bar */}
           <div className="fit-batch-bar">
             <span className="fit-batch-count">
               {entries.length} file
@@ -221,13 +287,10 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
               {running ? 'Đang xử lý…' : `Xử lý & Lưu (${pendingCount})`}
             </button>
             {!running && (
-              <button className="btn btn-secondary btn-sm" onClick={clearAll}>
-                Xoá tất cả
-              </button>
+              <button className="btn btn-secondary btn-sm" onClick={clearAll}>Xoá tất cả</button>
             )}
           </div>
 
-          {/* Table */}
           <div className="fit-batch-table-wrap">
             <table className="fit-batch-table">
               <thead>
@@ -245,22 +308,23 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
                 {entries.map((entry) => (
                   <tr key={entry.id}>
 
-                    {/* Thumbnail → kết quả sau khi xong */}
+                    {/* Thumbnail / ZIP icon / Kết quả */}
                     <td>
-                      {entry.status === S.DONE && entry.result
-                        ? <SlotThumbs result={entry.result} />
-                        : <img src={entry.previewUrl} alt="" className="fit-batch-thumb" />
-                      }
+                      {entry.status === S.DONE && entry.result ? (
+                        <SlotThumbs result={entry.result} />
+                      ) : entry.type === 'zip' ? (
+                        <div className="fit-batch-thumb fit-batch-thumb--zip">📦</div>
+                      ) : (
+                        <img src={entry.previewUrl} alt="" className="fit-batch-thumb" />
+                      )}
                     </td>
 
-                    {/* Filename */}
                     <td>
                       <span className="fit-batch-filename" title={entry.file.name}>
                         {entry.file.name}
                       </span>
                     </td>
 
-                    {/* NCC */}
                     <td>
                       {entry.ncc
                         ? <span className="fit-batch-ncc">{entry.ncc}</span>
@@ -268,17 +332,12 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
                       }
                     </td>
 
-                    {/* Loại */}
                     <td>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--color-text)' }}>
-                        {TYPE_LABEL[entry.type] || entry.type}
-                      </span>
+                      <span style={{ fontSize: '0.78rem' }}>{TYPE_LABEL[entry.type] || entry.type}</span>
                     </td>
 
-                    {/* Match */}
                     <td><MatchBadge match={entry.match} /></td>
 
-                    {/* Status */}
                     <td>
                       {entry.status === S.PENDING    && <span className="fit-badge fit-badge--pending">Chờ</span>}
                       {entry.status === S.PROCESSING && <span className="fit-badge fit-badge--processing">Đang xử lý…</span>}
@@ -288,14 +347,9 @@ export default function DirectImporter({ priceTable = [], onSaveImages }) {
                       )}
                     </td>
 
-                    {/* Remove */}
                     <td>
                       {entry.status !== S.PROCESSING && (
-                        <button
-                          className="fit-reset-btn"
-                          onClick={() => removeEntry(entry.id)}
-                          title="Xoá khỏi danh sách"
-                        >✕</button>
+                        <button className="fit-reset-btn" onClick={() => removeEntry(entry.id)} title="Xoá">✕</button>
                       )}
                     </td>
                   </tr>

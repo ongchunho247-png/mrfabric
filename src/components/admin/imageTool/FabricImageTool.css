@@ -442,6 +442,13 @@
   vertical-align: middle;
 }
 
+.fit-batch-thumb--zip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
 .fit-batch-filename {
   font-family: monospace;
   font-size: 0.78rem;
