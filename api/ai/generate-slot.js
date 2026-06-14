@@ -1084,6 +1084,7 @@ export default async function handler(req, res) {
       materialMetadata,
       scaleMetadata,
       productType,
+      fabricAnalysis: cachedAnalysis, // tái sử dụng từ slot trước, bỏ qua GPT-4o call
     } = req.body || {}
 
     const VALID_SLOTS = ['slot_1', 'slot_2', 'slot_3', 'slot_4', 'slot_5', 'slot_6']
@@ -1104,9 +1105,11 @@ export default async function handler(req, res) {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const imageBuffer = Buffer.from(base64Image, 'base64')
 
-    // Step 1: Phân tích vật liệu
-    const fabricAnalysis = await analyzeMaterial(client, base64Image, imageType)
-    console.log(`[generate-slot:${slot}:${productType || 'CUR'}] analysis:`, fabricAnalysis.slice(0, 120))
+    // Step 1: Phân tích vật liệu — bỏ qua nếu đã có kết quả từ slot trước
+    const fabricAnalysis = cachedAnalysis || await analyzeMaterial(client, base64Image, imageType)
+    if (!cachedAnalysis) {
+      console.log(`[generate-slot:${slot}:${productType || 'CUR'}] analysis:`, fabricAnalysis.slice(0, 120))
+    }
 
     // Step 2: Build prompt theo type
     const prompt = buildPrompt(slot, {
@@ -1130,7 +1133,7 @@ export default async function handler(req, res) {
         prompt,
         n: 1,
         size: '1024x1024',
-        quality: 'high',
+        quality: 'medium',
       })
       const b64 = editResponse.data[0]?.b64_json
       if (!b64) throw new Error('images.edit trả về rỗng')
@@ -1142,6 +1145,9 @@ export default async function handler(req, res) {
         productType: productType || null,
       })
     } catch (e1) {
+      if (e1.status === 429 || String(e1.message).includes('Billing') || String(e1.message).includes('billing')) {
+        throw e1 // Lỗi billing/rate-limit: không cần fallback, throw ngay
+      }
       console.warn(`[generate-slot:${slot}] images.edit thất bại — HTTP ${e1.status || '?'}: ${e1.message}`)
     }
 
@@ -1151,7 +1157,7 @@ export default async function handler(req, res) {
       prompt,
       n: 1,
       size: '1024x1024',
-      quality: 'high',
+      quality: 'medium',
     })
     const b64Gen = genResponse.data[0]?.b64_json
     if (!b64Gen) throw new Error('images.generate trả về rỗng')
@@ -1164,6 +1170,10 @@ export default async function handler(req, res) {
     })
   } catch (error) {
     console.error(`[generate-slot]`, error?.message || error)
-    return res.status(500).json({ ok: false, error: error?.message || 'Lỗi khi gọi OpenAI tạo ảnh.' })
+    const msg = error?.message || ''
+    const userError = (msg.includes('Billing') || msg.includes('billing') || msg.includes('hard limit'))
+      ? 'Tài khoản OpenAI đã chạm giới hạn thanh toán. Vui lòng nạp thêm credit tại platform.openai.com/account/billing.'
+      : msg || 'Lỗi khi gọi OpenAI tạo ảnh.'
+    return res.status(500).json({ ok: false, error: userError })
   }
 }

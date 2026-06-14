@@ -101,12 +101,12 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
           const data = await res.json()
           if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo slot_1')
           updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: data.imageUrl })
-          return data.imageUrl
+          return { imageUrl: data.imageUrl, fabricAnalysis: data.fabricAnalysis || null }
         } catch (err) {
           // Fallback về ảnh gốc nếu API lỗi
           console.warn('[MCG] generate-slot slot_1 thất bại, fallback ảnh gốc:', err.message)
-          updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: baseSurfaceUrl })
-          return baseSurfaceUrl
+          updateSlot(colorEntry.maNCC, 'slot_1', { status: S.ERROR, error: err.message })
+          return { imageUrl: baseSurfaceUrl, fabricAnalysis: null }
         }
       }
 
@@ -132,10 +132,10 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         const data = await res.json()
         if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo surface')
         updateSlot(colorEntry.maNCC, 'slot_1', { status: S.DONE, imageUrl: data.imageUrl })
-        return data.imageUrl
+        return { imageUrl: data.imageUrl, fabricAnalysis: data.fabricAnalysis || null }
       } catch (err) {
         updateSlot(colorEntry.maNCC, 'slot_1', { status: S.ERROR, error: err.message })
-        return null
+        return { imageUrl: null, fabricAnalysis: null }
       }
     },
     [baseSurfaceUrl, baseNcc, scaleMetadata, productType],
@@ -143,7 +143,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
 
   // ── Tạo 1 slot ứng dụng (slot_2–slot_6) ─────────────────────────────────
   const generateAppSlot = useCallback(
-    async (colorEntry, slotKey, surfaceRef) => {
+    async (colorEntry, slotKey, surfaceRef, cachedFabricAnalysis) => {
       const targetColor = { name: colorEntry.nhomMau || colorEntry.maNCC, hex: null }
       updateSlot(colorEntry.maNCC, slotKey, { status: S.GENERATING, error: null })
       setColorProg(colorEntry.maNCC, SLOT_PROGRESS[slotKey] || `Tạo ${slotKey}…`)
@@ -161,12 +161,14 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
             collection: colorEntry.tenCuon || '',
             scaleMetadata: scaleMetadata || null,
             productType: productType || null,
+            fabricAnalysis: cachedFabricAnalysis || null, // tái sử dụng — bỏ qua GPT-4o call
             materialMetadata: {
               thanhPhan: colorEntry.thanhPhan || '',
               khoVai: colorEntry.khoVai || '',
               beMat: Array.isArray(colorEntry.beMat)
                 ? colorEntry.beMat.join(', ')
                 : colorEntry.beMat || '',
+              grainDirection: fabricGrain || '',
             },
           }),
         })
@@ -177,19 +179,19 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         updateSlot(colorEntry.maNCC, slotKey, { status: S.ERROR, error: err.message })
       }
     },
-    [],
+    [scaleMetadata, productType, fabricGrain],
   )
 
   // ── Tạo đầy đủ 6 slot cho 1 màu ─────────────────────────────────────────
   async function generateColor(colorEntry) {
     setActiveColor(colorEntry.maNCC)
-    // Bước 1: tạo surface màu mới
-    const coloredSurface = await generateSurface(colorEntry)
+    // Bước 1: tạo surface màu mới (slot_1) — nhận về fabricAnalysis để tái sử dụng
+    const { imageUrl: coloredSurface, fabricAnalysis: cachedAnalysis } = await generateSurface(colorEntry)
     // Dùng surface màu mới làm tham chiếu; nếu thất bại dùng ảnh gốc
     const surfaceRef = coloredSurface || baseSurfaceUrl
-    // Bước 2: tạo 5 slot ứng dụng tuần tự
+    // Bước 2: tạo 5 slot ứng dụng tuần tự — truyền fabricAnalysis đã có, tiết kiệm 5 GPT-4o calls
     for (const sk of APP_SLOT_KEYS) {
-      await generateAppSlot(colorEntry, sk.slot, surfaceRef)
+      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
