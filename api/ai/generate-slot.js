@@ -317,7 +317,7 @@ ROOM — refined luxury interior (like a high-end residential project):
 - Large living space, high ceiling (2.8–3.2m)
 - Neutral warm palette: cream, taupe, warm white walls and floor
 - Light wood or warm stone flooring
-- Furniture PARTIALLY visible — low-profile sofa or chaise at one side, a round coffee table, possibly a vase with tall botanical arrangement
+- Furniture PARTIALLY visible — low-profile sofa or chaise at one side, a round coffee table, possibly a low compact floral arrangement (NOT tall vases, NOT large plants)
 - Soft ambient lighting: warm downlights or natural light — no harsh overhead fluorescence
 - Calm, sophisticated atmosphere — not cluttered
 
