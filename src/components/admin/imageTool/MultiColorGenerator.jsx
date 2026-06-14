@@ -469,10 +469,12 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     // colorMode='force' khi slot_1 thất bại → slot 2-4 tự đổi màu từ targetColor
     const appColorMode = coloredSurface ? 'ref' : 'force'
     for (const sk of APP_SLOT_KEYS) {
-      // slot_4 (flat overhead / sơ đồ kỹ thuật): luôn dùng force để áp màu chính xác theo target HEX
-      // Flat shot không có context phòng che giấu lệch màu → không dùng ref từ slot_1 có thể sai
+      // slot_4 (flat overhead / sơ đồ kỹ thuật): luôn force + dùng ảnh GỐC làm reference
+      // Lý do: force colorLine nói "reference shows DIFFERENT color" — cần ref thật sự khác màu
+      // Nếu dùng slot_1 (đã đúng màu) làm ref + force → contradiction → AI sinh ra sai
       const slotColorMode = sk.slot === 'slot_4' ? 'force' : appColorMode
-      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis, slotColorMode)
+      const slotRef = sk.slot === 'slot_4' ? (baseSurfaceUrl || surfaceRef) : surfaceRef
+      await generateAppSlot(colorEntry, sk.slot, slotRef, cachedAnalysis, slotColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
@@ -537,11 +539,11 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     } else {
       const slot1Image = colorData[colorEntry.maNCC]?.slot_1?.imageUrl
       const currentSurface = slot1Image || baseSurfaceUrl
-      // Nếu slot_1 đã có output → dùng làm reference + 'ref' mode để khớp màu
-      // Nếu chưa có → fallback về ảnh gốc + 'force' mode để đổi màu
-      // slot_4 luôn force để áp màu chính xác; slot_2/3 dùng ref nếu có slot_1
+      // slot_4: force + ảnh gốc để tránh contradiction với colorLine ("reference DIFFERENT color")
+      // slot_2/3: ref nếu có slot_1, force nếu chưa
       const regenColorMode = slotKey === 'slot_4' ? 'force' : (slot1Image ? 'ref' : 'force')
-      await generateAppSlot(colorEntry, slotKey, currentSurface, null, regenColorMode)
+      const regenRef = slotKey === 'slot_4' ? (baseSurfaceUrl || currentSurface) : currentSurface
+      await generateAppSlot(colorEntry, slotKey, regenRef, null, regenColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
