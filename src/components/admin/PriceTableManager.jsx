@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { addPriceEntry, updatePriceEntry } from '../../helpers/priceTableStorage'
 import { getProductTypeCode } from '../../helpers/generateMrFabricCode'
 import { COLOR_GROUPS, findColorEntry } from '../../data/colorGroups'
+import { getVariantHex } from '../../helpers/colorDictStorage'
 import './PriceTableManager.css'
 
 const CONSTELLATION_CODES = [
@@ -490,12 +491,17 @@ function NccPriceSection({ nccName, nccCode, nccCodes, entries, priceTable, onUp
                                   <td className="ptm-td-mat">
                                     {(() => {
                                       const ce = findColorEntry(e.nhomMau)
-                                      if (ce) return (
-                                        <span className="ptm-color">
-                                          <span className="ptm-color-dot" style={{ background: ce.hex }} />
-                                          {ce.name_en}
-                                        </span>
-                                      )
+                                      if (ce) {
+                                        // Ưu tiên per-maNCC variant override để hiện đúng màu AI đã render
+                                        const varHex = getVariantHex(e.maNCC)
+                                        return (
+                                          <span className="ptm-color">
+                                            <span className="ptm-color-dot" style={{ background: varHex || ce.hex }} />
+                                            {ce.name_en}
+                                            {varHex && <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--color-text-muted)', marginLeft: 4 }}>{varHex.toUpperCase()}</span>}
+                                          </span>
+                                        )
+                                      }
                                       const fb = mat ? translateColor(mat.mauSac) : (e.nhomMau || '')
                                       return fb ? <span>{fb}</span> : <span className="ptm-td-empty">—</span>
                                     })()}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 import { recordGeneration } from '../../../helpers/budgetStorage'
@@ -28,7 +28,7 @@ function ColorDot({ maNCC, nhomMau, onChanged }) {
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
       {/* Chip màu — hình chữ nhật bo góc, dễ thấy hơn dot tròn nhỏ */}
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => { e.stopPropagation(); if (!open) setOpen(true) }}
         title={`${displayHex.toUpperCase()} — ${source}. Click để đổi màu`}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -56,6 +56,8 @@ function ColorDot({ maNCC, nhomMau, onChanged }) {
 
       {open && (
         <div
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute', top: 28, left: 0, zIndex: 100,
             background: 'var(--color-surface)',
@@ -340,9 +342,9 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     async (colorEntry) => {
       updateSlot(colorEntry.maNCC, 'slot_1', { status: S.GENERATING, error: null })
 
-      // Màu gốc: dùng generate-slot (slot_1) để làm sạch thước đo khỏi ảnh thật
-      // Prompt slot_1 đã yêu cầu AI xóa thước — AI giữ nguyên pattern + màu gốc
-      if (baseNcc && colorEntry.maNCC === baseNcc) {
+      // BaseNcc KHÔNG có color override: chỉ làm sạch (xóa thước), giữ màu gốc
+      // BaseNcc CÓ variant override: rơi xuống recolor-surface để đổi màu chính xác hơn
+      if (baseNcc && colorEntry.maNCC === baseNcc && !getVariantHex(colorEntry.maNCC)) {
         setColorProg(colorEntry.maNCC, 'Làm sạch bề mặt vải (xóa thước đo)…')
         try {
           const res = await fetch('/api/ai/generate-slot', {
@@ -467,7 +469,10 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
     // colorMode='force' khi slot_1 thất bại → slot 2-4 tự đổi màu từ targetColor
     const appColorMode = coloredSurface ? 'ref' : 'force'
     for (const sk of APP_SLOT_KEYS) {
-      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis, appColorMode)
+      // slot_4 (flat overhead / sơ đồ kỹ thuật): luôn dùng force để áp màu chính xác theo target HEX
+      // Flat shot không có context phòng che giấu lệch màu → không dùng ref từ slot_1 có thể sai
+      const slotColorMode = sk.slot === 'slot_4' ? 'force' : appColorMode
+      await generateAppSlot(colorEntry, sk.slot, surfaceRef, cachedAnalysis, slotColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
     setActiveColor(null)
@@ -534,7 +539,8 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
       const currentSurface = slot1Image || baseSurfaceUrl
       // Nếu slot_1 đã có output → dùng làm reference + 'ref' mode để khớp màu
       // Nếu chưa có → fallback về ảnh gốc + 'force' mode để đổi màu
-      const regenColorMode = slot1Image ? 'ref' : 'force'
+      // slot_4 luôn force để áp màu chính xác; slot_2/3 dùng ref nếu có slot_1
+      const regenColorMode = slotKey === 'slot_4' ? 'force' : (slot1Image ? 'ref' : 'force')
       await generateAppSlot(colorEntry, slotKey, currentSurface, null, regenColorMode)
     }
     setColorProg(colorEntry.maNCC, '')
