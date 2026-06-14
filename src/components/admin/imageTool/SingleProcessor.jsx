@@ -135,7 +135,7 @@ function ProductInfoCard({ entry, nhomBienThe, variantCount }) {
       <div className="fit-card-title">Thông tin sản phẩm</div>
       <InfoRow label="Mã MrFabric"      value={entry.maMrFabric}    highlight />
       <InfoRow label="Mã sản phẩm NCC"  value={entry.maNCC} />
-      <InfoRow label="Nhóm biến thể"    value={nhomBienThe || entry.nhomBienThe || entry.variantGroup} highlight />
+      <InfoRow label="Nhóm biến thể"    value={nhomBienThe || entry.nhomVatLieu || entry.nhomBienThe || entry.variantGroup} highlight />
       {variantCount > 1 && (
         <InfoRow label="Số biến thể màu" value={`${variantCount} màu cùng nhóm`} />
       )}
@@ -515,7 +515,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     return colorVariants // 'all'
   }, [scope, selectedNccs, colorVariants, selectedEntry])
 
-  const nhomBienThe = selectedEntry?.nhomBienThe || selectedEntry?.variantGroup || ''
+  const nhomBienThe = selectedEntry?.nhomVatLieu || selectedEntry?.nhomBienThe || selectedEntry?.variantGroup || ''
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 

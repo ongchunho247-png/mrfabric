@@ -87,11 +87,12 @@ export function findColorVariants(maNCC, priceTable) {
   )
   if (!base) return []
 
-  const nhomBienThe = (base.nhomBienThe || base.variantGroup || '').trim()
+  // Field thực tế trong priceTable là nhomVatLieu (xem PriceTableManager)
+  const nhomBienThe = (base.nhomVatLieu || base.nhomBienThe || base.variantGroup || '').trim()
   if (!nhomBienThe) return [base]
 
   const variants = priceTable.filter(
-    (e) => !e.deletedAt && ((e.nhomBienThe || e.variantGroup || '').trim() === nhomBienThe),
+    (e) => !e.deletedAt && ((e.nhomVatLieu || e.nhomBienThe || e.variantGroup || '').trim() === nhomBienThe),
   )
 
   // base lên đầu, dedup by maNCC
