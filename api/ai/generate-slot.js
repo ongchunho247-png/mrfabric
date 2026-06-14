@@ -55,7 +55,7 @@ const SCALE_NOTE = `SCALE PRINCIPLE: Maintain the exact real-world scale of the 
 function slot1_surface(desc, colorLine, scaleLine, brandLine, noText) {
   return `Professional premium material surface texture photography.
 
-!!!CRITICAL FIRST: The reference image may contain a ruler, measuring tape, or scale bar at the bottom or edge. YOU MUST COMPLETELY REMOVE IT from the output. The ruler is only used to determine scale — it must NOT appear in this image. Output: clean fabric/material surface only, no ruler, no measuring tools whatsoever.
+${colorLine ? colorLine + '\n' : ''}!!!CRITICAL FIRST: The reference image may contain a ruler, measuring tape, or scale bar at the bottom or edge. YOU MUST COMPLETELY REMOVE IT from the output. The ruler is only used to determine scale — it must NOT appear in this image. Output: clean fabric/material surface only, no ruler, no measuring tools whatsoever.
 
 MATERIAL: ${desc}
 ${colorLine}
@@ -78,7 +78,7 @@ STYLE: Premium material swatch photography. Liberty Fabrics / Schumacher / Mahar
 
 CRITICAL OUTPUT RULES:
 1. NO ruler, NO measuring tape, NO scale bar, NO graduation marks anywhere in the image.
-2. Reproduce exact pattern, colors, surface texture with maximum fidelity.
+2. Reproduce exact weave structure, surface texture, and pattern/motif shapes from reference. If a COLOR CHANGE is specified above: ALL colors must change to the specified color — do NOT reproduce the reference color.
 3. This is the hero texture shot — no props, no hands, no furniture, no labels.
 4. Fill the entire frame with fabric/material surface.
 5. Material COMPLETELY FLAT — absolutely NO folds, NO drapes, NO curled edges, NO rolls anywhere in the image.
@@ -1116,12 +1116,15 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const baseDesc = fabricAnalysis
     || `material with exact texture from reference${colorDesc ? ` in ${colorDesc}` : ''}`
   // Đặt beMat trước analysis để AI ưu tiên surface type từ database
-  const desc = beMat
-    ? `[Surface type: ${beMat}] ${baseDesc}`
-    : baseDesc
+  // Khi có targetColor: gắn nhãn rõ để AI không bị confused bởi màu gốc trong analysis
+  const descBase = beMat ? `[Surface type: ${beMat}] ${baseDesc}` : baseDesc
+  const desc = colorDesc
+    ? `${descBase} [IGNORE any color described above — color will be overridden per COLOR CHANGE instruction]`
+    : descBase
 
+  // Khi có targetColor: lệnh đổi màu tuyệt đối — ghi đè màu reference image
   const colorLine = colorDesc
-    ? `COLOR: The material is in ${colorDesc} — maintain this exact color throughout the entire image.`
+    ? `!!!MANDATORY COLOR CHANGE: RECOLOR the ENTIRE fabric/material to ${colorDesc}. The reference image shows a DIFFERENT color — you MUST replace ALL fabric colors with ${colorDesc}. Do NOT preserve the original reference color. Preserve ONLY the weave structure, surface texture, and pattern/motif shapes. Every fiber, thread, and surface in the output must be ${colorDesc}.`
     : ''
 
   const scaleLine = buildScaleLine(scaleMetadata)
