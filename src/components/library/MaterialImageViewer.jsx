@@ -3,9 +3,9 @@ import './MaterialImageViewer.css'
 
 const IMAGE_TABS = [
   { key: 'surface_texture', fallback: 'closeup',      label: 'Bề mặt' },
-  { key: 'main_hand_image', fallback: null,            label: 'Cận chất liệu' },
-  { key: 'curtain_image',   fallback: 'curtain',      label: 'Không gian gần' },
-  { key: 'detail_image',    fallback: 'renderTexture', label: 'Ruler tỉ lệ' },
+  { key: 'main_hand_image', fallback: null,            label: 'Thành phẩm ~1m' },
+  { key: 'curtain_image',   fallback: 'curtain',      label: 'Nội thất ~2m' },
+  { key: 'detail_image',    fallback: 'renderTexture', label: 'Sơ đồ kỹ thuật' },
 ]
 
 function ThumbItem({ tabKey, label, src, active, onClick }) {

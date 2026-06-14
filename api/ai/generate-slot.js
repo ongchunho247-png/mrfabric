@@ -121,6 +121,69 @@ ${brandLine}
 ${noText}`
 }
 
+function slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine) {
+  const materialNote = ['WB', 'AL'].includes(productType)
+    ? 'aluminum or wood slat sample (full width, 2–3 slats visible, flat)'
+    : 'flat fabric/material sample (approx 25cm × 20cm, laid flat)'
+
+  const isGrainKho  = grainLine && grainLine.includes('HORIZONTALLY')
+  const isGrainCuon = grainLine && grainLine.includes('VERTICALLY')
+
+  const grainCornerDiagram = (isGrainKho || isGrainCuon) ? `
+CORNER GRAIN DIAGRAM — render in the BOTTOM-RIGHT corner of the image, compact box (approx 15% of image area):
+- Bordered box with light grey outline, clean white background inside
+- Inside: miniature fabric roll illustration (cylinder rolled sideways)
+- Left of roll: vertical double-headed arrow (↕) labeled "Cuộn" — roll/length direction
+- Below roll: horizontal double-headed arrow (↔) labeled "Khổ" — width direction
+- On roll surface: a bold directional arrow labeled "Vân":
+  ${isGrainKho ? '→ HORIZONTAL arrow (→) across the roll surface — grain runs along width' : '→ VERTICAL arrow (↓) down the roll surface — grain runs along roll length'}
+- All annotations: thin clean lines, filled arrowheads, small crisp sans-serif Vietnamese labels
+- This corner diagram must NOT obscure the main material sample or the L-shaped rulers` : ''
+
+  return `Technical scale reference diagram — material sample with dual-axis rulers and grain direction annotation.
+
+MATERIAL: ${desc}
+${colorLine}
+${grainLine ? `GRAIN DIRECTION: ${grainLine}` : ''}
+
+COMPOSITION (follow exactly):
+- ${materialNote} fills the CENTER 55% of the image, laid flat on a pure white surface
+- X-AXIS RULER: a classic wooden ruler (30cm long) placed HORIZONTALLY at the BOTTOM of the frame, directly below the material
+  - Ruler FULLY within image — both ends completely visible, NOT cut off
+  - Centered horizontally; graduation marks (5, 10, 15, 20, 25 cm) LARGE, crisp, readable black on wood
+  - Small gap between material bottom edge and ruler top
+- Y-AXIS RULER: a classic wooden ruler (25cm long) placed VERTICALLY on the LEFT side of the frame, directly beside the material
+  - Ruler FULLY within image — both ends completely visible, NOT cut off
+  - Graduation marks readable from 0 (bottom) to 25 (top)
+  - Small gap between material left edge and ruler
+- Both rulers form an L-shape around the bottom-left corner of the material sample
+- Material surface texture clearly visible at center
+${grainCornerDiagram}
+
+LIGHTING:
+- Bright, flat, even overhead lighting — zero shadows, zero glare
+- All ruler numbers and tick marks on BOTH axes are legible
+- Material texture not blown out
+
+CAMERA:
+- Directly overhead, 90° top-down bird's-eye view
+- Perfectly level, zero perspective distortion
+
+BACKGROUND: Pure white seamless.
+
+STYLE: Technical specification sheet. Clinical diagram — fabric data card with dual-axis scale rulers and grain direction annotations.
+
+CRITICAL:
+1. BOTH rulers (horizontal X bottom + vertical Y left) FULLY visible — never cut off at any edge
+2. All cm numbers legible on both rulers
+3. Material texture clearly visible at center
+4. 90° overhead only — no perspective tilt
+5. L-shape ruler arrangement (horizontal at bottom, vertical at left)
+6. Grain corner box (if present) must be compact in bottom-right corner, clean and non-obstructive
+${brandLine}
+${noText}`
+}
+
 function slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine) {
   const materialNote = ['WB', 'AL'].includes(productType)
     ? 'aluminum or wood slat sample (full width visible)'
@@ -1054,12 +1117,12 @@ function buildPrompt(slot, { fabricAnalysis, colorName, targetColor, supplier, c
   const noText = 'No text, no watermarks, no logos, no branding overlays.'
 
   if (slot === 'slot_1') return slot1_surface(desc, colorLine, scaleLine, brandLine, noText)
-  if (slot === 'slot_4') return slot6_ruler(desc, colorLine, brandLine, noText, productType, grainLine)
+  if (slot === 'slot_4') return slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine)
 
   const pType = productType || 'CUR'
   const typeFns = TYPE_SLOT_FNS[pType] || TYPE_SLOT_FNS.CUR
-  // slot_2 → slot_2 function; slot_3 (không gian gần ~1m) → maps to old slot_4 function
-  const internalSlot = slot === 'slot_3' ? 'slot_4' : slot
+  // slot_2 → ~1m product shot (typeFns.slot_4), slot_3 → ~2m room shot (typeFns.slot_5)
+  const internalSlot = slot === 'slot_2' ? 'slot_4' : slot === 'slot_3' ? 'slot_5' : slot
   const fn = typeFns?.[internalSlot]
   return fn ? fn(desc, colorLine, brandLine, noText) : ''
 }

@@ -9,9 +9,9 @@ const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2, 3
 
 const SLOT_PROGRESS = {
   slot_1: 'Tạo bề mặt vải…',
-  slot_2: 'Tạo ảnh cận chất liệu…',
-  slot_3: 'Tạo ảnh không gian gần (~1m)…',
-  slot_4: 'Tạo ảnh ruler tỉ lệ…',
+  slot_2: 'Tạo ảnh thành phẩm ~1m…',
+  slot_3: 'Tạo ảnh nội thất ~2m…',
+  slot_4: 'Tạo sơ đồ kỹ thuật…',
 }
 
 // Giá ước tính USD per image (gpt-image-1, 1024×1024)
