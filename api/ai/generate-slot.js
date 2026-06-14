@@ -123,64 +123,62 @@ ${noText}`
 }
 
 function slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine) {
-  const materialNote = ['WB', 'AL'].includes(productType)
-    ? 'aluminum or wood slat sample (full width, 2–3 slats visible, flat)'
-    : 'flat fabric/material sample (approx 25cm × 20cm, laid flat)'
-
   const isGrainKho  = grainLine && grainLine.includes('HORIZONTALLY')
   const isGrainCuon = grainLine && grainLine.includes('VERTICALLY')
 
-  const grainCornerDiagram = (isGrainKho || isGrainCuon) ? `
-CORNER GRAIN DIAGRAM — render in the BOTTOM-RIGHT corner of the image, compact box (approx 15% of image area):
-- Bordered box with light grey outline, clean white background inside
-- Inside: miniature fabric roll illustration (cylinder rolled sideways)
-- Left of roll: vertical double-headed arrow (↕) labeled "Cuộn" — roll/length direction
-- Below roll: horizontal double-headed arrow (↔) labeled "Khổ" — width direction
-- On roll surface: a bold directional arrow labeled "Vân":
-  ${isGrainKho ? '→ HORIZONTAL arrow (→) across the roll surface — grain runs along width' : '→ VERTICAL arrow (↓) down the roll surface — grain runs along roll length'}
-- All annotations: thin clean lines, filled arrowheads, small crisp sans-serif Vietnamese labels
-- This corner diagram must NOT obscure the main material sample or the L-shaped rulers` : ''
+  // Icon cuộn vải: hình minh họa cylinder, mũi tên chỉ hướng, không text
+  const rollIcon = (isGrainKho || isGrainCuon) ? `
+FABRIC ROLL ICON — place in TOP-RIGHT corner, compact (approx 12–15% of image width):
+- Draw a fabric roll illustration in the style of a technical diagram icon:
+  A cylindrical roll (viewed from the side) on the LEFT of the icon, with fabric unrolling out to the RIGHT
+  showing the material pattern/texture on the unrolled surface
+- The roll cylinder: circular end visible, concentric rings suggesting wound layers, dark outline, light fill
+- Unrolled fabric panel extends to the right from the roll, bordered with a thin rectangular frame
+- ONE bold directional arrow drawn on the unrolled fabric surface:
+  ${isGrainKho
+    ? '→ A single horizontal arrow pointing RIGHT (→) — grain runs horizontally along the fabric width'
+    : '↑ A single vertical arrow pointing UP (↑) — grain runs vertically along the roll length'}
+- NO text, NO labels anywhere on the icon — arrow only
+- Style: clean line illustration, dark outline on white/light background, like a textile spec sheet icon
+- Must be small, self-contained, and placed neatly in the top-right corner without overlapping material or rulers` : ''
 
-  return `Technical scale reference diagram — material sample with dual-axis rulers and grain direction annotation.
+  return `Technical fabric specification diagram — material sample with L-shaped scale rulers and grain direction icon.
 
 MATERIAL: ${desc}
 ${colorLine}
 ${grainLine ? `GRAIN DIRECTION: ${grainLine}` : ''}
 
-COMPOSITION (follow exactly):
-- ${materialNote} fills the CENTER 55% of the image, laid flat on a pure white surface
-- X-AXIS RULER: a classic wooden ruler (30cm long) placed HORIZONTALLY at the BOTTOM of the frame, directly below the material
-  - Ruler FULLY within image — both ends completely visible, NOT cut off
-  - Centered horizontally; graduation marks (5, 10, 15, 20, 25 cm) LARGE, crisp, readable black on wood
-  - Small gap between material bottom edge and ruler top
-- Y-AXIS RULER: a classic wooden ruler (25cm long) placed VERTICALLY on the LEFT side of the frame, directly beside the material
-  - Ruler FULLY within image — both ends completely visible, NOT cut off
-  - Graduation marks readable from 0 (bottom) to 25 (top)
-  - Small gap between material left edge and ruler
-- Both rulers form an L-shape around the bottom-left corner of the material sample
-- Material surface texture clearly visible at center
-${grainCornerDiagram}
-
-LIGHTING:
-- Bright, flat, even overhead lighting — zero shadows, zero glare
-- All ruler numbers and tick marks on BOTH axes are legible
-- Material texture not blown out
-
-CAMERA:
-- Directly overhead, 90° top-down bird's-eye view
-- Perfectly level, zero perspective distortion
+LAYOUT (follow precisely):
+- MATERIAL SAMPLE fills the MAXIMUM area possible — approximately 82% of the total image
+  Flat, taut, no folds, no drape — material surface and pattern clearly visible
+- LEFT RULER (Y-axis): thin flat ruler flush against the LEFT EDGE of the image, vertical
+  - Range: 0 cm (bottom) to 15 cm (top) — USE EXACTLY 15 cm, no other value
+  - Tick marks: every 1 cm; numbered labels at 0, 5, 10, 15 — bold, crisp, black
+  - Ruler is THIN (≈ 3–4% of image width) to maximize material display area
+  - Flush to the left border — no gap between ruler and image edge
+- BOTTOM RULER (X-axis): thin flat ruler flush against the BOTTOM EDGE of the image, horizontal
+  - Range: 0 cm (left) to 15 cm (right) — USE EXACTLY 15 cm, no other value
+  - Tick marks: every 1 cm; numbered labels at 0, 5, 10, 15 — bold, crisp, black
+  - Ruler is THIN (≈ 3–4% of image height) to maximize material display area
+  - Flush to the bottom border — no gap between ruler and image edge
+- Rulers meet at BOTTOM-LEFT corner (origin = 0,0)
+- Ruler style: flat measuring tape or thin metal/plastic ruler — modern, minimal, not bulky wooden
+${rollIcon}
 
 BACKGROUND: Pure white seamless.
 
-STYLE: Technical specification sheet. Clinical diagram — fabric data card with dual-axis scale rulers and grain direction annotations.
+CAMERA: Directly overhead, 90° top-down, perfectly level, zero perspective distortion.
 
-CRITICAL:
-1. BOTH rulers (horizontal X bottom + vertical Y left) FULLY visible — never cut off at any edge
-2. All cm numbers legible on both rulers
-3. Material texture clearly visible at center
-4. 90° overhead only — no perspective tilt
-5. L-shape ruler arrangement (horizontal at bottom, vertical at left)
-6. Grain corner box (if present) must be compact in bottom-right corner, clean and non-obstructive
+LIGHTING: Bright, flat, even — zero shadows, zero glare. All ruler numbers legible, material texture visible.
+
+STYLE: Professional textile technical specification card. Clean, minimal, clinical.
+
+CRITICAL RULES:
+1. Rulers show EXACTLY 0–15 cm — numbers 5, 10, 15 must be present and clearly legible. No invented scale.
+2. Both rulers THIN and flush to image edges — material occupies maximum space
+3. Material completely FLAT — no folds, no drape, no curled edges
+4. 90° overhead only — no perspective
+5. Roll icon (if present): illustration style, arrow only, no text, top-right corner, compact
 ${brandLine}
 ${noText}`
 }
