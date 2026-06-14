@@ -5,6 +5,7 @@ import {
   matchNccInPriceTable,
   findColorVariants,
   loadImageAsDataUrl,
+  applyImageTransform,
   SLOT_KEYS,
   BATCH_STATUS,
   STATUS_LABEL,
@@ -493,6 +494,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   // Phase 3: raw surface URL (ảnh gốc, không xử lý canvas) + chiều vân
   const [rawSurfaceUrl, setRawSurfaceUrl] = useState(null)
   const [fabricGrain, setFabricGrain] = useState(null) // 'ngang' | 'doc'
+  const [rotating, setRotating] = useState(false)
 
   // Khi file thay đổi: chỉ load sang data URL (1 lần encode) để gửi API
   useEffect(() => {
@@ -540,6 +542,18 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
+  async function handleRotate(dir) {
+    if (!rawSurfaceUrl || rotating) return
+    setRotating(true)
+    try {
+      const transform = dir === 'cw' ? 'rotate90' : 'rotate270'
+      const rotated = await applyImageTransform(rawSurfaceUrl, transform)
+      setRawSurfaceUrl(rotated)
+    } finally {
+      setRotating(false)
+    }
+  }
+
   function handleFile(f) {
     if (!f) return
     const objectUrl = URL.createObjectURL(f)
@@ -548,6 +562,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setRawSurfaceUrl(null)
     setFabricGrain(null)
     setScaleMetadata(null)
+    setRotating(false)
 
     const ncc = extractNccCode(f.name)
     const type = detectImageType(f.name)
@@ -598,6 +613,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     setRawSurfaceUrl(null); setFabricGrain(null)
     setScaleMetadata(null)
     setScope('all'); setSelectedNccs(null)
+    setRotating(false)
   }
 
   // Chọn lại: mở file dialog ngay, chỉ reset state khi user thật sự chọn file mới
@@ -646,10 +662,26 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
 
           {/* Cột trái: preview */}
           <div className="fit-preview-col">
-            <img src={previewUrl} alt={file.name} className="fit-preview-img" />
+            <img src={rawSurfaceUrl || previewUrl} alt={file.name} className="fit-preview-img" />
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <TypeChip type={imageType} />
               <button className="fit-reset-btn" onClick={handleChooseNew}>↺ Chọn lại</button>
+              {rawSurfaceUrl && (
+                <>
+                  <button
+                    className="fit-reset-btn"
+                    onClick={() => handleRotate('ccw')}
+                    disabled={rotating}
+                    title="Xoay ngược chiều kim đồng hồ 90°"
+                  >↺ 90°</button>
+                  <button
+                    className="fit-reset-btn"
+                    onClick={() => handleRotate('cw')}
+                    disabled={rotating}
+                    title="Xoay cùng chiều kim đồng hồ 90°"
+                  >↻ 90°</button>
+                </>
+              )}
               <input
                 ref={replaceFileInputRef}
                 type="file"

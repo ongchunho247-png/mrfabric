@@ -235,24 +235,33 @@ export function matchNccInPriceTable(nccCode, priceTable) {
 
 // ── Canvas image processing ───────────────────────────────────────────────────
 
-/** Load File → dataURL (compressed, max maxDim px on longest side) */
+/** Load File → dataURL (compressed, max maxDim px on longest side).
+ *  Uses createImageBitmap({ imageOrientation: 'from-image' }) to auto-apply
+ *  EXIF rotation so canvas output matches what the browser shows in <img>. */
 export function loadImageAsDataUrl(file, maxDim = 1200) {
+  function drawBitmap(source, resolve) {
+    const scale = Math.min(1, maxDim / Math.max(source.width, source.height))
+    const w = Math.round(source.width * scale)
+    const h = Math.round(source.height * scale)
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    canvas.getContext('2d').drawImage(source, 0, 0, w, h)
+    if (source.close) source.close()
+    resolve(canvas.toDataURL('image/jpeg', 0.88))
+  }
+
   return new Promise((resolve, reject) => {
-    const img = new Image()
-    const url = URL.createObjectURL(file)
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height))
-      const w = Math.round(img.width * scale)
-      const h = Math.round(img.height * scale)
-      const canvas = document.createElement('canvas')
-      canvas.width = w
-      canvas.height = h
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
-      resolve(canvas.toDataURL('image/jpeg', 0.88))
-    }
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không tải được ảnh')) }
-    img.src = url
+    createImageBitmap(file, { imageOrientation: 'from-image' })
+      .then((bitmap) => drawBitmap(bitmap, resolve))
+      .catch(() => {
+        // Fallback for browsers without createImageBitmap imageOrientation support
+        const img = new Image()
+        const url = URL.createObjectURL(file)
+        img.onload = () => { URL.revokeObjectURL(url); drawBitmap(img, resolve) }
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không tải được ảnh')) }
+        img.src = url
+      })
   })
 }
 
