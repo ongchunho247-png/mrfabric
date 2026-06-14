@@ -494,14 +494,10 @@ function NccPriceSection({ nccName, nccCode, nccCodes, entries, priceTable, onUp
                                       if (ce) {
                                         // Ưu tiên per-maNCC variant override để hiện đúng màu AI đã render
                                         const varHex = getVariantHex(e.maNCC)
-                                        // Khi có override: tên màu dùng nhóm gần nhất với HEX mới
-                                        const displayName = varHex
-                                          ? (findClosestColorEntry(varHex)?.name_en || ce.name_en)
-                                          : ce.name_en
                                         return (
                                           <span className="ptm-color">
                                             <span className="ptm-color-dot" style={{ background: varHex || ce.hex }} />
-                                            {displayName}
+                                            {ce.name_en}
                                             {varHex && <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--color-text-muted)', marginLeft: 4 }}>{varHex.toUpperCase()}</span>}
                                           </span>
                                         )
