@@ -492,12 +492,12 @@ function NccPriceSection({ nccName, nccCode, nccCodes, entries, priceTable, onUp
                                     {(() => {
                                       const ce = findColorEntry(e.nhomMau)
                                       if (ce) {
-                                        // Ưu tiên per-maNCC variant override để hiện đúng màu AI đã render
                                         const varHex = getVariantHex(e.maNCC)
+                                        const displayEntry = varHex ? (findClosestColorEntry(varHex) || ce) : ce
                                         return (
                                           <span className="ptm-color">
                                             <span className="ptm-color-dot" style={{ background: varHex || ce.hex }} />
-                                            {ce.name_en}
+                                            {displayEntry.name_en}
                                             {varHex && <span style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--color-text-muted)', marginLeft: 4 }}>{varHex.toUpperCase()}</span>}
                                           </span>
                                         )
