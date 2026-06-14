@@ -659,6 +659,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               />
             </div>
             <div className="fit-filename" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4, wordBreak: 'break-all' }}>{file.name}</div>
+            {showGenerator && <BudgetCard colorCount={activeVariants.length} />}
           </div>
 
           {/* Cột phải: NCC + thông tin + thước + xử lý */}
@@ -745,9 +746,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
           </div>
         </div>
       )}
-
-      {/* Budget tracker — luôn hiện khi có tool AI */}
-      {showGenerator && <BudgetCard colorCount={activeVariants.length} />}
 
       {/* Phase 5+6: MultiColorGenerator */}
       {showGenerator && (
