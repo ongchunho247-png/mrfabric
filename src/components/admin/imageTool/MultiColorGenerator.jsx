@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { SLOT_KEYS, downloadImageAs } from '../../../helpers/fabricImageHelpers'
 import { idbSave, idbHas, surfaceRefKey } from '../../../helpers/imageDB'
 import { recordGeneration } from '../../../helpers/budgetStorage'
+import { addRulerOverlay } from '../../../helpers/rulerOverlay'
 
 const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error' }
 
@@ -337,7 +338,11 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         })
         const data = await res.json()
         if (!res.ok || !data.ok) throw new Error(data.error || 'Lỗi tạo ảnh AI')
-        updateSlot(colorEntry.maNCC, slotKey, { status: S.DONE, imageUrl: data.imageUrl })
+        // Slot 4: vẽ thước L bằng Canvas (AI không thể render số chính xác)
+        const imageUrl = slotKey === 'slot_4' && data.imageUrl
+          ? await addRulerOverlay(data.imageUrl)
+          : data.imageUrl
+        updateSlot(colorEntry.maNCC, slotKey, { status: S.DONE, imageUrl })
       } catch (err) {
         updateSlot(colorEntry.maNCC, slotKey, { status: S.ERROR, error: err.message })
       }

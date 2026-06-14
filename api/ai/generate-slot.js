@@ -122,46 +122,26 @@ ${brandLine}
 ${noText}`
 }
 
-function slot4_technical_diagram(desc, colorLine, brandLine, noText, productType, grainLine) {
-  return `Technical fabric specification diagram — fabric sample with L-shaped scale rulers.
+function slot4_technical_diagram(desc, colorLine, brandLine, noText) {
+  // Thước sẽ được vẽ bằng Canvas ở frontend — prompt chỉ cần mặt vải phẳng full frame
+  return `Flat material surface photograph — overhead technical reference.
 
 MATERIAL: ${desc}
 ${colorLine}
 
-LAYOUT — follow exactly:
+SCENE: The material fills the ENTIRE image frame — 100% coverage.
+- Completely flat, taut surface — no folds, no drape, no curled edges
+- Sharp focus edge to edge
+- Surface texture and pattern faithfully reproduced from the reference
 
-RULERS:
-- LEFT RULER (Y-axis): white ruler strip running the FULL HEIGHT of the image, flush to the LEFT EDGE
-  · Pure white background, crisp sharp black tick marks and numbers
-  · Every 1 cm tick mark; NUMBER LABELS ONLY at: 0, 5, 10, 15 — absolutely no other numbers
-  · Numbers: large, bold, black, clearly legible — printed inside the white ruler strip
-  · Scale: 0 at bottom, 15 at top
-  · Ruler width: narrow — approx 6% of image width
-- BOTTOM RULER (X-axis): white ruler strip running the FULL WIDTH of the image, flush to the BOTTOM EDGE
-  · Pure white background, crisp sharp black tick marks and numbers
-  · Every 1 cm tick mark; NUMBER LABELS ONLY at: 0, 5, 10, 15 — absolutely no other numbers
-  · Numbers: large, bold, black, clearly legible — printed inside the white ruler strip
-  · Scale: 0 at left, 15 at right
-  · Ruler height: narrow — approx 6% of image height
-- Rulers meet at BOTTOM-LEFT corner (origin 0,0) — clean 90° joint
-- Both rulers extend edge-to-edge across the full image width/height with NO gaps
-
-FABRIC SAMPLE:
-- Fills ALL remaining space — occupies the TOP-RIGHT area after the two ruler strips (~88% of image)
-- A perfectly square, flat fabric swatch with a SHARP crisp border on all 4 sides (thin dark outline)
-- Fabric lies completely flat — no folds, no drape, no curl, no shadow at edges
-- Surface texture and pattern reproduced faithfully, evenly lit
-
-BACKGROUND: Pure white.
 CAMERA: 90° top-down, perfectly level, zero perspective distortion.
-LIGHTING: Bright, flat, shadowless — fabric surface evenly lit, ruler numbers fully legible.
+LIGHTING: Bright, flat, even — no shadows, no hotspots. Full surface evenly lit.
 
 CRITICAL:
-1. Ruler numbers at EXACTLY 0, 5, 10, 15 — bold, black, sharp — no other numbers
-2. Ruler strips extend full image edge, flush, no gaps
-3. Fabric swatch perfectly square with a clear sharp border
-4. No grain direction icons, no symbols, no labels on the fabric surface
-5. 90° overhead only, white background only
+1. Material fills 100% of frame — no white background, no borders, no gaps at any edge
+2. Completely flat — no folds, no drape
+3. 90° overhead only
+4. No rulers, no text, no annotations, no symbols anywhere
 ${brandLine}
 ${noText}`
 }
