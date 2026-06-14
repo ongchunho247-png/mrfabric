@@ -261,8 +261,37 @@ ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
 
-  // slot_5: nội thất ~2m — full room, ripple-wave curtains, refined interior
-  slot_5: (desc, colorLine, brandLine, noText) => `Luxury interior architecture photography — floor-to-ceiling curtains in a refined living space.
+  // slot_5: nội thất ~2m — full room, ripple-wave curtains, random room type
+  slot_5: (desc, colorLine, brandLine, noText) => {
+    const rooms = [
+      {
+        name: 'master bedroom',
+        desc: 'Elegant master bedroom. King-size bed with neutral linen bedding centered against the curtain wall. Bedside tables with warm lamp glow. Soft carpet or herringbone wood floor. Calm, serene atmosphere.',
+      },
+      {
+        name: 'living room',
+        desc: 'Refined living room. Low-profile sofa partially visible at one side, round coffee table with a low compact floral arrangement. Warm stone or light wood floor. Sophisticated, uncluttered.',
+      },
+      {
+        name: 'sitting room / reading nook',
+        desc: 'Intimate sitting room. A single elegant armchair and small side table visible. Soft rug on the floor. Warm ambient downlight. Quiet, literary atmosphere.',
+      },
+      {
+        name: 'dining room',
+        desc: 'Minimal dining room. A long dining table with 2–4 chairs partially visible. Pendant light hanging above table. Light stone or wood floor. Refined, calm.',
+      },
+      {
+        name: 'home office / study',
+        desc: 'Elegant home office. A clean desk with minimal items partially visible at one side. Bookshelf edge or artwork on side wall. Neutral palette. Focused, sophisticated.',
+      },
+      {
+        name: 'hotel suite / boutique hospitality',
+        desc: 'Boutique hotel suite. Minimal furniture — just a partial view of a chaise or bench at the foot of a bed. Very refined, aspirational, architectural.',
+      },
+    ]
+    const room = rooms[Math.floor(Math.random() * rooms.length)]
+
+    return `Luxury interior architecture photography — floor-to-ceiling curtains in a refined ${room.name}.
 
 FABRIC: ${desc}
 ${colorLine}
@@ -273,37 +302,36 @@ CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
   · Fullness ratio: 2.5× — fabric is 2.5 times the finished width, creating full, rounded waves
   · Wave shape: each wave is a smooth, round cylinder-like column — soft rounded crest and soft rounded trough
   · ALL waves IDENTICAL from left to right: same 7 cm width, same depth, same curvature — no variation
-  · Waves are PERMANENT (steam-set): they hold their shape rigidly from the header tape at top to the hem at bottom
+  · Waves are PERMANENT (steam-set): hold their shape rigidly from header tape at top to hem at bottom
   · Each wave column runs perfectly plumb vertical — straight from ceiling to floor without tapering or twisting
   · Fabric surface between wave peaks: smooth, taut — no bunching, no gathering, no secondary creases
-  · The overall curtain face looks like a row of identical soft cylinders standing side by side
-- HANG: Ceiling-mounted concealed track — fabric drops perfectly vertical, all waves in perfect alignment
-- HEM: Bottom hem exactly 1 cm above floor — precise, intentional, not pooling, not short
-- COVERAGE: Full wall-to-wall, floor-to-ceiling curtain — panels span the entire window/wall width
+- HANG: Ceiling-mounted concealed track — no visible rod or hardware
+- HEM: Bottom hem exactly 1 cm above floor — not pooling, not short
+- COVERAGE: Full wall-to-wall, floor-to-ceiling curtain panels
 
-ROOM — refined luxury interior (like a high-end residential project):
-- Large living space, high ceiling (2.8–3.2m)
-- Neutral warm palette: cream, taupe, warm white walls and floor
-- Light wood or warm stone flooring
-- Furniture PARTIALLY visible — low-profile sofa or chaise at one side, a round coffee table, possibly a low compact floral arrangement (NOT tall vases, NOT large plants)
+ROOM — ${room.name}:
+${room.desc}
+- High ceiling (2.8–3.2m), neutral warm palette: cream, taupe, warm white
+- Light wood, warm stone, or soft carpet flooring
 - Soft ambient lighting: warm downlights or natural light — no harsh overhead fluorescence
 - Calm, sophisticated atmosphere — not cluttered
 
 CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximately 1.2–1.5m height. Full curtain height and room breadth visible. Distance approximately 2 metres from curtain face.
 
-STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home showroom quality. Calm, architectural, aspirational.
+STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home quality. Calm, architectural, aspirational.
 
 CRITICAL:
-1. Waves MUST follow factory steam-set standard: 7 cm pitch, 2.5× fullness, round uniform columns top to bottom
-   WRONG: large irregular folds / pinch-pleat bunching / waves that taper or change shape toward the bottom
-   CORRECT: a mechanical row of identical soft cylinders — like sine wave columns, every wave the same
-2. Waves are IDENTICAL from the very top header tape to the very bottom hem — no variation anywhere
-3. Hem exactly 1 cm from floor — precise
-4. Curtain fabric color and surface texture clearly visible on the wave faces
-5. Interior refined and minimal — curtain wall is the hero, furniture supports only
+1. Waves MUST be uniform steam-set ripple fold: 7 cm pitch, 2.5× fullness, identical round columns top to bottom
+   WRONG: large irregular folds / pinch-pleat bunching / waves that vary in width or depth
+   CORRECT: a mechanical row of identical soft cylinders — like sine wave columns, edge to edge
+2. Waves identical from top header tape to bottom hem — no variation anywhere
+3. Hem exactly 1 cm from floor
+4. Curtain fabric color and texture clearly visible on the wave faces
+5. Interior matches the ${room.name} style — curtain wall is the hero
 ${SCALE_NOTE}
 ${brandLine}
-${noText}`,
+${noText}`
+  },
 }
 
 // ── FAB: Sofa / Vải bọc ──────────────────────────────────────────────────────
