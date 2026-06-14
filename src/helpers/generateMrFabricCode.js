@@ -13,14 +13,15 @@ function padNum(val, len) {
 }
 
 const PRODUCT_TYPE_RULES = [
-  ['rèm vải', 'CUR'],
+  ['sáo nhôm', 'AL'],
+  ['rèm vải',  'CUR'],
   ['rèm cuốn', 'BL'],
-  ['sáo gỗ', 'WB'],
-  ['roman', 'RM'],
-  ['tổ ong', 'HN'],
+  ['sáo gỗ',   'WB'],
+  ['roman',    'RM'],
+  ['tổ ong',   'HN'],
   ['cầu vồng', 'CB'],
-  ['trúc', 'BB'],
-  ['sofa', 'FAB'],
+  ['trúc',     'BB'],
+  ['sofa',     'FAB'],
 ]
 
 export function getProductTypeCode(productLineName) {

@@ -45,7 +45,7 @@ function compressDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, onSyncColor }) {
+export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, baseNcc, scaleMetadata, productType, slotTemplate, onSyncColor }) {
   const [colorData, setColorData] = useState(() => initColorData(colorVariants))
   const [globalRunning, setGlobalRunning] = useState(false)
   const [activeColor, setActiveColor] = useState(null) // maNCC đang generate
@@ -127,6 +127,7 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
             supplier: colorEntry.nhaCungCap || '',
             collection: colorEntry.tenCuon || '',
             scaleMetadata: scaleMetadata || null,
+            productType: productType || null,
             materialMetadata: {
               thanhPhan: colorEntry.thanhPhan || '',
               khoVai: colorEntry.khoVai || '',
@@ -266,6 +267,16 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
         <div className="fit-mcg-title">
           Tạo bộ ảnh theo màu
           <span className="fit-mcg-count">{colorVariants.length} màu</span>
+          {slotTemplate && (
+            <span className="fit-mcg-count" style={{ background: '#ede9fe', color: '#5b21b6' }}>
+              {slotTemplate.name}
+            </span>
+          )}
+          {!slotTemplate && productType && (
+            <span className="fit-mcg-count" style={{ background: '#fee2e2', color: '#991b1b' }}>
+              ⚠ Chưa có template cho {productType}
+            </span>
+          )}
         </div>
         <div className="fit-mcg-summary">
           {totalDone > 0 && (
@@ -385,10 +396,13 @@ export default function MultiColorGenerator({ colorVariants, baseSurfaceUrl, bas
               <div className="fit-slot-grid fit-color-grid">
                 {SLOT_KEYS.map((sk) => {
                   const slot = slots[sk.slot]
+                  // Use template label if available, fallback to SLOT_KEYS label
+                  const tplSlot = slotTemplate?.slots?.find((s) => s.key === sk.slot)
+                  const slotLabel = tplSlot?.label || sk.label
                   return (
                     <div key={sk.slot} className="fit-slot-item fit-color-cell">
                       <div className="fit-color-cell-hd">
-                        <span className="fit-slot-label">{sk.label}</span>
+                        <span className="fit-slot-label">{slotLabel}</span>
                         {slot.imageUrl && <span className="fit-aig-tag fit-aig-tag--ai">AI</span>}
                       </div>
 

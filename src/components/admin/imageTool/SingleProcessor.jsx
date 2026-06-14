@@ -15,6 +15,11 @@ import {
 } from '../../../helpers/fabricImageHelpers'
 import MultiColorGenerator from './MultiColorGenerator'
 import AIAssistPanel from './AIAssistPanel'
+import {
+  detectProductType,
+  getSlotTemplate,
+  ALL_PRODUCT_TYPES,
+} from '../../../helpers/productTypeHelpers'
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
@@ -44,6 +49,81 @@ function TypeChip({ type }) {
     : type.startsWith('slot') ? type.toUpperCase().replace('_', ' ')
     : 'Ảnh đơn'
   return <span className={`fit-type-chip ${cls}`}>{label}</span>
+}
+
+// ── Type & template detection card ───────────────────────────────────────────
+
+function TypeTemplateCard({ entry, productType, manualType, onSetManualType, slotTemplate }) {
+  const dongSanPham = entry?.dongSanPham || ''
+
+  return (
+    <div className="fit-card fit-type-tpl-card">
+      <div className="fit-card-title">Dòng sản phẩm & Template AI</div>
+
+      <InfoRow label="Dòng sản phẩm" value={dongSanPham || '—'} />
+
+      <div className="fit-type-tpl-row">
+        <span className="fit-info-label">Type nhận diện:</span>
+        {productType ? (
+          <span className="fit-type-badge fit-type-badge--ok">{productType}</span>
+        ) : (
+          <span className="fit-type-badge fit-type-badge--warn">Chưa nhận diện</span>
+        )}
+      </div>
+
+      {!productType && (
+        <div className="fit-phase-notice" style={{ color: '#92400e', background: '#fef3c7', borderLeftColor: '#f59e0b' }}>
+          ⚠ Không xác định được dòng sản phẩm từ &quot;{dongSanPham || '(trống)'}&quot;.
+          Chọn type thủ công để dùng đúng template AI.
+        </div>
+      )}
+
+      <div className="fit-type-tpl-row">
+        <span className="fit-info-label">Type dùng:</span>
+        <select
+          className="fit-type-select"
+          value={manualType || productType || ''}
+          onChange={(e) => onSetManualType(e.target.value || null)}
+        >
+          {!productType && <option value="">— Chọn thủ công —</option>}
+          {ALL_PRODUCT_TYPES.map((t) => (
+            <option key={t.code} value={t.code}>
+              {t.label} [{t.code}]{productType === t.code ? ' ✓ tự động' : ''}
+            </option>
+          ))}
+        </select>
+        {manualType && manualType !== productType && (
+          <button
+            className="fit-reset-btn"
+            onClick={() => onSetManualType(null)}
+            title="Trở về type tự động"
+          >
+            ✕ Bỏ
+          </button>
+        )}
+      </div>
+
+      {slotTemplate && (
+        <>
+          <div className="fit-type-tpl-name">{slotTemplate.name}</div>
+          <div className="fit-template-slots">
+            {slotTemplate.slots.map((s, i) => (
+              <div key={s.key} className="fit-template-slot">
+                <span className="fit-template-slot-num">{i + 1}</span>
+                <span className="fit-template-slot-label">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {!slotTemplate && (productType || manualType) && (
+        <div className="fit-phase-notice">
+          Chưa có template cho type &quot;{manualType || productType}&quot;.
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── Phase: Product info card ──────────────────────────────────────────────────
@@ -409,6 +489,15 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
   const [scope, setScope] = useState('all')
   const [selectedNccs, setSelectedNccs] = useState(null)
 
+  // Type detection
+  const [manualType, setManualType] = useState(null)
+  const productType = useMemo(
+    () => detectProductType(selectedEntry?.dongSanPham || ''),
+    [selectedEntry],
+  )
+  const activeType = manualType || productType
+  const slotTemplate = useMemo(() => getSlotTemplate(activeType), [activeType])
+
   // Tìm tất cả biến thể màu theo Nhóm biến thể
   const colorVariants = useMemo(() => {
     if (!selectedEntry || !priceTable) return []
@@ -449,9 +538,11 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
       const result = matchNccInPriceTable(ncc, priceTable)
       setMatchResult(result)
       setSelectedEntry(result.type === BATCH_STATUS.FOUND ? result.matches[0] : null)
+      setManualType(null)
     } else {
       setMatchResult({ type: BATCH_STATUS.INVALID, matches: [] })
       setSelectedEntry(null)
+      setManualType(null)
     }
   }
 
@@ -461,6 +552,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
     const result = matchNccInPriceTable(ncc, priceTable)
     setMatchResult(result)
     setSelectedEntry(result.type === BATCH_STATUS.FOUND ? result.matches[0] : null)
+    setManualType(null)
   }
 
   const onDragOver = useCallback((e) => { e.preventDefault(); setIsDrag(true) }, [])
@@ -599,6 +691,17 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
               </div>
             </div>
 
+            {/* Type detection & template */}
+            {selectedEntry && (
+              <TypeTemplateCard
+                entry={selectedEntry}
+                productType={productType}
+                manualType={manualType}
+                onSetManualType={setManualType}
+                slotTemplate={slotTemplate}
+              />
+            )}
+
             {/* Product info — extended */}
             <ProductInfoCard
               entry={selectedEntry}
@@ -717,6 +820,8 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
           baseSurfaceUrl={finalSurfaceUrl}
           baseNcc={selectedEntry?.maNCC}
           scaleMetadata={scaleMetadata}
+          productType={activeType}
+          slotTemplate={slotTemplate}
           onSyncColor={onSaveImages}
         />
       )}
