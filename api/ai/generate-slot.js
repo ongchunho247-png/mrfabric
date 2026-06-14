@@ -287,18 +287,19 @@ ${noText}`,
 FABRIC: ${desc}
 ${colorLine}
 
-CURTAIN SPECIFICATION (critical — follow exactly):
-- PLEAT STYLE: Ripple fold / S-fold pleat — this is the defining feature of the image
-  · Each wave is a gentle, round S-curve — soft rounded peaks, soft rounded valleys
-  · ALL waves are IDENTICAL: same width, same depth, same spacing from left to right
-  · Waves run perfectly straight top to bottom — each fold is a continuous vertical column
-  · Fabric between peaks hangs straight and smooth — no bunching, no gathering
-  · Wave amplitude: moderate and consistent — NOT dramatic large folds, NOT tight micro pleats
-  · Reference style: ceiling track ripple-fold system (Kvadrat, Hunter Douglas Wave, Silent Gliss Metropole)
-- HANG: Perfectly vertical drop from ceiling-mounted track — each ripple column plumb straight
-- HEM: Bottom of curtain exactly 1 cm above floor — NOT pooling, NOT short
-- COVERAGE: Curtain panels span full width of window wall, floor to ceiling
-- TRACK: Concealed ceiling track — no visible rod or hardware at top
+CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
+- PLEAT STYLE: Steam-set ripple fold (S-fold / wave pleat) — factory steam-pressed permanent waves
+  · Wave pitch: 7 cm — each complete wave cycle (peak to peak) is exactly 7 cm wide
+  · Fullness ratio: 2.5× — fabric is 2.5 times the finished width, creating full, rounded waves
+  · Wave shape: each wave is a smooth, round cylinder-like column — soft rounded crest and soft rounded trough
+  · ALL waves IDENTICAL from left to right: same 7 cm width, same depth, same curvature — no variation
+  · Waves are PERMANENT (steam-set): they hold their shape rigidly from the header tape at top to the hem at bottom
+  · Each wave column runs perfectly plumb vertical — straight from ceiling to floor without tapering or twisting
+  · Fabric surface between wave peaks: smooth, taut — no bunching, no gathering, no secondary creases
+  · The overall curtain face looks like a row of identical soft cylinders standing side by side
+- HANG: Ceiling-mounted concealed track — fabric drops perfectly vertical, all waves in perfect alignment
+- HEM: Bottom hem exactly 1 cm above floor — precise, intentional, not pooling, not short
+- COVERAGE: Full wall-to-wall, floor-to-ceiling curtain — panels span the entire window/wall width
 
 ROOM — refined luxury interior (like a high-end residential project):
 - Large living space, high ceiling (2.8–3.2m)
@@ -313,13 +314,13 @@ CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximat
 STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home showroom quality. Calm, architectural, aspirational.
 
 CRITICAL:
-1. RIPPLE FOLD waves MUST be uniform — every single wave is round, soft, identical width and depth
-   Do NOT produce: large uneven folds, pinch-pleat bunching, or irregular dramatic draping
-   The correct look: a row of equal, gentle S-curves like a sine wave — consistent from edge to edge
-2. Hem exactly 1 cm from floor — precise, intentional
-3. Curtain fabric color and any surface texture clearly visible at this distance
-4. Interior is refined and minimal — furniture supports, never dominates
-5. No sofa as the main subject — curtain wall is the hero
+1. Waves MUST follow factory steam-set standard: 7 cm pitch, 2.5× fullness, round uniform columns top to bottom
+   WRONG: large irregular folds / pinch-pleat bunching / waves that taper or change shape toward the bottom
+   CORRECT: a mechanical row of identical soft cylinders — like sine wave columns, every wave the same
+2. Waves are IDENTICAL from the very top header tape to the very bottom hem — no variation anywhere
+3. Hem exactly 1 cm from floor — precise
+4. Curtain fabric color and surface texture clearly visible on the wave faces
+5. Interior refined and minimal — curtain wall is the hero, furniture supports only
 ${SCALE_NOTE}
 ${brandLine}
 ${noText}`,
