@@ -298,16 +298,24 @@ ${colorLine}
 
 CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
 - PLEAT STYLE: Steam-set ripple fold — factory steam-pressed, permanent cylindrical wave columns
-  · Each wave is a VERTICAL CYLINDER running from ceiling to floor
-  · Wave pitch: 7 cm — peak to peak distance is 7 cm, consistent at every height
-  · Fullness: 2.5× — creating full, round wave profile
-  · CRITICAL WAVE SHAPE: The wave cross-section is IDENTICAL at the top, middle, and bottom of the curtain
-    - View from above: a fixed S-curve repeating every 7 cm — does NOT widen or narrow at any height
-    - The bottom hem edge is a STRAIGHT HORIZONTAL LINE — not wavy, not flared, not spreading
-    - Each wave column is like a perfect round cylinder: same width at floor level as at ceiling
-  · FORBIDDEN: waves that flare/spread/widen toward the bottom (like a cone or skirt shape)
-  · FORBIDDEN: waves that collapse, flatten, or taper toward the bottom
-  · ALL waves: smooth taut fabric between crests — no bunching, no secondary creases anywhere
+
+  WAVE GEOMETRY (absolute rule — zero deviation):
+  · Think CORRUGATED MATERIAL: a mechanical, perfectly regular, repeating wave pattern
+  · Wave pitch: 7 cm peak-to-peak — measured at ANY height, it is ALWAYS 7 cm
+  · Fullness: 2.5× — full, round, taut wave profile
+  · Every wave is a PERFECT VERTICAL CYLINDER: same diameter at the top, middle, and bottom — no change
+  · Slice the curtain at any horizontal height: the cross-section is ALWAYS the same S-curve, period always 7 cm
+  · The FIRST wave (leftmost) is IDENTICAL to the LAST wave (rightmost) and to every wave in between
+  · No wave differs from any other in width, depth, roundness, or shape — zero variation across the full width
+  · Smooth taut fabric between crests — no secondary creases, no bunching anywhere
+
+  FORBIDDEN (any of these = failed output):
+  · Waves that flare/widen toward the bottom (cone / skirt / A-line shape) → FORBIDDEN
+  · Waves that taper/narrow toward the bottom → FORBIDDEN
+  · Edge waves (leftmost or rightmost) that are flattened, narrower, or irregular → FORBIDDEN
+  · Any wave that changes shape, width, or curvature at any point along its height → FORBIDDEN
+  · Unequal spacing between any two adjacent wave crests → FORBIDDEN
+
 - HANG: Recessed ceiling pelmet box (hộp rèm âm trần):
   · Track is mounted INSIDE a recessed ceiling box (approx 20 cm deep)
   · Fabric hangs from inside the box and emerges cleanly below the plasterboard/drywall bottom face
@@ -315,7 +323,7 @@ CURTAIN SPECIFICATION — precise manufacturing standard (follow exactly):
   · Result: curtain flows seamlessly from the ceiling — completely concealed track, no visible rod or bracket
   · Ceiling line is clean and straight; fabric begins just below with a subtle shadow recess at top
 - HEM: Bottom hem EXACTLY 1 cm above floor — a clean straight horizontal gap between hem and floor
-  · Visible and consistent gap across the full curtain width
+  · All wave columns terminate at EXACTLY the same height — no wave longer or shorter than another
   · NOT pooling on floor, NOT touching floor, NOT visibly too short
 - COVERAGE: Full wall-to-wall, floor-to-ceiling curtain panels
 
@@ -331,12 +339,14 @@ CAMERA: Wide interior angle, 3/4 view from inside the room. Camera at approximat
 STYLE: High-end interior design — Fendi Casa, Minotti, Bentley Home quality. Calm, architectural, aspirational.
 
 CRITICAL:
-1. Wave columns are CYLINDRICAL — same width at ceiling AND at floor. They do NOT flare, spread, splay, or widen toward the bottom.
-   WRONG: waves that look like a cone or skirt (narrow at top, wide at bottom)
-   WRONG: bottom of curtain looks like irregular gathered fabric spreading on the floor
-   CORRECT: a row of perfect vertical cylinders — same 7 cm diameter from top header to bottom hem
-2. Bottom hem is a straight horizontal line 1 cm above floor — visible clean gap, consistent full width
-3. Waves are IDENTICAL top to bottom — no tapering, no flaring, no variation in width or depth at any height
+1. EVERY WAVE IS IDENTICAL — from the first (leftmost) to the last (rightmost), and from ceiling to floor.
+   CORRECT: viewed full-width, the curtain looks like a perfectly regular sine wave repeating every 7 cm across the entire width
+   WRONG: edge waves look different (flatter, narrower, or irregular) compared to center waves
+   WRONG: any two adjacent waves differ in width, depth, or curvature in any way
+2. Wave columns are CYLINDRICAL — same diameter at ceiling, waist, AND floor. NOT cone-shaped.
+   WRONG: narrow at top and wide at bottom (skirt), or any version where diameter changes with height
+   CORRECT: identical 7 cm width measured at header, mid-panel, AND hem — every wave, every height
+3. Bottom hem is a perfectly straight horizontal line 1 cm above floor — visible clean gap, consistent full width
 4. Curtain fabric color and texture clearly visible on the cylindrical wave surfaces
 5. Interior matches the ${room.name} style — curtain wall is the hero
 ${SCALE_NOTE}
