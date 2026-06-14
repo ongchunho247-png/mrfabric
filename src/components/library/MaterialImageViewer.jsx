@@ -4,9 +4,7 @@ import './MaterialImageViewer.css'
 const IMAGE_TABS = [
   { key: 'surface_texture', fallback: 'closeup',      label: 'Bề mặt' },
   { key: 'main_hand_image', fallback: null,            label: 'Cận chất liệu' },
-  { key: 'sofa_image',      fallback: 'sofaPillow',   label: 'Cầm nắm' },
   { key: 'curtain_image',   fallback: 'curtain',      label: 'Không gian gần' },
-  { key: 'ruler_image',     fallback: null,            label: 'Không gian tổng thể' },
   { key: 'detail_image',    fallback: 'renderTexture', label: 'Ruler tỉ lệ' },
 ]
 

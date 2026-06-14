@@ -6,11 +6,9 @@ const S = { IDLE: 'idle', GENERATING: 'generating', DONE: 'done', ERROR: 'error'
 const APP_SLOT_KEYS = SLOT_KEYS.filter((s) => s.slot !== 'slot_1') // slots 2–6
 
 const SLOT_PROGRESS = {
-  slot_1: 'Tạo bề mặt vải (chất lượng cao)…',
+  slot_1: 'Tạo bề mặt vải…',
   slot_2: 'Tạo ảnh cận chất liệu…',
-  slot_3: 'Tạo ảnh cầm nắm…',
   slot_4: 'Tạo ảnh không gian gần (~1m)…',
-  slot_5: 'Tạo ảnh không gian tổng thể (~2m)…',
   slot_6: 'Tạo ảnh ruler tỉ lệ…',
 }
 
