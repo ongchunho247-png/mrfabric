@@ -650,10 +650,7 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                 style={{ display: 'none' }}
               />
             </div>
-            <div className="fit-card">
-              <div className="fit-card-title">Tên file</div>
-              <div className="fit-filename">{file.name}</div>
-            </div>
+            <div className="fit-filename" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 4, wordBreak: 'break-all' }}>{file.name}</div>
           </div>
 
           {/* Cột phải: NCC + thông tin + thước + xử lý */}
@@ -709,47 +706,6 @@ export default function SingleProcessor({ priceTable, nccCodes, onSaveImages }) 
                 onSetManualType={setManualType}
                 slotTemplate={slotTemplate}
               />
-            )}
-
-            {/* Variant group list */}
-            {colorVariants.length > 1 && (
-              <div className="fit-card">
-                <div className="fit-card-title">
-                  Nhóm biến thể
-                  {nhomBienThe && <span className="fit-mcg-count">{nhomBienThe}</span>}
-                  <span className="fit-mcg-count" style={{ background: '#dbeafe', color: '#1e40af' }}>
-                    {colorVariants.length} màu
-                  </span>
-                </div>
-                <div className="fit-color-chips">
-                  {colorVariants.map((cv) => (
-                    <span
-                      key={cv.maNCC}
-                      className={`fit-color-chip${cv.maNCC === selectedEntry?.maNCC ? ' fit-color-chip--base' : ''}`}
-                      title={`Mã MrFabric: ${cv.maMrFabric || 'chưa có'}`}
-                    >
-                      {cv.nhomMau || cv.maNCC}
-                      <span style={{ fontSize: '0.65rem', opacity: 0.7, marginLeft: 3 }}>({cv.maNCC})</span>
-                    </span>
-                  ))}
-                </div>
-                {colorVariants.length > 1 && (
-                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: 4 }}>
-                    Nhóm: {nhomBienThe} — đọc từ cột "Nhóm biến thể"
-                  </div>
-                )}
-              </div>
-            )}
-
-            {colorVariants.length === 1 && nhomBienThe === '' && (
-              <div className="fit-card">
-                <div className="fit-card-title">Nhóm biến thể</div>
-                <div className="fit-phase-notice">
-                  Mã này chưa có cột "Nhóm biến thể" trong Bảng đơn giá.
-                  Sẽ xử lý chỉ mã hiện tại. Để tạo ảnh cho nhiều màu cùng lúc,
-                  hãy điền cột "Nhóm biến thể" trong Bảng đơn giá.
-                </div>
-              </div>
             )}
 
             {matchResult?.type === BATCH_STATUS.NOT_FOUND && (
